@@ -7,21 +7,34 @@ interface GameModeCardProps {
 
 export default function GameModeCard({ mode }: GameModeCardProps) {
   const isPlayable = mode.status === 'playable';
+
+  // Map mode.id to the correct image file name
+  const getImageSrc = (id: string) => {
+    switch (id) {
+      case 'mahjongg-solitaire': return '/images/solitaire_card.png';
+      case 'daily-puzzle': return '/images/daily_card.png';
+      case 'zen-mahjongg': return '/images/zen_card.png';
+      case 'time-attack': return '/images/time_attack_card.png';
+      case 'mahjong-connect': return '/images/connect_card.png';
+      case 'shisen-sho': return '/images/shisen_card.png';
+      case 'mahjongg-memory': return '/images/memory_card.png';
+      case 'real-mahjong': return '/images/real_mahjong_card.png';
+      case 'lobby': return '/images/lobby_card.png';
+      default: return '';
+    }
+  };
   
   return (
     <Link to={mode.path} className="game-card block group h-full flex flex-col">
-      <div className={`card-image relative overflow-hidden bg-gradient-to-br shrink-0 ${
-        mode.color === 'jade' ? 'from-jade-800 to-jade-950' : 
-        mode.color === 'gold' ? 'from-gold-dark to-ink-900' :
-        mode.color === 'vermilion' ? 'from-vermilion-dark to-ink-900' :
-        'from-ink-800 to-ink-950'
-      }`}>
-        <span className="text-6xl drop-shadow-lg transform transition-transform group-hover:scale-110 duration-500">
-          {mode.icon}
-        </span>
-        
-        {/* Subtle decorative overlay */}
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.1),transparent_50%)]" />
+      <div className="card-image relative overflow-hidden shrink-0 h-48 bg-ink-950 flex items-center justify-center">
+        <img 
+          src={getImageSrc(mode.id)} 
+          alt={mode.name} 
+          className="w-full h-full object-cover transition-transform group-hover:scale-110 duration-700 ease-out" 
+        />
+        {/* Subtle decorative vignette overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-ink-950 via-transparent to-transparent opacity-80" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,rgba(8,8,16,0.4)_100%)]" />
       </div>
       
       <div className="card-body flex-grow flex flex-col">
