@@ -52,8 +52,8 @@ export default function Header() {
         transition={{ duration: 0.5, ease: 'easeOut' }}
       >
         <div className="container-wide flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-3 group">
-            <img src="/logo.png" alt="Nine Gates Mahjong" className="h-12 w-auto object-contain transition-transform group-hover:scale-105 duration-300 brightness-0 invert" />
+          <Link to="/" className="flex items-center gap-3 group bg-ivory/95 px-4 py-1 rounded-full border border-gold/30 shadow-md transition-all duration-300 hover:bg-ivory-light hover:border-gold/50">
+            <img src="/logo.png" alt="Nine Gates Mahjong" className="h-9 w-auto object-contain transition-transform group-hover:scale-102 duration-300" />
           </Link>
 
           <nav className="hidden lg:flex items-center gap-8">
