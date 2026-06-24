@@ -53,7 +53,7 @@ export default function Header() {
       >
         <div className="container-wide flex items-center justify-between">
           <Link to="/" className="flex items-center gap-3 group transition-all duration-300">
-            <img src="/logo.png" alt="Nine Gates Mahjong" className="h-10 md:h-12 w-auto object-contain transition-transform group-hover:scale-[1.03] duration-300 filter drop-shadow-[0_2px_12px_rgba(212,175,55,0.25)]" />
+            <img src="/logo.png" alt="Nine Gates Mahjong" className="h-9 md:h-10 w-auto object-contain rounded-md border border-gold/30 shadow-md transition-transform group-hover:scale-[1.02] duration-300" />
           </Link>
 
           <nav className="hidden lg:flex items-center gap-8">

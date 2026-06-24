@@ -141,30 +141,52 @@ export default function HomePage() {
             className="grid grid-cols-1 md:grid-cols-2 gap-8"
           >
             {/* Casual Path */}
-            <motion.div variants={fadeUpVar} className="lacquer-panel group">
-              <div className="text-5xl mb-6">🀄</div>
-              <h2 className="font-display text-3xl text-gold mb-4">Casual Mahjongg</h2>
-              <p className="text-ink-200 text-lg mb-8">
-                Relax with classic tile-matching puzzles. Perfect for unwinding, testing your speed, or solving a fresh challenge every day.
-              </p>
-              <div className="flex flex-wrap gap-3">
-                <Link to="/mahjongg-solitaire" className="btn-secondary text-sm">Solitaire</Link>
-                <Link to="/daily" className="btn-secondary text-sm border-jade-500 text-jade-400 hover:bg-jade-900/30 hover:text-jade-300">Daily Puzzle</Link>
-                <Link to="/zen-mahjongg" className="btn-secondary text-sm">Zen Mode</Link>
+            <motion.div variants={fadeUpVar} className="lacquer-panel group overflow-hidden flex flex-col h-full !p-0">
+              <div className="relative overflow-hidden h-60 bg-ink-950 flex items-center justify-center shrink-0">
+                <img 
+                  src="/images/casual_path.png" 
+                  alt="Casual Mahjongg" 
+                  className="w-full h-full object-cover transition-transform group-hover:scale-105 duration-700 ease-out" 
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-ink-950 via-transparent to-transparent opacity-85" />
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,rgba(8,8,16,0.4)_100%)]" />
+              </div>
+              
+              <div className="p-8 flex-grow flex flex-col">
+                <h2 className="font-display text-3xl text-gold mb-4">Casual Mahjongg</h2>
+                <p className="text-ink-200 text-lg mb-8 flex-grow">
+                  Relax with classic tile-matching puzzles. Perfect for unwinding, testing your speed, or solving a fresh challenge every day.
+                </p>
+                <div className="flex flex-wrap gap-3 mt-auto">
+                  <Link to="/mahjongg-solitaire" className="btn-secondary text-sm">Solitaire</Link>
+                  <Link to="/daily" className="btn-secondary text-sm border-jade-500 text-jade-400 hover:bg-jade-900/30 hover:text-jade-300">Daily Puzzle</Link>
+                  <Link to="/zen-mahjongg" className="btn-secondary text-sm">Zen Mode</Link>
+                </div>
               </div>
             </motion.div>
 
             {/* Real Mahjong Path */}
-            <motion.div variants={fadeUpVar} className="lacquer-panel group bg-gradient-to-br from-lacquer to-ink-900">
-              <div className="text-5xl mb-6">🎲</div>
-              <h2 className="font-display text-3xl text-ivory mb-4">Real Mahjong</h2>
-              <p className="text-ink-200 text-lg mb-8">
-                Learn the authentic 4-player table game. Master strategy, declare melds, and play against AI or real opponents in global variants.
-              </p>
-              <div className="flex flex-wrap gap-3">
-                <Link to="/real-mahjong" className="btn-vermilion text-sm">Play vs AI</Link>
-                <Link to="/variants" className="btn-secondary text-sm border-gold text-gold">Explore Variants</Link>
-                <Link to="/learn" className="btn-secondary text-sm border-ink-500 text-ink-300">How to Play</Link>
+            <motion.div variants={fadeUpVar} className="lacquer-panel group bg-gradient-to-br from-lacquer to-ink-900 overflow-hidden flex flex-col h-full !p-0">
+              <div className="relative overflow-hidden h-60 bg-ink-950 flex items-center justify-center shrink-0">
+                <img 
+                  src="/images/real_path.png" 
+                  alt="Real Mahjong" 
+                  className="w-full h-full object-cover transition-transform group-hover:scale-105 duration-700 ease-out" 
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-ink-950 via-transparent to-transparent opacity-85" />
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,rgba(8,8,16,0.4)_100%)]" />
+              </div>
+              
+              <div className="p-8 flex-grow flex flex-col">
+                <h2 className="font-display text-3xl text-ivory mb-4">Real Mahjong</h2>
+                <p className="text-ink-200 text-lg mb-8 flex-grow">
+                  Learn the authentic 4-player table game. Master strategy, declare melds, and play against AI or real opponents in global variants.
+                </p>
+                <div className="flex flex-wrap gap-3 mt-auto">
+                  <Link to="/real-mahjong" className="btn-vermilion text-sm">Play vs AI</Link>
+                  <Link to="/variants" className="btn-secondary text-sm border-gold text-gold">Explore Variants</Link>
+                  <Link to="/learn" className="btn-secondary text-sm border-ink-500 text-ink-300">How to Play</Link>
+                </div>
               </div>
             </motion.div>
           </motion.div>
