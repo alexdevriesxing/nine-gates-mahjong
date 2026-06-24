@@ -22,6 +22,32 @@ export default function SEOHead({
 }: SEOHeadProps) {
   const finalCanonical = canonical || SITE_DOMAIN;
   
+  const baseSchema = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebSite",
+        "@id": "https://ninegatesmahjong.com/#website",
+        "url": "https://ninegatesmahjong.com/",
+        "name": "Nine Gates Mahjong",
+        "description": "The definitive online Mahjong portal for casual and serious players. Play Solitaire, Riichi, MCR, and more.",
+        "publisher": {
+          "@id": "https://ninegatesmahjong.com/#organization"
+        }
+      },
+      {
+        "@type": "Organization",
+        "@id": "https://ninegatesmahjong.com/#organization",
+        "name": "Nine Gates Mahjong",
+        "url": "https://ninegatesmahjong.com/",
+        "logo": {
+          "@type": "ImageObject",
+          "url": "https://ninegatesmahjong.com/logo.png"
+        }
+      }
+    ]
+  };
+  
   return (
     <Helmet>
       <title>{title}</title>
@@ -32,6 +58,10 @@ export default function SEOHead({
       <meta property="og:title" content={ogTitle || title} />
       <meta property="og:description" content={ogDescription || description} />
       {ogImage && <meta property="og:image" content={ogImage} />}
+      
+      <script type="application/ld+json">
+        {JSON.stringify(baseSchema)}
+      </script>
       
       {jsonLd && (
         <script type="application/ld+json">
