@@ -35,13 +35,6 @@ export class SolitaireGameScene extends Phaser.Scene {
 
     // Load background (the hero image the user just created)
     this.load.image('bg', '/hero-bg.jpg');
-    
-    // Particles for match effects
-    const g = this.add.graphics();
-    g.fillStyle(0xFFD700, 1);
-    g.fillCircle(4, 4, 4);
-    g.generateTexture('particle_gold', 8, 8);
-    g.destroy();
   }
 
   create() {
@@ -52,6 +45,15 @@ export class SolitaireGameScene extends Phaser.Scene {
     bg.setDisplaySize(width, height);
     bg.setAlpha(0.4); // Darken for playability
     bg.setTint(0x444444);
+
+    // Particles for match effects (moved from preload to prevent crashes)
+    if (!this.textures.exists('particle_gold')) {
+      const g = this.add.graphics();
+      g.fillStyle(0xFFD700, 1);
+      g.fillCircle(4, 4, 4);
+      g.generateTexture('particle_gold', 8, 8);
+      g.destroy();
+    }
 
     this.engine = new SolitaireEngine();
     const tiles = this.engine.getTiles();

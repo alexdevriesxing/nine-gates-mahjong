@@ -9,12 +9,13 @@ interface PhaserGameProps {
 
 export default function PhaserGame({ mode = 'solitaire' }: PhaserGameProps) {
   const gameRef = useRef<Phaser.Game | null>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (!gameRef.current) {
+    if (containerRef.current && !gameRef.current) {
       const config: Phaser.Types.Core.GameConfig = {
         type: Phaser.AUTO,
-        parent: 'phaser-container',
+        parent: containerRef.current,
         width: 1200,
         height: 800,
         backgroundColor: 'transparent',
@@ -40,5 +41,10 @@ export default function PhaserGame({ mode = 'solitaire' }: PhaserGameProps) {
     };
   }, []);
 
-  return <div id="phaser-container" className="w-full h-[800px] max-h-[80vh] rounded-2xl overflow-hidden border border-gold/20 shadow-2xl bg-ink-950/50 backdrop-blur-md" />;
+  return (
+    <div 
+      ref={containerRef} 
+      className="w-full h-[800px] max-h-[80vh] rounded-2xl overflow-hidden border border-gold/20 shadow-2xl bg-ink-950/50 backdrop-blur-md" 
+    />
+  );
 }
