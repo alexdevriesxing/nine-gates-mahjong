@@ -1,5 +1,5 @@
-import { BrowserRouter, Routes, Route, ScrollRestoration } from 'react-router-dom';
-import { lazy, Suspense } from 'react';
+import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
+import { lazy, Suspense, useEffect } from 'react';
 import { HelmetProvider } from 'react-helmet-async';
 import { AuthProvider } from './app/context/AuthContext';
 import Layout from './app/components/Layout';
@@ -48,6 +48,19 @@ function SuspensePage({ children }: { children: React.ReactNode }) {
 }
 
 // =====================================================
+// Scroll to Top on route change
+// =====================================================
+function ScrollToTop() {
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+
+  return null;
+}
+
+// =====================================================
 // App — Root component with routing, auth, and providers
 // =====================================================
 export default function App() {
@@ -55,7 +68,7 @@ export default function App() {
     <HelmetProvider>
       <AuthProvider>
         <BrowserRouter>
-          <ScrollRestoration />
+          <ScrollToTop />
           <Routes>
             <Route element={<Layout />}>
               {/* Homepage */}
