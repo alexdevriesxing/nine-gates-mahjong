@@ -53,7 +53,7 @@ export default function Header() {
       >
         <div className="container-wide flex items-center justify-between">
           <Link to="/" className="flex items-center gap-3 group">
-            <img src="/logo.png" alt="Nine Gates Mahjong" className="h-12 w-auto object-contain transition-transform group-hover:scale-105 duration-300" />
+            <img src="/logo.png" alt="Nine Gates Mahjong" className="h-12 w-auto object-contain transition-transform group-hover:scale-105 duration-300 brightness-0 invert" />
           </Link>
 
           <nav className="hidden lg:flex items-center gap-8">

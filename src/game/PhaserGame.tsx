@@ -12,28 +12,37 @@ export default function PhaserGame({ mode = 'solitaire' }: PhaserGameProps) {
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    let timer: any;
+
     if (containerRef.current && !gameRef.current) {
-      const config: Phaser.Types.Core.GameConfig = {
-        type: Phaser.AUTO,
-        parent: containerRef.current,
-        width: 1200,
-        height: 800,
-        backgroundColor: 'transparent',
-        scale: {
-          mode: Phaser.Scale.FIT,
-          autoCenter: Phaser.Scale.CENTER_BOTH
-        },
-        scene: [SolitaireGameScene]
-      };
+      // Delay initialization slightly to ensure the browser has completed layout reflow
+      // and containerRef.current has a non-zero width/height.
+      timer = setTimeout(() => {
+        if (!containerRef.current || gameRef.current) return;
 
-      gameRef.current = new Phaser.Game(config);
+        const config: Phaser.Types.Core.GameConfig = {
+          type: Phaser.AUTO,
+          parent: containerRef.current,
+          width: 1200,
+          height: 800,
+          backgroundColor: 'transparent',
+          scale: {
+            mode: Phaser.Scale.FIT,
+            autoCenter: Phaser.Scale.CENTER_BOTH
+          },
+          scene: [SolitaireGameScene]
+        };
 
-      gameRef.current.events.on('ready', () => {
-        eventBus.emit('scene-awake');
-      });
+        gameRef.current = new Phaser.Game(config);
+
+        gameRef.current.events.on('ready', () => {
+          eventBus.emit('scene-awake');
+        });
+      }, 150);
     }
 
     return () => {
+      clearTimeout(timer);
       if (gameRef.current) {
         gameRef.current.destroy(true);
         gameRef.current = null;

@@ -93,6 +93,16 @@ export class SolitaireGameScene extends Phaser.Scene {
       }
     });
 
+    // Listen for texture load errors
+    this.textures.on('onerror', (key: string) => {
+      console.error(`Phaser base64 texture load error for key: ${key}`);
+      this.add.text(width / 2, height / 2 + 50, `Error loading asset: ${key}`, {
+        fontFamily: 'Cinzel, Georgia, serif',
+        fontSize: '18px',
+        color: '#ff4444'
+      }).setOrigin(0.5);
+    });
+
     // Check immediately in case they are already cached/loaded
     checkAllLoaded();
   }
