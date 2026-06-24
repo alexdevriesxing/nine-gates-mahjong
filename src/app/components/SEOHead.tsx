@@ -42,7 +42,7 @@ export default function SEOHead({
         "url": "https://ninegatesmahjong.com/",
         "logo": {
           "@type": "ImageObject",
-          "url": "https://ninegatesmahjong.com/logo.png"
+          "url": "https://ninegatesmahjong.com/logo_white.png"
         }
       }
     ]
