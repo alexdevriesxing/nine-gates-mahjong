@@ -12,6 +12,8 @@ export class SolitaireGameScene extends Phaser.Scene {
     super('SolitaireGameScene');
   }
 
+  private loadingText!: Phaser.GameObjects.Text;
+
   preload() {
     // Generate all necessary SVG textures programmatically
     const suits = ['bamboo', 'circles', 'characters'];
@@ -22,8 +24,8 @@ export class SolitaireGameScene extends Phaser.Scene {
       const key = `tile_${suit}_${rank}`;
       if (!this.textures.exists(key)) {
         const uri = TileRenderer.generateTileURI(suit as any, rank);
-        // Using image loader with data URI
-        this.load.image(key, uri);
+        // Using addBase64 to inject texture directly and avoid XHR/fetch failures in loader
+        this.textures.addBase64(key, uri);
       }
     };
 
@@ -46,7 +48,7 @@ export class SolitaireGameScene extends Phaser.Scene {
     bg.setAlpha(0.4); // Darken for playability
     bg.setTint(0x444444);
 
-    // Particles for match effects (moved from preload to prevent crashes)
+    // Particles for match effects
     if (!this.textures.exists('particle_gold')) {
       const g = this.add.graphics();
       g.fillStyle(0xFFD700, 1);
@@ -55,6 +57,48 @@ export class SolitaireGameScene extends Phaser.Scene {
       g.destroy();
     }
 
+    // List of tile texture keys we need to verify are loaded
+    const keys: string[] = [];
+    const suits = ['bamboo', 'circles', 'characters'];
+    const winds = ['east', 'south', 'west', 'north'];
+    const dragons = ['red', 'green', 'white'];
+    
+    suits.forEach(s => {
+      for(let i=1; i<=9; i++) keys.push(`tile_${s}_${i}`);
+    });
+    winds.forEach(w => keys.push(`tile_winds_${w}`));
+    dragons.forEach(d => keys.push(`tile_dragons_${d}`));
+
+    // Add a loading feedback message while textures assemble in background
+    this.loadingText = this.add.text(width / 2, height / 2, 'Loading tile assets...', {
+      fontFamily: 'Cinzel, Georgia, serif',
+      fontSize: '24px',
+      color: '#c4a35a'
+    }).setOrigin(0.5);
+
+    const checkAllLoaded = () => {
+      const allLoaded = keys.every(key => this.textures.exists(key));
+      if (allLoaded) {
+        if (this.loadingText) {
+          this.loadingText.destroy();
+        }
+        this.buildGameBoard();
+      }
+    };
+
+    // Listen to texture additions and check if all have arrived
+    this.textures.on('addtexture', (key: string) => {
+      if (keys.includes(key)) {
+        checkAllLoaded();
+      }
+    });
+
+    // Check immediately in case they are already cached/loaded
+    checkAllLoaded();
+  }
+
+  private buildGameBoard() {
+    const { width, height } = this.scale;
     this.engine = new SolitaireEngine();
     const tiles = this.engine.getTiles();
 
