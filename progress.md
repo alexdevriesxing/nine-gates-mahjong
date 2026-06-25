@@ -30,4 +30,5 @@ Original prompt: I have tried to build this with google antigravity but it seems
 - Applied the remote D1 migration and deployed the Worker, static assets, Durable Object, and database bindings to Cloudflare.
 - Production testing exposed Cloudflare Web Crypto's 100,000-iteration PBKDF2 limit; reduced the password hash iteration count to the supported maximum, redeployed, and revalidated production auth.
 - Production Workers URL passes route/viewports, variants, auth, and two-player multiplayer smoke tests.
+- Bound `ninegatesmahjong.com/*` and `www.ninegatesmahjong.com/*` to the Worker; the canonical production domain passes the same route/viewports, variant, auth, and multiplayer checks.
 - Remaining release work from the original prompt: confirm final Adsterra production keys/legal configuration and merge the draft PR after review.
