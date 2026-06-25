@@ -3,6 +3,8 @@ import { motion } from 'framer-motion';
 import SEOHead from '../components/SEOHead';
 import GameModeCard from '../components/GameModeCard';
 import { GAME_MODES } from '@shared/constants';
+import AdSlot from '../components/AdSlot';
+import NativeBanner from '../components/NativeBanner';
 
 const containerVar = {
   hidden: {},
@@ -62,6 +64,12 @@ export default function PlayHub() {
           </motion.p>
         </div>
 
+        {/* Top responsive ad */}
+        <div className="flex justify-center items-center mb-12 w-full">
+          <AdSlot width={728} height={90} className="hidden md:flex" />
+          <AdSlot width={320} height={50} className="flex md:hidden" />
+        </div>
+
         {/* Filter Tabs */}
         <div className="flex justify-start md:justify-center overflow-x-auto pb-4 mb-12 scrollbar-none border-b border-gold/10 gap-2">
           {filterTabs.map((tab) => {
@@ -96,6 +104,11 @@ export default function PlayHub() {
             </motion.div>
           ))}
         </motion.div>
+
+        {/* Bottom native ad */}
+        <div className="mt-16" data-gaio-section="ads">
+          <NativeBanner />
+        </div>
       </div>
     </>
   );

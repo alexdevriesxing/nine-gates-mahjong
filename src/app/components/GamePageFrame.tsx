@@ -35,9 +35,10 @@ export default function GamePageFrame({
           offers: { '@type': 'Offer', price: 0, priceCurrency: 'USD' },
         }}
       />
-      <div className="game-page">
-        <div className="game-page__mobile-ad">
-          <AdSlot width={320} height={50} />
+      <div className="game-page" data-gaio-container="true">
+        <div className="game-page__mobile-ad flex justify-center items-center">
+          <AdSlot width={468} height={60} className="hidden sm:flex" />
+          <AdSlot width={320} height={50} className="flex sm:hidden" />
         </div>
         <div className="game-page__layout">
           <div className="game-page__rail game-page__rail--left">
@@ -45,8 +46,9 @@ export default function GamePageFrame({
           </div>
           <main className="game-page__main">
             {children}
-            <div className="game-page__leaderboard-ad">
-              <AdSlot width={728} height={90} />
+            <div className="flex justify-center items-center my-6 w-full">
+              <AdSlot width={728} height={90} className="hidden md:flex" />
+              <AdSlot width={300} height={250} className="flex md:hidden" />
             </div>
             {afterGame}
           </main>

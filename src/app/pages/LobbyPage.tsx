@@ -278,7 +278,10 @@ export default function LobbyPage() {
         )}
 
         {error && <p className="lobby-error" role="alert">{error}</p>}
-        <div className="lobby-ad"><AdSlot width={728} height={90} /></div>
+        <div className="lobby-ad flex justify-center items-center mt-12 w-full" data-gaio-section="ads">
+          <AdSlot width={728} height={90} className="hidden md:flex" />
+          <AdSlot width={320} height={50} className="flex md:hidden" />
+        </div>
       </div>
     </>
   );

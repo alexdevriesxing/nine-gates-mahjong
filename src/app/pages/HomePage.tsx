@@ -7,6 +7,7 @@ import VariantCard from '../components/VariantCard';
 import { GAME_MODES, MAHJONG_VARIANTS, AI_CHARACTERS } from '@shared/constants';
 import { useAuth } from '../context/AuthContext';
 import AdSlot from '../components/AdSlot';
+import NativeBanner from '../components/NativeBanner';
 
 // Animation variant for staggered reveals
 const fadeUpVar = {
@@ -194,6 +195,11 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* Mid-page ad section */}
+      <div className="container-wide py-4 flex justify-center items-center">
+        <NativeBanner />
+      </div>
+
       {/* FEATURED GAME MODES */}
       <section className="py-24 bg-ink-900/30" ref={modesRef}>
         <div className="container-wide">
@@ -319,8 +325,9 @@ export default function HomePage() {
         </div>
       </section>
 
-      <div className="container-wide py-8">
-        <AdSlot width={728} height={90} />
+      <div className="container-wide py-8 flex justify-center items-center">
+        <AdSlot width={728} height={90} className="hidden md:flex" />
+        <AdSlot width={320} height={50} className="flex md:hidden" />
       </div>
 
       {/* FINAL CTA */}

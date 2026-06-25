@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import SEOHead from './SEOHead';
 import AdSlot from './AdSlot';
+import NativeBanner from './NativeBanner';
 import { EDITORIAL } from '../content/editorial';
 import VariantMahjongTrainer, { type VariantRuleset } from '../../game/react/VariantMahjongTrainer';
 
@@ -35,7 +36,7 @@ export default function EditorialPage({ slug }: { slug: string }) {
         ogImage="https://ninegatesmahjong.com/hero-bg.jpg"
         jsonLd={faqSchema}
       />
-      <main className="editorial-page">
+      <main className="editorial-page" data-gaio-container="true">
         {ruleset && (
           <div className="editorial-page__trainer">
             <VariantMahjongTrainer ruleset={ruleset} />
@@ -47,13 +48,24 @@ export default function EditorialPage({ slug }: { slug: string }) {
             <h1>{entry.title}</h1>
             <p>{entry.summary}</p>
           </header>
-          <AdSlot width={728} height={90} />
-          {entry.sections.map((section) => (
-            <section key={section.heading}>
-              <h2>{section.heading}</h2>
-              {section.paragraphs.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}
-              {section.bullets && <ul>{section.bullets.map((bullet) => <li key={bullet}>{bullet}</li>)}</ul>}
-            </section>
+          <div className="flex justify-center items-center my-6 w-full">
+            <AdSlot width={728} height={90} className="hidden md:flex" />
+            <AdSlot width={320} height={50} className="flex md:hidden" />
+          </div>
+          {entry.sections.map((section, index) => (
+            <div key={section.heading}>
+              <section>
+                <h2>{section.heading}</h2>
+                {section.paragraphs.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}
+                {section.bullets && <ul>{section.bullets.map((bullet) => <li key={bullet}>{bullet}</li>)}</ul>}
+              </section>
+              {index === 0 && <NativeBanner />}
+              {index === 2 && (
+                <div className="flex justify-center items-center my-6 w-full">
+                  <AdSlot width={300} height={250} />
+                </div>
+              )}
+            </div>
           ))}
           <section>
             <h2>Frequently asked questions</h2>
