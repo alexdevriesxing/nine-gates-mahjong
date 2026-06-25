@@ -9,6 +9,7 @@ interface SEOHeadProps {
   ogDescription?: string;
   ogImage?: string;
   jsonLd?: Record<string, unknown>;
+  noIndex?: boolean;
 }
 
 export default function SEOHead({
@@ -18,7 +19,8 @@ export default function SEOHead({
   ogTitle,
   ogDescription,
   ogImage,
-  jsonLd
+  jsonLd,
+  noIndex = false,
 }: SEOHeadProps) {
   const finalCanonical = canonical || SITE_DOMAIN;
   
@@ -53,7 +55,7 @@ export default function SEOHead({
       <title>{title}</title>
       <meta name="description" content={description} />
       <link rel="canonical" href={finalCanonical} />
-      <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1" />
+      <meta name="robots" content={noIndex ? 'noindex,follow' : 'index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1'} />
       
       <meta property="og:site_name" content={SITE_NAME} />
       <meta property="og:title" content={ogTitle || title} />

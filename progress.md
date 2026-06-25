@@ -6,8 +6,8 @@ Original prompt: I have tried to build this with google antigravity but it seems
 - GitHub CLI and Cloudflare Wrangler are authenticated.
 - Repository is a React 19 + Vite 6 + Phaser 4 frontend with a Cloudflare Worker stub.
 - Policy decision: optimize ads and consent UX, but do not implement forced consent or remove legally required opt-outs.
-- TODO: reproduce current game loading failures in a real browser.
-- TODO: inspect game engine, page routing, worker, ads, SEO, responsive layout, and multiplayer implementation.
+- Completed: reproduced and fixed the game loading failures in a real browser.
+- Completed: inspected the game engine, page routing, worker, ads, SEO, responsive layout, and multiplayer implementation.
 
 ## 2026-06-25
 
@@ -32,3 +32,17 @@ Original prompt: I have tried to build this with google antigravity but it seems
 - Production Workers URL passes route/viewports, variants, auth, and two-player multiplayer smoke tests.
 - Bound `ninegatesmahjong.com/*` and `www.ninegatesmahjong.com/*` to the Worker; the canonical production domain passes the same route/viewports, variant, auth, and multiplayer checks.
 - Remaining release work from the original prompt: confirm final Adsterra production keys/legal configuration and merge the draft PR after review.
+- Final gap analysis removed the remaining false or incomplete interactions:
+  - persisted locale direction now restores correctly after reload;
+  - registered profiles now trust the server session instead of stale browser storage;
+  - avatar updates report save success or failure;
+  - account forms prevent duplicate submissions;
+  - unknown routes render an index-safe 404 page;
+  - ranking tabs now expose category-specific records;
+  - multiplayer now has authoritative room chat, readiness enforcement, room-code feedback, leave/reconnect controls, and disconnect AI takeover;
+  - the short-viewport mobile menu is scrollable;
+  - duplicate static and dynamic SEO metadata was removed;
+  - legal and gameplay copy was aligned with the implemented behavior.
+- Removed the obsolete page generator that could recreate under-construction placeholders.
+- Added durable browser regression suites for controls, feature flows, multiplayer UI, all routes/viewports, and the complete 13-game visual gallery.
+- Final local matrix passes: production build, game logic, seven original game completions, all controls, five variant trainers, 33 routes across desktop/tablet/mobile, account lifecycle, authoritative multiplayer, and multiplayer UI.

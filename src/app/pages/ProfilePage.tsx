@@ -15,11 +15,21 @@ const AVATAR_OPTIONS = [
 export default function ProfilePage() {
   const { user, guestSession, isGuest, updateAvatar, displayName, avatarTile } = useAuth();
   const [successMsg, setSuccessMsg] = useState('');
+  const [errorMsg, setErrorMsg] = useState('');
+  const [savingAvatar, setSavingAvatar] = useState('');
 
-  const handleSelectAvatar = (tile: string) => {
-    updateAvatar(tile);
-    setSuccessMsg('Avatar updated successfully!');
-    setTimeout(() => setSuccessMsg(''), 3000);
+  const handleSelectAvatar = async (tile: string) => {
+    setErrorMsg('');
+    setSavingAvatar(tile);
+    try {
+      await updateAvatar(tile);
+      setSuccessMsg('Avatar updated successfully!');
+      setTimeout(() => setSuccessMsg(''), 3000);
+    } catch (reason) {
+      setErrorMsg(reason instanceof Error ? reason.message : 'Avatar update failed.');
+    } finally {
+      setSavingAvatar('');
+    }
   };
 
   const getAvatarURI = (key: string) => {
@@ -35,7 +45,11 @@ export default function ProfilePage() {
     return (
       <div className="container-wide py-32 text-center">
         <h1 className="text-3xl text-ivory mb-4">You are not logged in</h1>
-        <p className="text-ivory-light">Please login or play as a guest to view this page.</p>
+        <p className="text-ivory-light mb-6">Log in or start a guest session to view a player profile.</p>
+        <div className="flex flex-wrap justify-center gap-3">
+          <Link className="btn-primary" to="/login">Log in</Link>
+          <Link className="btn-secondary" to="/guest">Play as guest</Link>
+        </div>
       </div>
     );
   }
@@ -107,12 +121,16 @@ export default function ProfilePage() {
                   {successMsg}
                 </div>
               )}
+              {errorMsg && <div className="account-error mb-6 text-center" role="alert">{errorMsg}</div>}
               
               <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-4">
                 {AVATAR_OPTIONS.map(tile => (
                   <button
                     key={tile}
                     onClick={() => handleSelectAvatar(tile)}
+                    disabled={Boolean(savingAvatar)}
+                    aria-label={`Use ${tile.replace(':', ' ')} as avatar`}
+                    aria-pressed={avatarTile === tile}
                     className={`relative aspect-square rounded-xl overflow-hidden border-2 transition-all duration-300 ${
                       avatarTile === tile 
                         ? 'border-gold shadow-[0_0_15px_rgba(196,163,90,0.5)] scale-105 z-10' 

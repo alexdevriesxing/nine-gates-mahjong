@@ -181,7 +181,7 @@ export default function HomePage() {
               <div className="p-8 flex-grow flex flex-col">
                 <h2 className="font-display text-3xl text-ivory mb-4">Real Mahjong</h2>
                 <p className="text-ink-200 text-lg mb-8 flex-grow">
-                  Learn the authentic 4-player table game. Master strategy, declare melds, and play against AI or real opponents in global variants.
+                  Learn the authentic four-player draw-and-discard rhythm, shape legal hands, and practice against AI or real opponents.
                 </p>
                 <div className="flex flex-wrap gap-3 mt-auto">
                   <Link to="/real-mahjong" className="btn-vermilion text-sm">Play vs AI</Link>

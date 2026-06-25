@@ -24,7 +24,7 @@ export default function MobileMenu({ onClose }: MobileMenuProps) {
 
       {/* Drawer */}
       <motion.div
-        className="relative w-full max-w-sm h-full bg-ink-950/95 backdrop-blur-xl border-l border-gold/10 p-6 flex flex-col"
+        className="relative w-full max-w-sm h-full overflow-y-auto bg-ink-950/95 backdrop-blur-xl border-l border-gold/10 p-6 flex flex-col"
         initial={{ x: '100%' }}
         animate={{ x: 0 }}
         exit={{ x: '100%' }}

@@ -202,7 +202,7 @@ export const GAME_MODES: GameModeInfo[] = [
     id: 'real-mahjong',
     name: 'Real Mahjong vs AI',
     description:
-      'Play 4-player table Mahjong against AI opponents. Draw, discard, and declare melds in the authentic game.',
+      'Practice 4-player table Mahjong against AI opponents. Draw, discard, read the table, and complete a legal hand.',
     category: 'real-mahjong',
     path: '/real-mahjong',
     status: 'playable',

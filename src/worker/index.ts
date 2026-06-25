@@ -30,11 +30,20 @@ interface RoomGame {
   lastAction: string;
 }
 
+interface RoomChatMessage {
+  id: string;
+  seat: number;
+  name: string;
+  text: string;
+  createdAt: number;
+}
+
 interface RoomData {
   code: string;
   status: 'waiting' | 'in-progress' | 'finished';
   seats: Array<RoomSeat | null>;
   game: RoomGame | null;
+  messages: RoomChatMessage[];
 }
 
 interface SocketMeta {
@@ -57,6 +66,22 @@ function createRoomCode() {
 
 function sanitizeName(value: string | null) {
   return (value || 'Guest Dragon').replace(/[^\p{L}\p{N} _-]/gu, '').trim().slice(0, 24) || 'Guest Dragon';
+}
+
+const BLOCKED_CHAT_WORDS = [
+  'fuck', 'shit', 'bitch', 'asshole', 'cunt', 'bastard', 'dick', 'pussy',
+  'kanker', 'kut', 'tyfus', 'tering', 'puta', 'mierda', 'scheisse', 'arschloch',
+  'connard', 'merde', 'putain',
+];
+
+function sanitizeChat(value: string | undefined) {
+  let message = (value ?? '').trim().replace(/\s+/g, ' ').slice(0, 160);
+  message = message.replace(/(?:https?:\/\/|www\.)\S+/giu, '[link removed]');
+  for (const word of BLOCKED_CHAT_WORDS) {
+    const pattern = new RegExp(`\\b${word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'giu');
+    message = message.replace(pattern, '•'.repeat(Math.max(3, word.length)));
+  }
+  return message;
 }
 
 const encoder = new TextEncoder();
@@ -166,12 +191,14 @@ export class MahjongRoom {
   private env: Env;
   private room: RoomData | null = null;
   private sockets = new Map<WebSocket, SocketMeta>();
+  private lastChatAt = new Map<string, number>();
 
   constructor(state: DurableObjectState, env: Env) {
     this.state = state;
     this.env = env;
     this.state.blockConcurrencyWhile(async () => {
       this.room = (await this.state.storage.get<RoomData>('room')) ?? null;
+      if (this.room && !this.room.messages) this.room.messages = [];
     });
   }
 
@@ -184,6 +211,7 @@ export class MahjongRoom {
         status: 'waiting',
         seats: [null, null, null, null],
         game: null,
+        messages: [],
       };
       await this.persist();
     }
@@ -226,7 +254,7 @@ export class MahjongRoom {
   private async onMessage(socket: WebSocket, raw: string) {
     const meta = this.sockets.get(socket);
     if (!meta || !this.room) return;
-    let message: { type?: string; tileId?: string };
+    let message: { type?: string; tileId?: string; text?: string };
     try {
       message = JSON.parse(raw);
     } catch {
@@ -242,8 +270,13 @@ export class MahjongRoom {
         break;
       case 'START_GAME':
         if (this.room.status !== 'waiting') break;
-        if (this.room.seats.filter((seat) => seat && !seat.isAI).length < 2) {
+        const humanSeats = this.room.seats.filter((seat): seat is RoomSeat => Boolean(seat && !seat.isAI));
+        if (humanSeats.length < 2) {
           this.sendError(socket, 'At least two connected players are required.');
+          return;
+        }
+        if (humanSeats.some((seat) => !seat.ready)) {
+          this.sendError(socket, 'Every connected player must be ready.');
           return;
         }
         this.room.seats = this.room.seats.map((seat, index) =>
@@ -267,6 +300,9 @@ export class MahjongRoom {
         this.discard(seatIndex, message.tileId);
         await this.runAITurns();
         break;
+      case 'CHAT':
+        this.addChatMessage(meta.playerId, seatIndex, message.text);
+        break;
       case 'LEAVE_ROOM':
         socket.close(1000, 'Player left');
         return;
@@ -276,6 +312,20 @@ export class MahjongRoom {
     }
     await this.persist();
     this.broadcast();
+  }
+
+  private addChatMessage(playerId: string, seatIndex: number, rawText: string | undefined) {
+    const now = Date.now();
+    if (now - (this.lastChatAt.get(playerId) ?? 0) < 500) return;
+    const text = sanitizeChat(rawText);
+    if (!text) return;
+    const seat = this.room!.seats[seatIndex];
+    if (!seat || seat.isAI) return;
+    this.lastChatAt.set(playerId, now);
+    this.room!.messages = [
+      ...(this.room!.messages ?? []).slice(-39),
+      { id: crypto.randomUUID(), seat: seatIndex, name: seat.name, text, createdAt: now },
+    ];
   }
 
   private draw(seatIndex: number) {
@@ -401,6 +451,7 @@ export class MahjongRoom {
             yourSeat: seatIndex,
           }
         : null,
+      messages: this.room!.messages ?? [],
       playerId,
     };
   }

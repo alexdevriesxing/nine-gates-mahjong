@@ -57,6 +57,16 @@ const alice = await connect(roomCode, 'Alice Dragon');
 const bob = await connect(roomCode, 'Bob Bamboo');
 await alice.waitFor((message) => message.room?.seats?.filter(Boolean).length === 2);
 
+alice.send({ type: 'START_GAME' });
+const notReadyError = await alice.waitFor((message) => message.type === 'ERROR');
+if (!/ready/i.test(notReadyError.message)) throw new Error('Room started before connected players were ready.');
+
+alice.send({ type: 'CHAT', text: 'Good luck https://example.com' });
+const chatState = await bob.waitFor((message) => message.messages?.length === 1);
+if (chatState.messages[0].text !== 'Good luck [link removed]') {
+  throw new Error('Room chat filtering or broadcast failed.');
+}
+
 alice.send({ type: 'READY' });
 bob.send({ type: 'READY' });
 alice.send({ type: 'START_GAME' });
@@ -104,6 +114,8 @@ console.log(JSON.stringify({
   wallRemaining: aliceState.game.wallRemaining,
   discardCounts: aliceState.game.discards.map((pool) => pool.length),
   authoritativeHiddenHands: true,
+  readyGateEnforced: true,
+  chatBroadcastAndFiltered: true,
 }));
 
 alice.socket.close(1000, 'Smoke test complete');

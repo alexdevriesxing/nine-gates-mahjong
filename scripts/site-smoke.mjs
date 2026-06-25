@@ -10,6 +10,7 @@ const routes = [
   '/learn/how-to-play-real-mahjong', '/learn/chi-pung-kong', '/learn/beginner-strategy',
   '/learn/mahjong-variants', '/how-to-play', '/history', '/events', '/lobby',
   '/leaderboards', '/login', '/register', '/privacy', '/terms',
+  '/this-route-does-not-exist',
 ];
 const viewports = [
   { name: 'desktop', width: 1440, height: 900 },
@@ -61,6 +62,13 @@ for (const viewport of viewports) {
     if (/under construction/i.test(rootText)) failures.push(`${viewport.name} ${route}: placeholder content`);
     const h1Count = await page.locator('h1').count();
     if (h1Count === 0 && route !== '/guest') failures.push(`${viewport.name} ${route}: missing H1`);
+    if (route === '/this-route-does-not-exist') {
+      await page.getByRole('heading', { name: /404/ }).waitFor({ state: 'visible', timeout: 7000 }).catch(() => {});
+      const notFoundText = await page.locator('#root').innerText().catch(() => '');
+      if (!/404/i.test(notFoundText)) failures.push(`${viewport.name} ${route}: missing not-found state`);
+      const robots = await page.locator('meta[name="robots"]').getAttribute('content');
+      if (robots !== 'noindex,follow') failures.push(`${viewport.name} ${route}: 404 is indexable`);
+    }
     const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
     if (overflow > 4) failures.push(`${viewport.name} ${route}: horizontal overflow ${overflow}px`);
     if (errors.length) failures.push(`${viewport.name} ${route}: ${errors.join(' | ')}`);

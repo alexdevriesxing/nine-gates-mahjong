@@ -218,6 +218,7 @@ export type ClientEvent =
   | { type: 'CALL_KONG' }
   | { type: 'DECLARE_WIN' }
   | { type: 'PASS' }
+  | { type: 'CHAT'; text: string }
   | { type: 'EMOTE'; emote: string };
 
 export type ServerEvent =

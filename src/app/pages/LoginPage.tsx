@@ -7,6 +7,7 @@ export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [submitting, setSubmitting] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
   return (
@@ -16,11 +17,15 @@ export default function LoginPage() {
         <form onSubmit={async (event) => {
           event.preventDefault();
           if (!email.includes('@') || password.length < 8) return setError('Enter a valid email and at least eight password characters.');
+          setError('');
+          setSubmitting(true);
           try {
             await login(email, password);
             navigate('/profile');
           } catch (reason) {
             setError(reason instanceof Error ? reason.message : 'Login failed.');
+          } finally {
+            setSubmitting(false);
           }
         }}>
           <div className="account-seal">門</div>
@@ -29,7 +34,7 @@ export default function LoginPage() {
           <label>Email<input className="input-nine" type="email" value={email} onChange={(event) => setEmail(event.target.value)} autoComplete="email" /></label>
           <label>Password<input className="input-nine" type="password" value={password} onChange={(event) => setPassword(event.target.value)} autoComplete="current-password" /></label>
           {error && <p className="account-error">{error}</p>}
-          <button className="btn-primary" type="submit">Log in</button>
+          <button className="btn-primary" type="submit" disabled={submitting}>{submitting ? 'Logging in…' : 'Log in'}</button>
           <p>New to Nine Gates? <Link to="/register">Create a profile</Link>.</p>
         </form>
       </main>

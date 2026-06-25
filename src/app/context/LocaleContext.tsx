@@ -1,4 +1,4 @@
-import { createContext, useContext, useMemo, useState, type ReactNode } from 'react';
+import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 
 export const LANGUAGES = [
   ['en', 'English'],
@@ -57,13 +57,17 @@ export function LocaleProvider({ children }: { children: ReactNode }) {
     const saved = localStorage.getItem('ngm_language') as LanguageCode | null;
     return saved && COPY[saved] ? saved : 'en';
   });
+
+  useEffect(() => {
+    document.documentElement.lang = language;
+    document.documentElement.dir = language === 'ar' || language === 'he' ? 'rtl' : 'ltr';
+  }, [language]);
+
   const value = useMemo<LocaleValue>(() => ({
     language,
     setLanguage: (next) => {
       setLanguageState(next);
       localStorage.setItem('ngm_language', next);
-      document.documentElement.lang = next;
-      document.documentElement.dir = next === 'ar' || next === 'he' ? 'rtl' : 'ltr';
     },
     t: (key) => COPY[language]?.[key] ?? COPY.en[key] ?? key,
   }), [language]);

@@ -1,7 +1,6 @@
 import type { ReactNode } from 'react';
 import AdSlot from './AdSlot';
 import SEOHead from './SEOHead';
-import GameChat from './GameChat';
 
 interface GamePageFrameProps {
   title: string;
@@ -46,7 +45,6 @@ export default function GamePageFrame({
           </div>
           <main className="game-page__main">
             {children}
-            <GameChat />
             <div className="game-page__leaderboard-ad">
               <AdSlot width={728} height={90} />
             </div>

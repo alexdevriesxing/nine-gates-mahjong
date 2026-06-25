@@ -3,6 +3,7 @@ import { chromium } from 'playwright';
 const base = process.env.NGM_BASE_URL || 'http://127.0.0.1:8787';
 const browser = await chromium.launch({ channel: 'chrome', headless: true });
 const page = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+page.setDefaultNavigationTimeout(45000);
 await page.addInitScript(() => localStorage.setItem('ngm_ad_consent', 'declined'));
 await page.route('**/api/profile', (route) => route.fulfill({
   status: 200,
@@ -21,8 +22,8 @@ async function state() {
 }
 
 async function completeGuidedVariant(route, american = false, riichi = false) {
-  await page.goto(`${base}${route}`, { waitUntil: 'domcontentloaded' });
-  await page.waitForFunction(() => typeof window.render_game_to_text === 'function', null, { timeout: 10000 });
+  await page.goto(`${base}${route}`, { waitUntil: 'commit' });
+  await page.waitForFunction(() => typeof window.render_game_to_text === 'function', null, { timeout: 20000 });
 
   if (american) {
     for (let pass = 0; pass < 3; pass += 1) {

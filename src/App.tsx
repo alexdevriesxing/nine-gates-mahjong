@@ -44,6 +44,7 @@ const TermsPage = lazy(() => import('./app/pages/TermsPage'));
 const EventsPage = lazy(() => import('./app/pages/EventsPage'));
 const TutorialsPage = lazy(() => import('./app/pages/TutorialsPage'));
 const HistoryPage = lazy(() => import('./app/pages/HistoryPage'));
+const NotFoundPage = lazy(() => import('./app/pages/NotFoundPage'));
 
 // =====================================================
 // Suspense wrapper for lazy pages
@@ -127,6 +128,7 @@ export default function App() {
               {/* Legal */}
               <Route path="/privacy" element={<SuspensePage><PrivacyPage /></SuspensePage>} />
               <Route path="/terms" element={<SuspensePage><TermsPage /></SuspensePage>} />
+              <Route path="*" element={<SuspensePage><NotFoundPage /></SuspensePage>} />
             </Route>
             </Routes>
           </BrowserRouter>

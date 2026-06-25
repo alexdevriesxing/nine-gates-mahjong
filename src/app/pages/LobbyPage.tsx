@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import SEOHead from '../components/SEOHead';
 import AdSlot from '../components/AdSlot';
+import GameChat, { type ChatMessage } from '../components/GameChat';
 import MahjongTileView from '../../game/react/MahjongTileView';
 import { generateGuestName } from '@shared/utils';
 import type { MahjongTileInstance } from '../../game/MahjongCore';
@@ -21,6 +22,7 @@ interface MultiplayerState {
     status: 'waiting' | 'in-progress' | 'finished';
     seats: Array<RoomSeat | null>;
   };
+  messages: Array<ChatMessage & { seat: number }>;
   game: null | {
     wallRemaining: number;
     hand: MahjongTileInstance[];
@@ -43,6 +45,8 @@ export default function LobbyPage() {
   const [selectedTile, setSelectedTile] = useState<string | null>(null);
   const [error, setError] = useState('');
   const [connecting, setConnecting] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const [lastRoom, setLastRoom] = useState(() => sessionStorage.getItem('ngm_last_room') ?? '');
   const socketRef = useRef<WebSocket | null>(null);
 
   const websocketOrigin = import.meta.env.DEV
@@ -53,7 +57,9 @@ export default function LobbyPage() {
     socketRef.current?.send(JSON.stringify({ type, ...extra }));
   };
 
-  const connect = (code: string) => {
+  const connect = (rawCode: string) => {
+    const code = rawCode.trim().toUpperCase();
+    if (code.length !== 6) return;
     socketRef.current?.close();
     setConnecting(true);
     setError('');
@@ -71,6 +77,9 @@ export default function LobbyPage() {
       }
       const next = message as MultiplayerState;
       if (next.playerId) sessionStorage.setItem(`ngm_room_${code}`, next.playerId);
+      sessionStorage.setItem('ngm_last_room', code);
+      setLastRoom(code);
+      setError('');
       setState(next);
       setRoomCode(code);
     });
@@ -100,6 +109,33 @@ export default function LobbyPage() {
   const game = state?.game;
   const yourTurn = game && game.yourSeat === game.turn;
   const hand = useMemo(() => game?.hand ?? [], [game?.hand]);
+  const humanSeats = state?.room.seats.filter((seat) => seat && !seat.isAI) ?? [];
+  const everyoneReady = humanSeats.length >= 2 && humanSeats.every((seat) => seat?.ready);
+  const yourSeat = state?.room.seats.find((seat) => seat?.id === state.playerId);
+
+  const copyRoomCode = async () => {
+    if (!state) return;
+    try {
+      await navigator.clipboard.writeText(state.room.code);
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 1800);
+    } catch {
+      setError('Copy failed. Select the room code and copy it manually.');
+    }
+  };
+
+  const leaveRoom = () => {
+    if (state?.playerId) sessionStorage.removeItem(`ngm_room_${state.room.code}`);
+    sessionStorage.removeItem('ngm_last_room');
+    setLastRoom('');
+    send('LEAVE_ROOM');
+    socketRef.current?.close(1000, 'Player left');
+    socketRef.current = null;
+    setState(null);
+    setRoomCode('');
+    setSelectedTile(null);
+    setError('');
+  };
 
   return (
     <>
@@ -150,6 +186,11 @@ export default function LobbyPage() {
                 Join room
               </button>
               <p>Room actions are validated by the Cloudflare room authority; clients never receive hidden opponent hands.</p>
+              {lastRoom && lastRoom !== roomCode && (
+                <button className="lobby-reconnect" onClick={() => connect(lastRoom)} disabled={connecting}>
+                  Reconnect to room {lastRoom}
+                </button>
+              )}
             </section>
           </div>
         ) : (
@@ -160,7 +201,8 @@ export default function LobbyPage() {
                 <h2>{state.room.code}</h2>
               </div>
               <span className={`room-status room-status--${state.room.status}`}>{state.room.status}</span>
-              <button className="btn-secondary" onClick={() => navigator.clipboard.writeText(state.room.code)}>Copy code</button>
+              <button className="btn-secondary" onClick={copyRoomCode}>{copied ? 'Copied' : 'Copy code'}</button>
+              <button className="btn-secondary" onClick={leaveRoom}>Leave room</button>
             </header>
 
             <div className="room-seats">
@@ -175,8 +217,11 @@ export default function LobbyPage() {
 
             {state.room.status === 'waiting' ? (
               <div className="room-actions">
-                <button className="btn-secondary" onClick={() => send('READY')}>Toggle ready</button>
-                <button className="btn-primary" onClick={() => send('START_GAME')}>Start with AI fill</button>
+                <button className="btn-secondary" onClick={() => send('READY')}>{yourSeat?.ready ? 'Set not ready' : 'Ready up'}</button>
+                <button className="btn-primary" disabled={!everyoneReady} onClick={() => send('START_GAME')}>Start with AI fill</button>
+                <span className="room-readiness">
+                  {humanSeats.length < 2 ? 'Waiting for a second player.' : everyoneReady ? 'All players ready.' : 'Every player must ready up.'}
+                </span>
               </div>
             ) : game ? (
               <div className="multiplayer-game">
@@ -224,6 +269,11 @@ export default function LobbyPage() {
                 {game.winner !== null && <div className="room-winner">{state.room.seats[game.winner]?.name} wins the hand.</div>}
               </div>
             ) : null}
+            <GameChat
+              messages={state.messages ?? []}
+              onSend={(text) => send('CHAT', { text })}
+              disabled={!socketRef.current || socketRef.current.readyState !== WebSocket.OPEN}
+            />
           </section>
         )}
 

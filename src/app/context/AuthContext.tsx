@@ -12,25 +12,17 @@ interface AuthContextType {
   register: (username: string, email: string, password: string) => Promise<void>;
   loginAsGuest: () => void;
   logout: () => void;
-  updateAvatar: (tileKey: string) => void;
+  updateAvatar: (tileKey: string) => Promise<void>;
   displayName: string;
   avatarTile: string;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
-const STORAGE_KEY_USER = 'ngm_user';
 const STORAGE_KEY_GUEST = 'ngm_guest';
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(() => {
-    try {
-      const stored = localStorage.getItem(STORAGE_KEY_USER);
-      return stored ? JSON.parse(stored) : null;
-    } catch {
-      return null;
-    }
-  });
+  const [user, setUser] = useState<User | null>(null);
 
   const [guestSession, setGuestSession] = useState<GuestSession | null>(() => {
     try {
@@ -49,24 +41,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return response.json() as Promise<{ user: User }>;
       })
       .then((payload) => {
-        if (!cancelled && payload?.user) {
-          setUser(payload.user);
-          setGuestSession(null);
+        if (!cancelled) {
+          setUser(payload?.user ?? null);
+          if (payload?.user) setGuestSession(null);
         }
       })
       .catch(() => {});
     return () => { cancelled = true; };
   }, []);
-
-  // Persist to localStorage
-  useEffect(() => {
-    if (user) {
-      localStorage.setItem(STORAGE_KEY_USER, JSON.stringify(user));
-      localStorage.removeItem(STORAGE_KEY_GUEST);
-    } else {
-      localStorage.removeItem(STORAGE_KEY_USER);
-    }
-  }, [user]);
 
   useEffect(() => {
     if (guestSession && !user) {
@@ -82,15 +64,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const displayName = user?.displayName || guestSession?.guestName || 'Player';
   const avatarTile = user?.avatarTile || guestSession?.avatarTile || 'dragons:red';
 
-  const updateAvatar = useCallback((tileKey: string) => {
+  const updateAvatar = useCallback(async (tileKey: string) => {
     if (user) {
-      setUser({ ...user, avatarTile: tileKey });
-      void fetch('/api/profile', {
+      const response = await fetch('/api/profile', {
         method: 'PUT',
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ avatarTile: tileKey }),
       });
+      const payload = await response.json() as { user?: User; error?: string };
+      if (!response.ok || !payload.user) throw new Error(payload.error || 'Avatar update failed.');
+      setUser(payload.user);
     } else if (guestSession) {
       setGuestSession({ ...guestSession, avatarTile: tileKey });
     }
@@ -143,7 +127,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     void fetch('/api/auth/logout', { method: 'POST', credentials: 'include' });
     setUser(null);
     setGuestSession(null);
-    localStorage.removeItem(STORAGE_KEY_USER);
     localStorage.removeItem(STORAGE_KEY_GUEST);
   }, []);
 
