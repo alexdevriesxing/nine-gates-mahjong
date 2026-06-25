@@ -26,15 +26,14 @@ async function assertNoBrokenImages(page, label) {
   const page = await context.newPage();
   const errors = trackErrors(page);
   await page.goto(base, { waitUntil: 'networkidle' });
-  await page.getByRole('complementary', { name: 'Privacy choices' }).waitFor();
-  await page.getByRole('button', { name: 'Accept ads' }).click();
-  const consent = await page.evaluate(() => localStorage.getItem('ngm_ad_consent'));
-  if (consent !== 'accepted') throw new Error('Advertising consent was not persisted.');
+  if (await page.getByRole('complementary', { name: 'Privacy choices' }).count()) {
+    throw new Error('Consent banner should not be present.');
+  }
   await page.goto(`${base}/mahjongg-solitaire`, { waitUntil: 'networkidle' });
   if (await page.getByRole('complementary', { name: 'Privacy choices' }).count()) {
-    throw new Error('Consent banner returned after a stored choice.');
+    throw new Error('Consent banner returned on subpages.');
   }
-  if (await page.locator('.ad-slot__house').count() < 1) throw new Error('Ad fallback slots did not render.');
+  if (await page.locator('.ad-slot').count() < 1) throw new Error('Ad slots did not render.');
   if (errors.length) throw new Error(`Consent/ad flow: ${errors.join(' | ')}`);
   results.consentAndAds = true;
   await context.close();
