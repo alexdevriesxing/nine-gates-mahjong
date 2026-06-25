@@ -45,7 +45,6 @@ export default function AdSlot({
           loading="lazy"
           onError={() => setFailed(true)}
           title={label}
-          sandbox="allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox"
         />
       ) : (
         <div className="ad-slot__house">
