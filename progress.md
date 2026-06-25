@@ -26,4 +26,8 @@ Original prompt: I have tried to build this with google antigravity but it seems
 - Added variant UI smoke coverage and visual capture tooling.
 - Verified auth registration/profile/logout/login and two-human authoritative multiplayer with hidden opponent hands.
 - Visual inspection completed for Riichi desktop, Events desktop/mobile, and American mobile.
-- Remaining release work from the original prompt: review final ad network production keys/legal configuration, commit and push the full dirty worktree, apply remote D1 migration, deploy to Cloudflare, and run production URL smoke tests.
+- Published branch `codex/mahjong-portal-overhaul` and opened draft PR #1.
+- Applied the remote D1 migration and deployed the Worker, static assets, Durable Object, and database bindings to Cloudflare.
+- Production testing exposed Cloudflare Web Crypto's 100,000-iteration PBKDF2 limit; reduced the password hash iteration count to the supported maximum, redeployed, and revalidated production auth.
+- Production Workers URL passes route/viewports, variants, auth, and two-player multiplayer smoke tests.
+- Remaining release work from the original prompt: confirm final Adsterra production keys/legal configuration and merge the draft PR after review.
