@@ -46,3 +46,7 @@ Original prompt: I have tried to build this with google antigravity but it seems
 - Removed the obsolete page generator that could recreate under-construction placeholders.
 - Added durable browser regression suites for controls, feature flows, multiplayer UI, all routes/viewports, and the complete 13-game visual gallery.
 - Final local matrix passes: production build, game logic, seven original game completions, all controls, five variant trainers, 33 routes across desktop/tablet/mobile, account lifecycle, authoritative multiplayer, and multiplayer UI.
+- Deployed the final gap-fix build to Cloudflare as version `60561d3b-a163-4dc4-adb8-4292cf69ffae`.
+- Final production matrix passes on `https://ninegatesmahjong.com`: 99 route/viewport checks, all seven original game completions, controls and touch input, five ruleset trainers, feature flows, account lifecycle, authoritative multiplayer, and two-browser multiplayer UI.
+- Captured and visually reviewed all 13 live games at desktop and mobile sizes; targeted initial-viewport checks confirmed no fixed-header overlap or horizontal overflow.
+- Corrected the advertising configuration to use independent Adsterra keys for 320x50, 728x90, and 160x600 placements. No publisher credentials are currently configured, so production intentionally renders the tested house-ad fallback until the owner supplies those keys.

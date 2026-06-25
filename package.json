@@ -10,7 +10,7 @@
     "typecheck": "tsc --noEmit",
     "test:games": "tsx scripts/game-completion-smoke.mjs",
     "test:ui": "node scripts/game-ui-smoke.mjs",
-    "test:controls": "node scripts/game-controls-smoke.mjs",
+    "test:controls": "tsx scripts/game-controls-smoke.mjs",
     "test:features": "node scripts/feature-smoke.mjs",
     "test:variants": "node scripts/variant-ui-smoke.mjs",
     "test:site": "node scripts/site-smoke.mjs",

@@ -9,6 +9,12 @@ interface AdSlotProps {
   sticky?: boolean;
 }
 
+const ADSTERRA_KEYS: Record<string, string | undefined> = {
+  '320x50': import.meta.env.VITE_ADSTERRA_320X50_KEY,
+  '728x90': import.meta.env.VITE_ADSTERRA_728X90_KEY,
+  '160x600': import.meta.env.VITE_ADSTERRA_160X600_KEY,
+};
+
 export default function AdSlot({
   width,
   height,
@@ -18,8 +24,8 @@ export default function AdSlot({
 }: AdSlotProps) {
   const { adsEnabled } = useAds();
   const [failed, setFailed] = useState(false);
-  const key = import.meta.env.VITE_ADSTERRA_BANNER_KEY as string | undefined;
-  const live = adsEnabled && key && !key.startsWith('placeholder') && !failed;
+  const key = ADSTERRA_KEYS[`${width}x${height}`]?.trim();
+  const liveKey = adsEnabled && key && !failed ? key : null;
 
   return (
     <aside
@@ -28,9 +34,9 @@ export default function AdSlot({
       aria-label={label}
     >
       <span>{label}</span>
-      {live ? (
+      {liveKey ? (
         <iframe
-          src={`/ad.html?key=${encodeURIComponent(key)}&w=${width}&h=${height}`}
+          src={`/ad.html?key=${encodeURIComponent(liveKey)}&w=${width}&h=${height}`}
           width={width}
           height={height}
           loading="lazy"

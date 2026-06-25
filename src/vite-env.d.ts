@@ -9,14 +9,10 @@ interface ImportMetaEnv {
   readonly VITE_APP_NAME: string;
   readonly VITE_SITE_DOMAIN: string;
   readonly VITE_API_BASE_URL: string;
-  readonly VITE_ENABLE_AD_PLACEHOLDERS: string;
-  readonly VITE_ENABLE_MULTIPLAYER: string;
-  readonly VITE_ENABLE_MOCK_AUTH: string;
-  readonly VITE_ADSTERRA_BANNER_KEY: string;
-  readonly VITE_ADSTERRA_NATIVE_KEY: string;
-  readonly VITE_ADSTERRA_SOCIAL_BAR_KEY: string;
-  readonly VITE_ADSTERRA_INTERSTITIAL_KEY: string;
-  readonly VITE_ADSTERRA_SMARTLINK_URL: string;
+  readonly VITE_ADSTERRA_320X50_KEY?: string;
+  readonly VITE_ADSTERRA_728X90_KEY?: string;
+  readonly VITE_ADSTERRA_160X600_KEY?: string;
+  readonly VITE_ADSTERRA_SOCIAL_BAR_URL?: string;
 }
 
 interface ImportMeta {

@@ -1,4 +1,5 @@
 import { chromium } from 'playwright';
+import { canConnectTiles } from '../src/game/MahjongCore.ts';
 
 const base = process.env.NGM_BASE_URL || 'http://127.0.0.1:8787';
 const browser = await chromium.launch({ channel: 'chrome', headless: true });
@@ -34,13 +35,21 @@ async function clickLayeredPair() {
 
 async function clickGridPair() {
   const current = await state();
-  const groups = new Map();
-  current.visibleTiles.filter(Boolean).forEach((tile) => groups.set(tile.key, [...(groups.get(tile.key) || []), tile]));
-  const pair = [...groups.values()].find((items) => items.length >= 2);
+  const keys = current.visibleTiles.map((tile) => tile?.key ?? null);
+  let pair = null;
+  for (let first = 0; first < keys.length && !pair; first += 1) {
+    if (!keys[first]) continue;
+    for (let second = first + 1; second < keys.length; second += 1) {
+      if (keys[first] === keys[second] && canConnectTiles(keys, 6, 8, first, second)) {
+        pair = [first, second];
+        break;
+      }
+    }
+  }
   if (!pair) throw new Error('No grid pair found.');
-  const active = page.locator(`.grid-board [data-tile-key="${pair[0].key}"]`);
-  await active.nth(0).click();
-  await active.nth(1).click();
+  const active = page.locator('.grid-board .mahjong-tile');
+  await active.nth(pair[0]).click();
+  await active.nth(pair[1]).click();
   await page.waitForTimeout(250);
 }
 
@@ -82,7 +91,11 @@ await page.getByRole('button', { name: 'Pause' }).click();
 if (!(await state()).paused) throw new Error('Grid pause failed.');
 await page.getByRole('button', { name: 'Resume' }).click();
 await clickGridPair();
-if ((await state()).remaining !== gridStart.remaining - 2) throw new Error('Grid pair did not clear.');
+await page.waitForFunction(
+  (expectedRemaining) => JSON.parse(window.render_game_to_text?.() || '{}').remaining === expectedRemaining,
+  gridStart.remaining - 2,
+  { timeout: 3000 },
+);
 const gridSeed = (await state()).seed;
 await page.getByRole('button', { name: 'New board' }).click();
 if ((await state()).seed === gridSeed) throw new Error('Grid reset did not create a new seed.');
