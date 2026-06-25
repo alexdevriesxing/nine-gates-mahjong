@@ -2,6 +2,8 @@ import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { lazy, Suspense, useEffect } from 'react';
 import { HelmetProvider } from 'react-helmet-async';
 import { AuthProvider } from './app/context/AuthContext';
+import { AdProvider } from './app/context/AdContext';
+import { LocaleProvider } from './app/context/LocaleContext';
 import Layout from './app/components/Layout';
 import LoadingSpinner from './app/components/LoadingSpinner';
 
@@ -39,6 +41,9 @@ const BeginnerStrategy = lazy(() => import('./app/pages/learn/BeginnerStrategy')
 const MahjongVariantsGuide = lazy(() => import('./app/pages/learn/MahjongVariantsGuide'));
 const PrivacyPage = lazy(() => import('./app/pages/PrivacyPage'));
 const TermsPage = lazy(() => import('./app/pages/TermsPage'));
+const EventsPage = lazy(() => import('./app/pages/EventsPage'));
+const TutorialsPage = lazy(() => import('./app/pages/TutorialsPage'));
+const HistoryPage = lazy(() => import('./app/pages/HistoryPage'));
 
 // =====================================================
 // Suspense wrapper for lazy pages
@@ -66,10 +71,12 @@ function ScrollToTop() {
 export default function App() {
   return (
     <HelmetProvider>
-      <AuthProvider>
-        <BrowserRouter>
-          <ScrollToTop />
-          <Routes>
+      <AdProvider>
+        <LocaleProvider>
+          <AuthProvider>
+          <BrowserRouter>
+            <ScrollToTop />
+            <Routes>
             <Route element={<Layout />}>
               {/* Homepage */}
               <Route path="/" element={<SuspensePage><HomePage /></SuspensePage>} />
@@ -107,6 +114,9 @@ export default function App() {
               {/* Community */}
               <Route path="/lobby" element={<SuspensePage><LobbyPage /></SuspensePage>} />
               <Route path="/leaderboards" element={<SuspensePage><LeaderboardsPage /></SuspensePage>} />
+              <Route path="/events" element={<SuspensePage><EventsPage /></SuspensePage>} />
+              <Route path="/how-to-play" element={<SuspensePage><TutorialsPage /></SuspensePage>} />
+              <Route path="/history" element={<SuspensePage><HistoryPage /></SuspensePage>} />
 
               {/* Account */}
               <Route path="/profile" element={<SuspensePage><ProfilePage /></SuspensePage>} />
@@ -118,9 +128,11 @@ export default function App() {
               <Route path="/privacy" element={<SuspensePage><PrivacyPage /></SuspensePage>} />
               <Route path="/terms" element={<SuspensePage><TermsPage /></SuspensePage>} />
             </Route>
-          </Routes>
-        </BrowserRouter>
-      </AuthProvider>
+            </Routes>
+          </BrowserRouter>
+          </AuthProvider>
+        </LocaleProvider>
+      </AdProvider>
     </HelmetProvider>
   );
 }

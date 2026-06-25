@@ -2,11 +2,6 @@ import { createContext, useContext, useState, useCallback, useEffect, type React
 import type { User, GuestSession } from '@shared/types';
 import { generateGuestName } from '@shared/utils';
 
-// =====================================================
-// Auth Context — Manages user state (registered, guest, or anonymous)
-// TODO: Connect to Cloudflare Worker auth endpoints for production
-// =====================================================
-
 interface AuthContextType {
   user: User | null;
   guestSession: GuestSession | null;
@@ -46,6 +41,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   });
 
+  useEffect(() => {
+    let cancelled = false;
+    fetch('/api/profile', { credentials: 'include' })
+      .then(async (response) => {
+        if (!response.ok) return null;
+        return response.json() as Promise<{ user: User }>;
+      })
+      .then((payload) => {
+        if (!cancelled && payload?.user) {
+          setUser(payload.user);
+          setGuestSession(null);
+        }
+      })
+      .catch(() => {});
+    return () => { cancelled = true; };
+  }, []);
+
   // Persist to localStorage
   useEffect(() => {
     if (user) {
@@ -73,47 +85,41 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const updateAvatar = useCallback((tileKey: string) => {
     if (user) {
       setUser({ ...user, avatarTile: tileKey });
+      void fetch('/api/profile', {
+        method: 'PUT',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ avatarTile: tileKey }),
+      });
     } else if (guestSession) {
       setGuestSession({ ...guestSession, avatarTile: tileKey });
     }
   }, [user, guestSession]);
 
-  const login = useCallback(async (email: string, _password: string) => {
-    // TODO: POST /api/auth/login — validate credentials via Cloudflare Worker
-    // TODO: Never store plaintext passwords — use bcrypt/argon2 on the server
-    const mockUser: User = {
-      id: `user-${Date.now()}`,
-      username: email.split('@')[0],
-      displayName: email.split('@')[0],
-      email,
-      isGuest: false,
-      avatarTile: 'dragons:red',
-      level: 1,
-      xp: 0,
-      coins: 100,
-      createdAt: new Date().toISOString(),
-    };
-    setUser(mockUser);
+  const login = useCallback(async (email: string, password: string) => {
+    const response = await fetch('/api/auth/login', {
+      method: 'POST',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password }),
+    });
+    const payload = await response.json() as { user?: User; error?: string };
+    if (!response.ok || !payload.user) throw new Error(payload.error || 'Login failed.');
+    setUser(payload.user);
     setGuestSession(null);
   }, []);
 
   const register = useCallback(
-    async (username: string, email: string, _password: string) => {
-      // TODO: POST /api/auth/register — hash password server-side
-      // TODO: Validate username uniqueness, email format, password strength
-      const mockUser: User = {
-        id: `user-${Date.now()}`,
-        username,
-        displayName: username,
-        email,
-        isGuest: false,
-        avatarTile: 'dragons:red',
-        level: 1,
-        xp: 0,
-        coins: 100,
-        createdAt: new Date().toISOString(),
-      };
-      setUser(mockUser);
+    async (username: string, email: string, password: string) => {
+      const response = await fetch('/api/auth/register', {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, email, password }),
+      });
+      const payload = await response.json() as { user?: User; error?: string };
+      if (!response.ok || !payload.user) throw new Error(payload.error || 'Registration failed.');
+      setUser(payload.user);
       setGuestSession(null);
     },
     []
@@ -134,6 +140,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const logout = useCallback(() => {
+    void fetch('/api/auth/logout', { method: 'POST', credentials: 'include' });
     setUser(null);
     setGuestSession(null);
     localStorage.removeItem(STORAGE_KEY_USER);

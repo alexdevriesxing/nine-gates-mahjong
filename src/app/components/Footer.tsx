@@ -37,7 +37,10 @@ export default function Footer() {
             <span>Nine Gates Mahjong — Free online Mahjong and Mahjongg portal.</span>
           </div>
           <div>
-            &copy; {new Date().getFullYear()} Nine Gates Mahjong. All rights reserved.
+            &copy; 2026 Fire Dragon Interactive ·{' '}
+            <a href="https://www.firedragoninteractive.com" target="_blank" rel="noreferrer">
+              www.firedragoninteractive.com
+            </a>
           </div>
         </div>
       </div>

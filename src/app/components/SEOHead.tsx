@@ -52,12 +52,19 @@ export default function SEOHead({
     <Helmet>
       <title>{title}</title>
       <meta name="description" content={description} />
-      {canonical && <link rel="canonical" href={canonical} />}
+      <link rel="canonical" href={finalCanonical} />
+      <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1" />
       
       <meta property="og:site_name" content={SITE_NAME} />
       <meta property="og:title" content={ogTitle || title} />
       <meta property="og:description" content={ogDescription || description} />
-      {ogImage && <meta property="og:image" content={ogImage} />}
+      <meta property="og:type" content="website" />
+      <meta property="og:url" content={finalCanonical} />
+      <meta property="og:image" content={ogImage || `${SITE_DOMAIN}/hero-bg.jpg`} />
+      <meta name="twitter:card" content="summary_large_image" />
+      <meta name="twitter:title" content={ogTitle || title} />
+      <meta name="twitter:description" content={ogDescription || description} />
+      <meta name="twitter:image" content={ogImage || `${SITE_DOMAIN}/hero-bg.jpg`} />
       
       <script type="application/ld+json">
         {JSON.stringify(baseSchema)}

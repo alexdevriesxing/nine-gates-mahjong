@@ -1,0 +1,72 @@
+PRAGMA foreign_keys = ON;
+
+CREATE TABLE IF NOT EXISTS users (
+  id TEXT PRIMARY KEY,
+  username TEXT NOT NULL UNIQUE COLLATE NOCASE,
+  email TEXT NOT NULL UNIQUE COLLATE NOCASE,
+  password_hash TEXT NOT NULL,
+  password_salt TEXT NOT NULL,
+  created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS sessions (
+  id TEXT PRIMARY KEY,
+  user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  expires_at TEXT NOT NULL,
+  created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+CREATE INDEX IF NOT EXISTS sessions_user_idx ON sessions(user_id);
+
+CREATE TABLE IF NOT EXISTS profiles (
+  user_id TEXT PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
+  display_name TEXT NOT NULL,
+  avatar_tile TEXT NOT NULL DEFAULT 'dragons:red',
+  level INTEGER NOT NULL DEFAULT 1,
+  xp INTEGER NOT NULL DEFAULT 0,
+  coins INTEGER NOT NULL DEFAULT 100,
+  rating INTEGER NOT NULL DEFAULT 1500,
+  rated_wins INTEGER NOT NULL DEFAULT 0,
+  rated_losses INTEGER NOT NULL DEFAULT 0,
+  games_played INTEGER NOT NULL DEFAULT 0,
+  updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS matches (
+  id TEXT PRIMARY KEY,
+  mode TEXT NOT NULL,
+  room_code TEXT,
+  rated INTEGER NOT NULL DEFAULT 0,
+  created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS match_players (
+  match_id TEXT NOT NULL REFERENCES matches(id) ON DELETE CASCADE,
+  user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  placement INTEGER NOT NULL,
+  score INTEGER NOT NULL DEFAULT 0,
+  rating_before INTEGER NOT NULL,
+  rating_after INTEGER NOT NULL,
+  PRIMARY KEY (match_id, user_id)
+);
+CREATE INDEX IF NOT EXISTS match_players_user_idx ON match_players(user_id);
+
+CREATE TABLE IF NOT EXISTS daily_puzzles (
+  puzzle_date TEXT PRIMARY KEY,
+  seed INTEGER NOT NULL,
+  layout TEXT NOT NULL,
+  difficulty TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS cosmetics (
+  id TEXT PRIMARY KEY,
+  name TEXT NOT NULL,
+  category TEXT NOT NULL,
+  metadata TEXT NOT NULL DEFAULT '{}'
+);
+
+CREATE TABLE IF NOT EXISTS user_cosmetics (
+  user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  cosmetic_id TEXT NOT NULL REFERENCES cosmetics(id) ON DELETE CASCADE,
+  acquired_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (user_id, cosmetic_id)
+);

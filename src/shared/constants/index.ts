@@ -167,9 +167,9 @@ export const GAME_MODES: GameModeInfo[] = [
     name: 'Mahjong Connect',
     description:
       'Match tiles through open paths on a flat board. A unique twist on the classic Mahjong puzzle format.',
-    category: 'coming-soon',
+    category: 'puzzle',
     path: '/mahjong-connect',
-    status: 'coming-soon',
+    status: 'playable',
     difficulty: 'Medium',
     icon: '🔗',
     color: 'gold',
@@ -179,9 +179,9 @@ export const GAME_MODES: GameModeInfo[] = [
     name: 'Shisen-Sho',
     description:
       'Japanese flat-board tile matching. Connect pairs with up to three straight lines to clear the board.',
-    category: 'coming-soon',
+    category: 'puzzle',
     path: '/shisen-sho',
-    status: 'coming-soon',
+    status: 'playable',
     difficulty: 'Medium',
     icon: '🎴',
     color: 'vermilion',
@@ -191,9 +191,9 @@ export const GAME_MODES: GameModeInfo[] = [
     name: 'Mahjongg Memory',
     description:
       'Face-down tile matching meets Mahjong. Test your memory with beautiful Mahjong tiles.',
-    category: 'coming-soon',
+    category: 'casual',
     path: '/mahjongg-memory',
-    status: 'coming-soon',
+    status: 'playable',
     difficulty: 'Easy',
     icon: '🧠',
     color: 'ink',
@@ -217,7 +217,7 @@ export const GAME_MODES: GameModeInfo[] = [
       'Join or create rooms for real-time Mahjong with other players and AI opponents.',
     category: 'real-mahjong',
     path: '/lobby',
-    status: 'coming-soon',
+    status: 'playable',
     difficulty: 'Varies',
     icon: '👥',
     color: 'gold',
@@ -239,7 +239,7 @@ export const MAHJONG_VARIANTS: MahjongVariant[] = [
       'Hong Kong Mahjong is fast-paced and social, with straightforward rules that make it popular among family and friends.',
     whyPlay:
       'Perfect balance of skill and speed. Great for social play and the most natural starting point for new players.',
-    status: 'coming-soon',
+    status: 'playable',
     path: '/real-mahjong/hong-kong',
   },
   {
@@ -255,7 +255,7 @@ export const MAHJONG_VARIANTS: MahjongVariant[] = [
       'Riichi Mahjong is the competitive standard in Japan, featuring the unique riichi declaration, dora tiles, and a rich yaku system.',
     whyPlay:
       'The deepest competitive experience. Rich strategy, beautiful tradition, and a thriving global tournament scene.',
-    status: 'coming-soon',
+    status: 'playable',
     path: '/real-mahjong/riichi',
   },
   {
@@ -271,7 +271,7 @@ export const MAHJONG_VARIANTS: MahjongVariant[] = [
       'Chinese Official Mahjong Competition Rules (MCR) is the international tournament standard, featuring 81 scoring patterns and strategic depth.',
     whyPlay:
       'The ultimate scoring challenge with 81 patterns to master. The official competitive format for international tournaments.',
-    status: 'coming-soon',
+    status: 'playable',
     path: '/real-mahjong/mcr',
   },
   {
@@ -287,7 +287,7 @@ export const MAHJONG_VARIANTS: MahjongVariant[] = [
       'American Mahjongg has its own unique identity with jokers, the Charleston tile pass, and a scoring card updated annually by the National Mah Jongg League.',
     whyPlay:
       'A uniquely American twist on Mahjong. Social, strategic, and always fresh with annually changing scoring cards.',
-    status: 'coming-soon',
+    status: 'playable',
     path: '/real-mahjong/american',
   },
   {
@@ -303,7 +303,7 @@ export const MAHJONG_VARIANTS: MahjongVariant[] = [
       'Taiwanese Mahjong is known for its fast rounds, 16-tile hands (instead of the standard 13), and exciting all-or-nothing scoring.',
     whyPlay:
       'Fast, thrilling gameplay with 16-tile hands and exciting scoring. Great for players who want quick, intense rounds.',
-    status: 'coming-soon',
+    status: 'playable',
     path: '/real-mahjong/taiwanese',
   },
 ];
@@ -396,6 +396,8 @@ export const FOOTER_SECTIONS = [
       { label: 'Chi, Pung & Kong', path: '/learn/chi-pung-kong' },
       { label: 'Beginner Strategy', path: '/learn/beginner-strategy' },
       { label: 'Mahjong Variants', path: '/learn/mahjong-variants' },
+      { label: 'Guided Tutorials', path: '/how-to-play' },
+      { label: 'History of Mahjong', path: '/history' },
     ],
   },
   {
@@ -407,6 +409,7 @@ export const FOOTER_SECTIONS = [
       { label: 'Profile', path: '/profile' },
       { label: 'Leaderboards', path: '/leaderboards' },
       { label: 'Multiplayer Lobby', path: '/lobby' },
+      { label: 'Events & Tournaments', path: '/events' },
     ],
   },
   {

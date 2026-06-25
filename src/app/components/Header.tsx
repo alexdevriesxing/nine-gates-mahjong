@@ -1,16 +1,17 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { NAV_LINKS } from '@shared/constants';
 import { useAuth } from '../context/AuthContext';
 import MobileMenu from './MobileMenu';
 import { TileRenderer } from '../../game/TileRenderer';
+import { LANGUAGES, useLocale } from '../context/LocaleContext';
 
 export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const location = useLocation();
   const { isLoggedIn, displayName, avatarTile } = useAuth();
+  const { language, setLanguage, t } = useLocale();
 
   const isHome = location.pathname === '/';
 
@@ -56,8 +57,16 @@ export default function Header() {
             <img src="/logo_dark.png" alt="Nine Gates Mahjong" className="h-9 md:h-10 w-auto object-contain transition-transform group-hover:scale-[1.02] duration-300" />
           </Link>
 
-          <nav className="hidden lg:flex items-center gap-8">
-            {NAV_LINKS.map((link) => (
+          <nav className="hidden xl:flex items-center gap-6">
+            {[
+              { label: t('play'), path: '/play' },
+              { label: t('daily'), path: '/daily' },
+              { label: t('variants'), path: '/variants' },
+              { label: t('learn'), path: '/learn' },
+              { label: t('events'), path: '/events' },
+              { label: t('lobby'), path: '/lobby' },
+              { label: t('rankings'), path: '/leaderboards' },
+            ].map((link) => (
               <Link
                 key={link.path}
                 to={link.path}
@@ -68,9 +77,15 @@ export default function Header() {
             ))}
           </nav>
 
-          <div className="hidden lg:flex items-center gap-4">
+          <div className="hidden xl:flex items-center gap-3">
+            <label className="language-select">
+              <span className="sr-only">{t('language')}</span>
+              <select value={language} onChange={(event) => setLanguage(event.target.value as typeof language)}>
+                {LANGUAGES.map(([code, label]) => <option key={code} value={code}>{label}</option>)}
+              </select>
+            </label>
             <Link to="/play" className="btn-primary py-2 px-6 text-sm">
-              Play Free
+              {t('playFree')}
             </Link>
 
             {isLoggedIn ? (
@@ -87,14 +102,14 @@ export default function Header() {
             ) : (
               <div className="flex items-center gap-4 ml-4">
                 <Link to="/login" className="text-ivory-dark hover:text-gold text-sm font-semibold transition-colors">
-                  Login
+                  {t('login')}
                 </Link>
               </div>
             )}
           </div>
 
           <button
-            className="lg:hidden text-gold p-2"
+            className="xl:hidden text-gold p-2"
             onClick={() => setIsMobileMenuOpen(true)}
             aria-label="Open menu"
           >

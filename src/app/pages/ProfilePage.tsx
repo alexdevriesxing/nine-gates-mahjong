@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { TileRenderer } from '../../game/TileRenderer';
 import SEOHead from '../components/SEOHead';
@@ -77,12 +78,12 @@ export default function ProfilePage() {
                   <div className="text-2xl text-gold font-display">{user?.coins || 0}</div>
                 </div>
                 <div className="p-4 rounded-lg bg-ink-900 border border-ivory/5">
-                  <div className="text-ivory-dark text-sm mb-1">Games Played</div>
-                  <div className="text-2xl text-ivory font-display">0</div>
+                  <div className="text-ivory-dark text-sm mb-1">Rated Wins</div>
+                  <div className="text-2xl text-ivory font-display">{user?.ratedWins || 0}</div>
                 </div>
                 <div className="p-4 rounded-lg bg-ink-900 border border-ivory/5">
-                  <div className="text-ivory-dark text-sm mb-1">Win Rate</div>
-                  <div className="text-2xl text-ivory font-display">0%</div>
+                  <div className="text-ivory-dark text-sm mb-1">Mahjong Rating</div>
+                  <div className="text-2xl text-ivory font-display">{user?.rating || 1500}</div>
                 </div>
               </div>
             </div>
@@ -97,7 +98,7 @@ export default function ProfilePage() {
           {isGuest ? (
             <div className="p-6 bg-lacquer-dark/30 border border-vermilion/30 rounded-xl text-center">
               <p className="text-ivory mb-4">Guest players receive a random avatar. To choose your own, create a free account.</p>
-              <button className="btn-primary text-sm">Register Now</button>
+              <Link className="btn-primary text-sm inline-block" to="/register">Register now</Link>
             </div>
           ) : (
             <>

@@ -19,15 +19,14 @@ const itemVar = {
 } as const;
 
 export default function PlayHub() {
-  const [activeFilter, setActiveFilter] = useState<'all' | 'casual' | 'daily' | 'puzzle' | 'real-mahjong' | 'coming-soon'>('all');
+  const [activeFilter, setActiveFilter] = useState<'all' | 'casual' | 'daily' | 'puzzle' | 'real-mahjong'>('all');
 
   const filterTabs = [
     { id: 'all', label: 'All Modes' },
     { id: 'casual', label: 'Casual' },
     { id: 'daily', label: 'Daily Challenge' },
     { id: 'puzzle', label: 'Puzzles' },
-    { id: 'real-mahjong', label: 'Real Mahjong' },
-    { id: 'coming-soon', label: 'Coming Soon' }
+    { id: 'real-mahjong', label: 'Real Mahjong' }
   ] as const;
 
   const filteredModes = GAME_MODES.filter(mode => {

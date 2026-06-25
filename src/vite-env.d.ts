@@ -1,5 +1,10 @@
 /// <reference types="vite/client" />
 
+interface Window {
+  render_game_to_text?: () => string;
+  advanceTime?: (milliseconds: number) => Promise<void> | void;
+}
+
 interface ImportMetaEnv {
   readonly VITE_APP_NAME: string;
   readonly VITE_SITE_DOMAIN: string;

@@ -1,50 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>https://ninegatesmahjong.com/</loc>
-    <changefreq>daily</changefreq>
-    <priority>1.0</priority>
-  </url>
-  <url>
-    <loc>https://ninegatesmahjong.com/play</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://ninegatesmahjong.com/variants</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://ninegatesmahjong.com/learn</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://ninegatesmahjong.com/leaderboards</loc>
-    <changefreq>always</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <!-- Game Modes -->
-  <url><loc>https://ninegatesmahjong.com/play/solitaire</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://ninegatesmahjong.com/play/daily</loc><changefreq>daily</changefreq><priority>0.8</priority></url>
-  <url><loc>https://ninegatesmahjong.com/play/zen</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://ninegatesmahjong.com/play/time-attack</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://ninegatesmahjong.com/play/connect</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://ninegatesmahjong.com/play/shisen-sho</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://ninegatesmahjong.com/play/memory</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://ninegatesmahjong.com/play/real-mahjong</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>
-  <!-- Real Variants -->
-  <url><loc>https://ninegatesmahjong.com/variants/hong-kong</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://ninegatesmahjong.com/variants/riichi</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://ninegatesmahjong.com/variants/mcr</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://ninegatesmahjong.com/variants/american</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://ninegatesmahjong.com/variants/taiwanese</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <!-- Learning -->
-  <url><loc>https://ninegatesmahjong.com/learn/beginner-strategy</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://ninegatesmahjong.com/learn/how-to-play-solitaire</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://ninegatesmahjong.com/</loc><changefreq>weekly</changefreq><priority>1.0</priority></url>
+  <url><loc>https://ninegatesmahjong.com/play</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://ninegatesmahjong.com/mahjongg-solitaire</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://ninegatesmahjong.com/daily</loc><changefreq>daily</changefreq><priority>0.9</priority></url>
+  <url><loc>https://ninegatesmahjong.com/zen-mahjongg</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://ninegatesmahjong.com/time-attack</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://ninegatesmahjong.com/mahjong-connect</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://ninegatesmahjong.com/shisen-sho</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://ninegatesmahjong.com/mahjongg-memory</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://ninegatesmahjong.com/real-mahjong</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://ninegatesmahjong.com/lobby</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://ninegatesmahjong.com/events</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://ninegatesmahjong.com/leaderboards</loc><changefreq>daily</changefreq><priority>0.8</priority></url>
+  <url><loc>https://ninegatesmahjong.com/variants</loc><changefreq>monthly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://ninegatesmahjong.com/real-mahjong/hong-kong</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://ninegatesmahjong.com/real-mahjong/riichi</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://ninegatesmahjong.com/real-mahjong/mcr</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://ninegatesmahjong.com/real-mahjong/american</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://ninegatesmahjong.com/real-mahjong/taiwanese</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://ninegatesmahjong.com/learn</loc><changefreq>monthly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://ninegatesmahjong.com/how-to-play</loc><changefreq>monthly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://ninegatesmahjong.com/history</loc><changefreq>yearly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://ninegatesmahjong.com/learn/mahjong-vs-mahjongg</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://ninegatesmahjong.com/learn/how-to-play-mahjongg-solitaire</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
   <url><loc>https://ninegatesmahjong.com/learn/how-to-play-real-mahjong</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://ninegatesmahjong.com/learn/chi-pung-kong</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://ninegatesmahjong.com/learn/mahjong-variants-guide</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://ninegatesmahjong.com/learn/mahjong-vs-mahjongg</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://ninegatesmahjong.com/learn/chi-pung-kong</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://ninegatesmahjong.com/learn/beginner-strategy</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://ninegatesmahjong.com/learn/mahjong-variants</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
 </urlset>

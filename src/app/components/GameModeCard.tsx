@@ -6,8 +6,6 @@ interface GameModeCardProps {
 }
 
 export default function GameModeCard({ mode }: GameModeCardProps) {
-  const isPlayable = mode.status === 'playable';
-
   // Map mode.id to the correct image file name
   const getImageSrc = (id: string) => {
     switch (id) {
@@ -42,11 +40,7 @@ export default function GameModeCard({ mode }: GameModeCardProps) {
           <h3 className="font-display text-xl text-gold group-hover:text-gold-light transition-colors">
             {mode.name}
           </h3>
-          {isPlayable ? (
-            <span className="badge badge-jade shrink-0">Play Now</span>
-          ) : (
-            <span className="badge badge-ink shrink-0">Coming Soon</span>
-          )}
+          <span className="badge badge-jade shrink-0">Play Now</span>
         </div>
         
         <p className="text-ink-200 text-sm mb-4 flex-grow">

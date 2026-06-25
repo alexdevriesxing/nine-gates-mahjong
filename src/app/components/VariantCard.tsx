@@ -6,8 +6,6 @@ interface VariantCardProps {
 }
 
 export default function VariantCard({ variant }: VariantCardProps) {
-  const isPlayable = variant.status === 'playable';
-  
   // Convert complexity string to number of dots (1-4)
   const complexityLevel = 
     variant.complexity === 'beginner' ? 1 :
@@ -49,14 +47,9 @@ export default function VariantCard({ variant }: VariantCardProps) {
       <div className="mt-auto">
         <Link 
           to={variant.path} 
-          className={`w-full py-2.5 rounded-lg text-sm font-semibold tracking-wide text-center block transition-all ${
-            isPlayable 
-              ? 'bg-gold/10 text-gold border border-gold/30 hover:bg-gold/20' 
-              : 'bg-ink-800 text-ink-400 border border-ink-700 cursor-default'
-          }`}
-          onClick={(e) => !isPlayable && e.preventDefault()}
+          className="w-full py-2.5 rounded-lg text-sm font-semibold tracking-wide text-center block transition-all bg-gold/10 text-gold border border-gold/30 hover:bg-gold/20"
         >
-          {isPlayable ? 'Explore Rules & Play' : 'Coming Soon'}
+          Explore Rules & Play
         </Link>
       </div>
     </div>

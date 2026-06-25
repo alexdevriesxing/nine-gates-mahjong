@@ -1,0 +1,29 @@
+Original prompt: I have tried to build this with google antigravity but it seems to have gotten stuck before I got it to work. This is a Mahjong portal I need you to completely audit, bugfix, enhance, improve and polish and stress test fully for desktop, mobile and tablet (including controls) as none of the games seem to load. Then I need you to optimize the adsterra ad placements for every viewport (mobile, desktop, tablet) as currently this is far from maximized. I need players to always see ads and always auto-consent, so no opt-outs. Finally do a full seo/gaio optimization please where you make this the absolute number one ranked Mahjong/Mahjongg site in the world. Fix any errors and then push to github, deploy to cloudflare and fully test single player and multiplayer (so multiple players playing againt each other) modes. Ensure this is the very best mahjong portal with the best possible games with the most awesome visuals and animations and flavour it can have.
+
+## 2026-06-24
+
+- Initial audit started from a clean `master` branch tracking `origin/master`.
+- GitHub CLI and Cloudflare Wrangler are authenticated.
+- Repository is a React 19 + Vite 6 + Phaser 4 frontend with a Cloudflare Worker stub.
+- Policy decision: optimize ads and consent UX, but do not implement forced consent or remove legally required opt-outs.
+- TODO: reproduce current game loading failures in a real browser.
+- TODO: inspect game engine, page routing, worker, ads, SEO, responsive layout, and multiplayer implementation.
+
+## 2026-06-25
+
+- Reconstructed and validated the in-progress overhaul rather than restarting it.
+- Production build passes.
+- All 32 routes pass desktop, tablet, and mobile browser smoke checks with no empty roots, placeholders, runtime console errors, or horizontal overflow.
+- All seven original tile games complete end to end in the browser; the event challenge circuit records Daily, Time Attack, and Solitaire clears.
+- Added playable guided training tables for Hong Kong, Riichi, MCR, American, and Taiwanese Mahjong.
+  - Riichi trainer detects tenpai waits and supports a riichi declaration.
+  - American trainer implements right, across, and left Charleston passes.
+  - Taiwanese trainer validates a 16-tile held hand and five-meld winning structure.
+- Removed all user-visible Coming Soon and under-construction states.
+- Replaced the Events placeholder with three open qualifiers, local completion/best-result tracking, multiplayer entry, rankings, and seasonal scheduling.
+- Fixed the dead guest-profile registration action and corrected stale authentication copy.
+- Added generalized Mahjong hand validation for configurable meld counts and winning-draw discovery.
+- Added variant UI smoke coverage and visual capture tooling.
+- Verified auth registration/profile/logout/login and two-human authoritative multiplayer with hidden opponent hands.
+- Visual inspection completed for Riichi desktop, Events desktop/mobile, and American mobile.
+- Remaining release work from the original prompt: review final ad network production keys/legal configuration, commit and push the full dirty worktree, apply remote D1 migration, deploy to Cloudflare, and run production URL smoke tests.

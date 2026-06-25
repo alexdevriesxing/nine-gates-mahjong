@@ -141,6 +141,10 @@ export interface User {
   level: number;
   xp: number;
   coins: number;
+  rating?: number;
+  ratedWins?: number;
+  ratedLosses?: number;
+  gamesPlayed?: number;
   createdAt: string;
 }
 

@@ -6,6 +6,7 @@ import GameModeCard from '../components/GameModeCard';
 import VariantCard from '../components/VariantCard';
 import { GAME_MODES, MAHJONG_VARIANTS, AI_CHARACTERS } from '@shared/constants';
 import { useAuth } from '../context/AuthContext';
+import AdSlot from '../components/AdSlot';
 
 // Animation variant for staggered reveals
 const fadeUpVar = {
@@ -318,11 +319,8 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* AD PLACEHOLDER */}
       <div className="container-wide py-8">
-        <div className="ad-container max-w-4xl mx-auto">
-          Advertisement Placeholder
-        </div>
+        <AdSlot width={728} height={90} />
       </div>
 
       {/* FINAL CTA */}

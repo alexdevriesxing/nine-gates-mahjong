@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { NAV_LINKS } from '@shared/constants';
 import { useAuth } from '../context/AuthContext';
+import { LANGUAGES, useLocale } from '../context/LocaleContext';
 
 interface MobileMenuProps {
   onClose: () => void;
@@ -9,6 +9,7 @@ interface MobileMenuProps {
 
 export default function MobileMenu({ onClose }: MobileMenuProps) {
   const { isLoggedIn, displayName, logout } = useAuth();
+  const { language, setLanguage, t } = useLocale();
 
   return (
     <div className="fixed inset-0 z-[60] flex justify-end">
@@ -40,7 +41,17 @@ export default function MobileMenu({ onClose }: MobileMenuProps) {
         </div>
 
         <nav className="flex flex-col gap-2 mb-auto">
-          {NAV_LINKS.map((link) => (
+          {[
+            { label: t('play'), path: '/play' },
+            { label: t('daily'), path: '/daily' },
+            { label: t('variants'), path: '/variants' },
+            { label: t('learn'), path: '/learn' },
+            { label: t('tutorials'), path: '/how-to-play' },
+            { label: t('history'), path: '/history' },
+            { label: t('events'), path: '/events' },
+            { label: t('lobby'), path: '/lobby' },
+            { label: t('rankings'), path: '/leaderboards' },
+          ].map((link) => (
             <Link
               key={link.path}
               to={link.path}
@@ -53,6 +64,12 @@ export default function MobileMenu({ onClose }: MobileMenuProps) {
         </nav>
 
         <div className="mt-8 pt-8 border-t border-gold/10">
+          <label className="mobile-language">
+            <span>{t('language')}</span>
+            <select value={language} onChange={(event) => setLanguage(event.target.value as typeof language)}>
+              {LANGUAGES.map(([code, label]) => <option key={code} value={code}>{label}</option>)}
+            </select>
+          </label>
           {isLoggedIn ? (
             <div className="flex flex-col gap-4">
               <div className="flex items-center gap-3 mb-4">
