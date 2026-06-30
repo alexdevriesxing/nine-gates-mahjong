@@ -1,9 +1,21 @@
 <!DOCTYPE html>
 <html>
 <head>
-<style>body { margin: 0; padding: 0; background: transparent; overflow: hidden; }</style>
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<style>
+  html, body {
+    margin: 0;
+    padding: 0;
+    min-height: 260px;
+    background: transparent;
+    overflow: hidden;
+  }
+</style>
 </head>
 <body>
+<script>
+  document.body.dataset.placement = new URLSearchParams(window.location.search).get('placement') || 'native';
+</script>
 <script async="async" data-cfasync="false" src="https://pl29884536.effectivecpmnetwork.com/c9947e22755623a8fe8d556aa1ba06d5/invoke.js"></script>
 <div id="container-c9947e22755623a8fe8d556aa1ba06d5"></div>
 </body>

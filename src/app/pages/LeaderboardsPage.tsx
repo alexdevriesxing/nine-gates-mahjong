@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import SEOHead from '../components/SEOHead';
-import AdSlot from '../components/AdSlot';
+import ResponsiveAdSlot from '../components/ResponsiveAdSlot';
 
 const categories = ['Hall of Fame', 'Real Mahjong', 'Solitaire', 'Daily Puzzle', 'Time Attack'] as const;
 type Category = (typeof categories)[number];
@@ -152,8 +152,14 @@ export default function LeaderboardsPage() {
             : `${category} sample standings demonstrate the published ranking format until enough verified public results are available.`}
         </p>
         <div className="flex justify-center items-center mt-12 w-full" data-gaio-section="ads">
-          <AdSlot width={728} height={90} className="hidden md:flex" />
-          <AdSlot width={320} height={50} className="flex md:hidden" />
+          <ResponsiveAdSlot
+            label="Sponsored"
+            placement="leaderboards-bottom"
+            sizes={[
+              { media: '(min-width: 768px)', width: 728, height: 90 },
+              { width: 320, height: 50 },
+            ]}
+          />
         </div>
       </main>
     </>

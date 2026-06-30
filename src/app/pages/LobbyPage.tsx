@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import SEOHead from '../components/SEOHead';
-import AdSlot from '../components/AdSlot';
+import ResponsiveAdSlot from '../components/ResponsiveAdSlot';
 import GameChat, { type ChatMessage } from '../components/GameChat';
 import MahjongTileView from '../../game/react/MahjongTileView';
 import { generateGuestName } from '@shared/utils';
@@ -279,8 +279,14 @@ export default function LobbyPage() {
 
         {error && <p className="lobby-error" role="alert">{error}</p>}
         <div className="lobby-ad flex justify-center items-center mt-12 w-full" data-gaio-section="ads">
-          <AdSlot width={728} height={90} className="hidden md:flex" />
-          <AdSlot width={320} height={50} className="flex md:hidden" />
+          <ResponsiveAdSlot
+            label="Sponsored"
+            placement="lobby-bottom"
+            sizes={[
+              { media: '(min-width: 768px)', width: 728, height: 90 },
+              { width: 320, height: 50 },
+            ]}
+          />
         </div>
       </div>
     </>

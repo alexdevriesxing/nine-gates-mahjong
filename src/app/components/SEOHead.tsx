@@ -1,5 +1,6 @@
 import { Helmet } from 'react-helmet-async';
 import { SITE_NAME, SITE_DOMAIN } from '@shared/constants';
+import { buildStructuredData, getSeoRoute } from '@shared/seo';
 
 interface SEOHeadProps {
   title: string;
@@ -23,37 +24,16 @@ export default function SEOHead({
   noIndex = false,
 }: SEOHeadProps) {
   const finalCanonical = canonical || SITE_DOMAIN;
-  
-  const baseSchema = {
-    "@context": "https://schema.org",
-    "@graph": [
-      {
-        "@type": "WebSite",
-        "@id": "https://ninegatesmahjong.com/#website",
-        "url": "https://ninegatesmahjong.com/",
-        "name": "Nine Gates Mahjong",
-        "description": "The definitive online Mahjong portal for casual and serious players. Play Solitaire, Riichi, MCR, and more.",
-        "publisher": {
-          "@id": "https://ninegatesmahjong.com/#organization"
-        }
-      },
-      {
-        "@type": "Organization",
-        "@id": "https://ninegatesmahjong.com/#organization",
-        "name": "Nine Gates Mahjong",
-        "url": "https://ninegatesmahjong.com/",
-        "logo": {
-          "@type": "ImageObject",
-          "url": "https://ninegatesmahjong.com/logo_dark.png"
-        }
-      }
-    ]
-  };
+  const routePath = finalCanonical.replace(SITE_DOMAIN, '') || '/';
+  const routeMeta = getSeoRoute(routePath);
+  const baseSchema = buildStructuredData(routePath);
+  const keywords = routeMeta.keywords.join(', ');
   
   return (
     <Helmet>
       <title>{title}</title>
       <meta name="description" content={description} />
+      <meta name="keywords" content={keywords} />
       <link rel="canonical" href={finalCanonical} />
       <meta name="robots" content={noIndex ? 'noindex,follow' : 'index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1'} />
       

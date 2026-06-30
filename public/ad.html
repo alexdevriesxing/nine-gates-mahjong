@@ -1,24 +1,41 @@
 <!DOCTYPE html>
 <html>
 <head>
-<style>body { margin: 0; padding: 0; background: transparent; overflow: hidden; display: flex; justify-content: center; align-items: center; }</style>
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<style>
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: transparent;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+</style>
 </head>
 <body>
 <script>
   const urlParams = new URLSearchParams(window.location.search);
   const key = urlParams.get('key');
-  const width = urlParams.get('w');
-  const height = urlParams.get('h');
+  const width = Number.parseInt(urlParams.get('w') || '0', 10);
+  const height = Number.parseInt(urlParams.get('h') || '0', 10);
+  const placement = urlParams.get('placement') || 'banner';
+  document.body.dataset.placement = placement;
+  document.documentElement.style.width = `${width}px`;
+  document.documentElement.style.height = `${height}px`;
+  document.body.style.width = `${width}px`;
+  document.body.style.height = `${height}px`;
   
-  if (key) {
+  if (/^[a-f0-9]{32}$/i.test(key || '') && width > 0 && height > 0) {
     window.atOptions = {
       'key' : key,
       'format' : 'iframe',
-      'height' : parseInt(height),
-      'width' : parseInt(width),
+      'height' : height,
+      'width' : width,
       'params' : {}
     };
-    document.write('<script src="https://www.highperformanceformat.com/' + key + '/invoke.js"></' + 'script>');
+    document.write('<script data-cfasync="false" src="https://www.highperformanceformat.com/' + key + '/invoke.js"></' + 'script>');
   }
 </script>
 </body>

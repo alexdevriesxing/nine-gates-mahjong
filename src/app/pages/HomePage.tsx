@@ -6,8 +6,8 @@ import GameModeCard from '../components/GameModeCard';
 import VariantCard from '../components/VariantCard';
 import { GAME_MODES, MAHJONG_VARIANTS, AI_CHARACTERS } from '@shared/constants';
 import { useAuth } from '../context/AuthContext';
-import AdSlot from '../components/AdSlot';
 import NativeBanner from '../components/NativeBanner';
+import ResponsiveAdSlot from '../components/ResponsiveAdSlot';
 
 // Animation variant for staggered reveals
 const fadeUpVar = {
@@ -100,6 +100,24 @@ export default function HomePage() {
             <Link to="/real-mahjong" className="btn-vermilion text-lg w-full sm:w-auto px-8 py-4">
               Try Real Mahjong
             </Link>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.8 }}
+            className="mt-8 flex justify-center"
+            data-gaio-section="hero-ad"
+          >
+            <ResponsiveAdSlot
+              label="Sponsored"
+              placement="home-hero"
+              priority
+              sizes={[
+                { media: '(min-width: 768px)', width: 728, height: 90 },
+                { width: 320, height: 50 },
+              ]}
+            />
           </motion.div>
           
           <motion.div
@@ -197,7 +215,7 @@ export default function HomePage() {
 
       {/* Mid-page ad section */}
       <div className="container-wide py-4 flex justify-center items-center">
-        <NativeBanner />
+        <NativeBanner placement="home-mid-native" />
       </div>
 
       {/* FEATURED GAME MODES */}
@@ -326,9 +344,49 @@ export default function HomePage() {
       </section>
 
       <div className="container-wide py-8 flex justify-center items-center">
-        <AdSlot width={728} height={90} className="hidden md:flex" />
-        <AdSlot width={320} height={50} className="flex md:hidden" />
+        <ResponsiveAdSlot
+          label="Sponsored"
+          placement="home-late-banner"
+          sizes={[
+            { media: '(min-width: 768px)', width: 728, height: 90 },
+            { width: 320, height: 50 },
+          ]}
+        />
       </div>
+
+      <section className="home-seo-section" data-gaio-section="answers">
+        <div className="container-wide">
+          <div className="home-seo-section__grid">
+            <article>
+              <p className="game-eyebrow">Free online Mahjong portal</p>
+              <h2>Play Mahjongg Solitaire, puzzle Mahjong, and real Mahjong in one place</h2>
+              <p>
+                Nine Gates Mahjong is built for players who search for free online Mahjong games and want more than a single
+                tile-matching board. Start with Mahjongg Solitaire, return for the shared Daily Mahjongg Puzzle, switch into
+                Mahjong Connect or Shisen-Sho, then practice authentic four-player Mahjong against AI opponents.
+              </p>
+              <p>
+                The learning hub explains the difference between Mahjong and Mahjongg, free-tile logic, chi, pung, kong,
+                discard strategy, and regional rules such as Hong Kong Mahjong, Riichi, MCR, American Mahjongg, and Taiwanese Mahjong.
+              </p>
+            </article>
+            <dl>
+              <div>
+                <dt>Best game for beginners</dt>
+                <dd>Mahjongg Solitaire teaches tile recognition and matching before moving into strategy-heavy table Mahjong.</dd>
+              </div>
+              <div>
+                <dt>Best daily challenge</dt>
+                <dd>The Daily Mahjongg Puzzle gives every visitor the same deterministic solvable board for comparable scores.</dd>
+              </div>
+              <div>
+                <dt>Best real Mahjong practice</dt>
+                <dd>Real Mahjong vs AI teaches drawing, discarding, concealed hands, table reading, and the four-player rhythm.</dd>
+              </div>
+            </dl>
+          </div>
+        </div>
+      </section>
 
       {/* FINAL CTA */}
       <section className="py-28 bg-gradient-to-b from-ink-950 to-lacquer-dark border-t border-gold/10 text-center relative overflow-hidden">

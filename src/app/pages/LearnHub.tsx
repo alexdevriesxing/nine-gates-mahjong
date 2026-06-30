@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import SEOHead from '../components/SEOHead';
-import AdSlot from '../components/AdSlot';
+import ResponsiveAdSlot from '../components/ResponsiveAdSlot';
 
 const guides = [
   ['Mahjong vs Mahjongg', 'Understand real four-player Mahjong, American Mahjongg, and Mahjongg Solitaire.', '/learn/mahjong-vs-mahjongg', 'Foundations'],
@@ -39,8 +39,14 @@ export default function LearnHub() {
           ))}
         </section>
         <div className="flex justify-center items-center mt-16 w-full" data-gaio-section="ads">
-          <AdSlot width={728} height={90} className="hidden md:flex" />
-          <AdSlot width={320} height={50} className="flex md:hidden" />
+          <ResponsiveAdSlot
+            label="Sponsored"
+            placement="learn-hub-bottom"
+            sizes={[
+              { media: '(min-width: 768px)', width: 728, height: 90 },
+              { width: 320, height: 50 },
+            ]}
+          />
         </div>
       </main>
     </>

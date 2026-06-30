@@ -18,7 +18,8 @@ export default function PrivacyPage() {
           </p>
           <p>
             We display advertisements from trusted third-party networks to support the site and keep play free. 
-            These ads are served in sandboxed frames and do not collect or track your personal identifier data from our portal.
+            Ad partners may receive standard browser, device, and network signals when their ads load, and they may use
+            cookies or similar technologies according to their own policies and the laws that apply to each visitor.
           </p>
         </article>
       </main>

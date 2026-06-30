@@ -5,8 +5,10 @@ interface AdSlotProps {
   width: number;
   height: number;
   label?: string;
+  placement?: string;
   className?: string;
   sticky?: boolean;
+  priority?: boolean;
 }
 
 const ADSTERRA_KEYS: Record<string, string | undefined> = {
@@ -22,28 +24,37 @@ export default function AdSlot({
   width,
   height,
   label = 'Advertisement',
+  placement,
   className = '',
   sticky = false,
+  priority = false,
 }: AdSlotProps) {
   const { adsEnabled } = useAds();
   const [failed, setFailed] = useState(false);
   const key = ADSTERRA_KEYS[`${width}x${height}`]?.trim();
   const liveKey = adsEnabled && key && !failed ? key : null;
+  const placementId = placement || `${width}x${height}`;
+  const src = liveKey
+    ? `/ad.html?key=${encodeURIComponent(liveKey)}&w=${width}&h=${height}&placement=${encodeURIComponent(placementId)}`
+    : '';
 
   return (
     <aside
       className={`ad-slot ${sticky ? 'ad-slot--sticky' : ''} ${className}`}
       style={{ '--ad-width': `${width}px`, '--ad-height': `${height}px` } as React.CSSProperties}
       aria-label={label}
+      data-ad-placement={placementId}
+      data-ad-size={`${width}x${height}`}
     >
       <span>{label}</span>
       {liveKey ? (
         <iframe
-          src={`/ad.html?key=${encodeURIComponent(liveKey)}&w=${width}&h=${height}`}
+          src={src}
           width={width}
           height={height}
-          loading="lazy"
+          loading={priority ? 'eager' : 'lazy'}
           onError={() => setFailed(true)}
+          referrerPolicy="strict-origin-when-cross-origin"
           title={label}
         />
       ) : (

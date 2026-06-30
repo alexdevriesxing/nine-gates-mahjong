@@ -4,3 +4,4 @@ Disallow: /profile
 Disallow: /api/
 
 Sitemap: https://ninegatesmahjong.com/sitemap.xml
+Host: https://ninegatesmahjong.com

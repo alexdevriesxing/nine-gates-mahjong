@@ -1,16 +1,21 @@
-import { useEffect, useRef } from 'react';
+interface NativeBannerProps {
+  placement?: string;
+  priority?: boolean;
+}
 
-export default function NativeBanner() {
+export default function NativeBanner({ placement = 'native', priority = false }: NativeBannerProps) {
   return (
-    <div className="w-full flex justify-center items-center my-4">
-      <div className="w-full max-w-[800px] min-h-[100px] bg-ink-950/50 border border-gold/10 flex justify-center items-center overflow-hidden">
+    <div className="native-ad w-full flex justify-center items-center my-4" data-ad-placement={placement}>
+      <div className="native-ad__frame w-full max-w-[800px] bg-ink-950/50 border border-gold/10 flex justify-center items-center overflow-hidden">
         <iframe
-          src="/native.html"
+          src={`/native.html?placement=${encodeURIComponent(placement)}`}
           width="100%"
           height="100%"
-          style={{ minHeight: '100px', border: 'none', overflow: 'hidden' }}
+          style={{ minHeight: '260px', border: 'none', overflow: 'hidden' }}
           frameBorder="0"
           scrolling="no"
+          loading={priority ? 'eager' : 'lazy'}
+          referrerPolicy="strict-origin-when-cross-origin"
           title="Native Ad"
         />
       </div>

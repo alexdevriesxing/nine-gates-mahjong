@@ -1479,6 +1479,69 @@
     border: 0;
   }
 
+  .site-ad-strip {
+    display: flex;
+    justify-content: center;
+    padding: 0.9rem 1rem 0.25rem;
+    background: rgba(8, 8, 16, 0.92);
+  }
+
+  .native-ad__frame {
+    min-height: 260px;
+    border-radius: 9px;
+  }
+
+  .home-seo-section {
+    padding: clamp(3rem, 7vw, 6rem) 0;
+    background:
+      linear-gradient(180deg, rgba(8, 8, 16, 0.92), rgba(10, 74, 58, 0.16)),
+      var(--color-ink-950);
+    border-top: 1px solid rgba(196, 163, 90, 0.08);
+  }
+
+  .home-seo-section__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.25fr) minmax(280px, 0.75fr);
+    gap: clamp(1.5rem, 4vw, 4rem);
+    align-items: start;
+  }
+
+  .home-seo-section h2 {
+    max-width: 860px;
+    margin: 0 0 1rem;
+    color: var(--color-ivory);
+    font-size: clamp(2rem, 4vw, 3.5rem);
+  }
+
+  .home-seo-section p,
+  .home-seo-section dd {
+    color: var(--color-ink-200);
+    line-height: 1.75;
+  }
+
+  .home-seo-section dl {
+    display: grid;
+    gap: 0.8rem;
+    margin: 0;
+  }
+
+  .home-seo-section dl > div {
+    padding: 1rem;
+    border-left: 3px solid rgba(196, 163, 90, 0.5);
+    background: rgba(8, 8, 16, 0.42);
+  }
+
+  .home-seo-section dt {
+    margin-bottom: 0.25rem;
+    color: var(--color-gold);
+    font-weight: 700;
+  }
+
+  .home-seo-section dd {
+    margin: 0;
+    font-size: 0.95rem;
+  }
+
   .ad-slot--sticky {
     position: sticky;
     top: 92px;
@@ -1604,6 +1667,10 @@
 
   .game-page__layout {
     padding-inline: 0.35rem;
+  }
+
+  .home-seo-section__grid {
+    grid-template-columns: 1fr;
   }
 
   .consent-banner {

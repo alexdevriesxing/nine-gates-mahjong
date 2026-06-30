@@ -2,6 +2,7 @@ import { Outlet, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import Header from './Header';
 import Footer from './Footer';
+import SiteAdStrip from './SiteAdStrip';
 
 export default function Layout() {
   const location = useLocation();
@@ -11,6 +12,7 @@ export default function Layout() {
       <Header />
       <main className="flex-grow flex flex-col relative pt-[72px] min-w-0 w-full">
         {/* pt-[72px] offsets the fixed header for most pages except Home which underlaps it */}
+        <SiteAdStrip />
         <AnimatePresence mode="wait">
           <motion.div
             key={location.pathname}

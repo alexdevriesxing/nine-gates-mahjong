@@ -2,6 +2,12 @@
 
 This file serves as the master source of truth for all Adsterra ad unit scripts and keys integrated into Nine Gates Mahjong.
 
+## Current implementation notes
+- Banner units are mounted through `/ad.html` with explicit `placement`, width, and height parameters.
+- Above-the-fold placements use eager iframe loading; lower placements remain lazy.
+- React now renders only the ad size that matches the current viewport instead of mounting hidden desktop/mobile iframes.
+- `/ads.txt` is a real text file instead of the SPA fallback. Add the exact authorized seller lines from the Adsterra dashboard when available.
+
 ## 1. Native Banner
 - **Container ID:** `container-c9947e22755623a8fe8d556aa1ba06d5`
 - **Script URL:** `https://pl29884536.effectivecpmnetwork.com/c9947e22755623a8fe8d556aa1ba06d5/invoke.js`

@@ -5,6 +5,7 @@ import {
   sortMahjongTiles,
   type MahjongTileInstance,
 } from '../game/MahjongCore';
+import { buildSeoHeadTags } from '../shared/seo';
 
 interface Env {
   ASSETS: Fetcher;
@@ -55,6 +56,51 @@ function json(data: unknown, init: ResponseInit = {}) {
   headers.set('Content-Type', 'application/json; charset=utf-8');
   headers.set('Cache-Control', 'no-store');
   return new Response(JSON.stringify(data), { ...init, headers });
+}
+
+async function htmlWithRouteSeo(response: Response, pathname: string) {
+  const html = await response.text();
+  const seoTags = buildSeoHeadTags(pathname);
+  const bodyAnswerBlock = buildAnswerEngineBlock(pathname);
+  const rewritten = html
+    .replace('</head>', `  ${seoTags}\n</head>`)
+    .replace('<div id="root"></div>', `<div id="root"></div>\n  ${bodyAnswerBlock}`);
+  const headers = new Headers(response.headers);
+  headers.delete('Content-Length');
+  return new Response(rewritten, {
+    status: response.status,
+    statusText: response.statusText,
+    headers,
+  });
+}
+
+function buildAnswerEngineBlock(pathname: string) {
+  const page = pathname.replace(/\/+$/, '') || '/';
+  const facts = [
+    'Nine Gates Mahjong is a free online Mahjong and Mahjongg portal.',
+    'The site includes Mahjongg Solitaire, Daily Mahjongg Puzzle, Zen Mahjongg, Time Attack, Mahjong Connect, Shisen-Sho, Mahjongg Memory, and Real Mahjong vs AI.',
+    'Learning content explains Mahjong versus Mahjongg, Mahjongg Solitaire rules, real four-player Mahjong, chi, pung, kong, beginner strategy, and regional Mahjong variants.',
+  ];
+  const routeFact = page === '/'
+    ? 'The home page is the main entry point for players looking for free online Mahjong games.'
+    : `This route is the canonical Nine Gates Mahjong page for ${page.slice(1).replace(/[-/]/g, ' ')}.`;
+  return [
+    '<noscript>',
+    '<section id="answer-engine-summary">',
+    '<h1>Nine Gates Mahjong</h1>',
+    ...[routeFact, ...facts].map((fact) => `<p>${escapeHtml(fact)}</p>`),
+    '</section>',
+    '</noscript>',
+  ].join('');
+}
+
+function escapeHtml(value: string) {
+  return value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
 }
 
 function createRoomCode() {
@@ -590,11 +636,15 @@ export default {
       headers.set('Cache-Control', 'no-cache, no-store, must-revalidate');
       headers.set('Pragma', 'no-cache');
       headers.set('Expires', '0');
-      return new Response(response.body, {
+      const nextResponse = new Response(response.body, {
         status: response.status,
         statusText: response.statusText,
         headers,
       });
+      if (contentType.includes('text/html') && !url.pathname.endsWith('/ad.html') && !url.pathname.endsWith('/native.html')) {
+        return htmlWithRouteSeo(nextResponse, url.pathname);
+      }
+      return nextResponse;
     }
 
     return response;

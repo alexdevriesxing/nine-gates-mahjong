@@ -1,0 +1,3 @@
+# Nine Gates Mahjong ads.txt
+# Replace or extend this file with the exact authorized seller lines from the Adsterra publisher dashboard.
+# The previous deployment served the SPA HTML shell at /ads.txt, which is invalid for ad verification crawlers.
