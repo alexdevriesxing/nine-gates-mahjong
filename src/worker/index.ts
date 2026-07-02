@@ -94,6 +94,11 @@ function buildAnswerEngineBlock(pathname: string) {
   ].join('');
 }
 
+function isAdHelperPath(pathname: string) {
+  const cleanPath = pathname.replace(/\/+$/, '').toLowerCase();
+  return cleanPath === '/ad' || cleanPath === '/ad.html' || cleanPath === '/native' || cleanPath === '/native.html';
+}
+
 function escapeHtml(value: string) {
   return value
     .replace(/&/g, '&amp;')
@@ -641,7 +646,7 @@ export default {
         statusText: response.statusText,
         headers,
       });
-      if (contentType.includes('text/html') && !url.pathname.endsWith('/ad.html') && !url.pathname.endsWith('/native.html')) {
+      if (contentType.includes('text/html') && !isAdHelperPath(url.pathname)) {
         return htmlWithRouteSeo(nextResponse, url.pathname);
       }
       return nextResponse;
