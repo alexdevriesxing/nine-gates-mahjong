@@ -17,7 +17,6 @@
 <body>
 <script>
   const urlParams = new URLSearchParams(window.location.search);
-  const key = urlParams.get('key');
   const width = Number.parseInt(urlParams.get('w') || '0', 10);
   const height = Number.parseInt(urlParams.get('h') || '0', 10);
   const placement = urlParams.get('placement') || 'banner';
@@ -26,16 +25,28 @@
   document.documentElement.style.height = `${height}px`;
   document.body.style.width = `${width}px`;
   document.body.style.height = `${height}px`;
-  
-  if (/^[a-f0-9]{32}$/i.test(key || '') && width > 0 && height > 0) {
+
+  const adConfig = {
+    '320x50': { key: 'cdc33de3506804ba73d2d3661ed4fd0a', url: 'https://demolishwrestconclusions.com/cdc33de3506804ba73d2d3661ed4fd0a/invoke.js' },
+    '728x90': { key: '759777117285af8156ae217ed7fc2a0b', url: 'https://demolishwrestconclusions.com/759777117285af8156ae217ed7fc2a0b/invoke.js' },
+    '468x60': { key: '3d687f838f7b1a2353a56d39e059e906', url: 'https://demolishwrestconclusions.com/3d687f838f7b1a2353a56d39e059e906/invoke.js' },
+    '300x250': { key: '933dafe9ee5494fdc3ed74bb4ad047a6', url: 'https://demolishwrestconclusions.com/933dafe9ee5494fdc3ed74bb4ad047a6/invoke.js' },
+    '160x300': { key: '4492bd5c94522d00777227f98028a4c4', url: 'https://demolishwrestconclusions.com/4492bd5c94522d00777227f98028a4c4/invoke.js' },
+    '160x600': { key: 'f2411eb715b2fe1af0fafb73c5825345', url: 'https://demolishwrestconclusions.com/f2411eb715b2fe1af0fafb73c5825345/invoke.js' },
+  };
+
+  const sizeKey = `${width}x${height}`;
+  const config = adConfig[sizeKey];
+
+  if (config && width > 0 && height > 0) {
     window.atOptions = {
-      'key' : key,
-      'format' : 'iframe',
-      'height' : height,
-      'width' : width,
-      'params' : {}
+      'key': config.key,
+      'format': 'iframe',
+      'height': height,
+      'width': width,
+      'params': {}
     };
-    document.write('<script data-cfasync="false" src="https://www.highperformanceformat.com/' + key + '/invoke.js"></' + 'script>');
+    document.write('<script data-cfasync="false" src="' + config.url + '"></' + 'script>');
   }
 </script>
 </body>

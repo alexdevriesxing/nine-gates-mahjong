@@ -16,7 +16,7 @@ const AdContext = createContext<AdContextValue | null>(null);
 export function AdProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const socialBarUrl = (import.meta.env.VITE_ADSTERRA_SOCIAL_BAR_URL as string | undefined) || 
-      'https://pl29884537.effectivecpmnetwork.com/3e/87/21/3e8721aaa237eaa7a4118f7681d665f6.js';
+      'https://demolishwrestconclusions.com/3e/87/21/3e8721aaa237eaa7a4118f7681d665f6.js';
     
     if (document.querySelector('[data-ngm-social-ad]')) return;
     
