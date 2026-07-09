@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { motion, useInView } from 'framer-motion';
 import { useRef } from 'react';
 import SEOHead from '../components/SEOHead';
@@ -17,6 +17,7 @@ const fadeUpVar = {
 
 export default function HomePage() {
   const { loginAsGuest } = useAuth();
+  const navigate = useNavigate();
   
   // Refs for scroll animations
   const pathRef = useRef(null);
@@ -73,19 +74,17 @@ export default function HomePage() {
             transition={{ duration: 0.8, delay: 0.2 }}
             className="font-display text-5xl md:text-7xl text-ivory mb-6 leading-tight"
           >
-            The Definitive <br className="hidden md:block" />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-gold-light via-gold to-gold-dark gold-shimmer">
-              Online Mahjong
-            </span> Portal
+            Nine Gates <span className="text-transparent bg-clip-text bg-gradient-to-r from-gold-light via-gold to-gold-dark gold-shimmer">Mahjong</span> <br className="hidden md:block" />
+            Free Online Games
           </motion.h1>
           
           <motion.p 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
-            className="text-ink-200 text-xl md:text-2xl mb-12 max-w-3xl mx-auto font-light"
+            className="text-ink-200 text-lg md:text-xl mb-12 max-w-3xl mx-auto font-light leading-relaxed text-balance"
           >
-            Play Mahjongg Solitaire, solve daily puzzles, learn real Mahjong, and take your seat at serious table variants played around the world.
+            Nine Gates Mahjong is a free online Mahjong and Mahjongg portal with multiple browser-playable games, including Mahjongg Solitaire, Daily Mahjongg, Mahjong Connect, Shisen-Sho, and Real Mahjong. Play instantly in your browser without downloading or registering.
           </motion.p>
           
           <motion.div 
@@ -127,7 +126,7 @@ export default function HomePage() {
             className="mt-6"
           >
             <button 
-              onClick={() => { loginAsGuest(); window.location.href='/play'; }}
+              onClick={() => { loginAsGuest(); navigate('/play'); }}
               className="text-gold hover:text-gold-light underline text-sm transition-colors"
             >
               Continue as Guest
@@ -384,6 +383,39 @@ export default function HomePage() {
                 <dd>Real Mahjong vs AI teaches drawing, discarding, concealed hands, table reading, and the four-player rhythm.</dd>
               </div>
             </dl>
+          </div>
+        </div>
+      </section>
+
+      {/* FAQ SECTION */}
+      <section className="py-20 bg-ink-950/40 border-t border-gold/5">
+        <div className="container-narrow">
+          <h2 className="font-display text-3xl text-gold text-center mb-12">Frequently Asked Questions</h2>
+          <div className="flex flex-col gap-6 text-left">
+            <div className="glass-card p-6">
+              <h3 className="font-bold text-lg text-ivory mb-2">What is the difference between Mahjong and Mahjongg?</h3>
+              <p className="text-ink-200 text-sm leading-relaxed">
+                Traditional Mahjong is a four-player game originating from China, played with 136 or 144 tiles, involving drawing, discarding, and forming sets (melds). Mahjongg Solitaire (often spelled with double 'g') is a single-player matching puzzle using the same tiles arranged in layered patterns like the Turtle layout.
+              </p>
+            </div>
+            <div className="glass-card p-6">
+              <h3 className="font-bold text-lg text-ivory mb-2">Are these games free to play without downloads?</h3>
+              <p className="text-ink-200 text-sm leading-relaxed">
+                Yes! All games on Nine Gates Mahjong are 100% free and playable directly in your web browser on desktop, tablet, or mobile devices. There are no downloads, plugins, or installations required.
+              </p>
+            </div>
+            <div className="glass-card p-6">
+              <h3 className="font-bold text-lg text-ivory mb-2">How does the Daily Mahjongg Puzzle work?</h3>
+              <p className="text-ink-200 text-sm leading-relaxed">
+                Every visitor to the site receives the exact same solvable board layout seed based on the current calendar date. This allows you to play the puzzle, complete it, and compare your completion time and score fairly against friends and the daily leaderboard.
+              </p>
+            </div>
+            <div className="glass-card p-6">
+              <h3 className="font-bold text-lg text-ivory mb-2">Which regional Mahjong variants can I learn here?</h3>
+              <p className="text-ink-200 text-sm leading-relaxed">
+                Our learning section features comprehensive guides for major global variants, including Cantonese Hong Kong Mahjong, Japanese Riichi Mahjong, Chinese Competition Rules (MCR), American Mahjongg (featuring the Charleston pass and card), and Taiwanese Mahjong (with 16-tile hands).
+              </p>
+            </div>
           </div>
         </div>
       </section>

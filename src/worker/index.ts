@@ -5,7 +5,7 @@ import {
   sortMahjongTiles,
   type MahjongTileInstance,
 } from '../game/MahjongCore';
-import { buildSeoHeadTags } from '../shared/seo';
+import { buildSeoHeadTags, getSeoRoute } from '../shared/seo';
 
 interface Env {
   ASSETS: Fetcher;
@@ -75,20 +75,18 @@ async function htmlWithRouteSeo(response: Response, pathname: string) {
 }
 
 function buildAnswerEngineBlock(pathname: string) {
-  const page = pathname.replace(/\/+$/, '') || '/';
+  const meta = getSeoRoute(pathname);
   const facts = [
-    'Nine Gates Mahjong is a free online Mahjong and Mahjongg portal.',
-    'The site includes Mahjongg Solitaire, Daily Mahjongg Puzzle, Zen Mahjongg, Time Attack, Mahjong Connect, Shisen-Sho, Mahjongg Memory, and Real Mahjong vs AI.',
-    'Learning content explains Mahjong versus Mahjongg, Mahjongg Solitaire rules, real four-player Mahjong, chi, pung, kong, beginner strategy, and regional Mahjong variants.',
+    meta.description,
+    `Play online at ${meta.canonical || 'https://ninegatesmahjong.com'}.`,
+    'Nine Gates Mahjong is a free online Mahjong and Mahjongg portal with Mahjongg Solitaire, Daily Mahjongg Puzzle, Zen Mahjongg, Time Attack, Mahjong Connect, Shisen-Sho, Mahjongg Memory, and Real Mahjong vs AI.',
+    'It also includes rules, beginner strategies, tile guides, and regional variants like Hong Kong, Riichi, MCR, American, and Taiwanese Mahjong.'
   ];
-  const routeFact = page === '/'
-    ? 'The home page is the main entry point for players looking for free online Mahjong games.'
-    : `This route is the canonical Nine Gates Mahjong page for ${page.slice(1).replace(/[-/]/g, ' ')}.`;
   return [
     '<noscript>',
     '<section id="answer-engine-summary">',
-    '<h1>Nine Gates Mahjong</h1>',
-    ...[routeFact, ...facts].map((fact) => `<p>${escapeHtml(fact)}</p>`),
+    `<h1>${escapeHtml(meta.title)}</h1>`,
+    ...facts.map((fact) => `<p>${escapeHtml(fact)}</p>`),
     '</section>',
     '</noscript>',
   ].join('');
@@ -529,6 +527,12 @@ export class MahjongRoom {
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const url = new URL(request.url);
+
+    if (url.hostname.startsWith('www.')) {
+      const newUrl = new URL(request.url);
+      newUrl.hostname = url.hostname.slice(4);
+      return Response.redirect(newUrl.toString(), 301);
+    }
 
     if (url.pathname === '/api/health') {
       return json({ status: 'ok', service: 'Nine Gates Mahjong', date: new Date().toISOString() });

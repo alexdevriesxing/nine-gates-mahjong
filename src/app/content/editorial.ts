@@ -328,4 +328,217 @@ Object.assign(EDITORIAL, {
       { question: 'Are Taiwanese rules identical everywhere?', answer: 'No. House rules for tai, flowers, special hands, and payments vary, so confirm the table rules.' },
     ]
   ),
+  'mahjong-tiles': {
+    title: 'Mahjong Tiles Guide: Suits, Honors and Flowers',
+    metaTitle: 'Mahjong Tiles Guide: Suits, Honors and Flowers',
+    description: 'Learn to recognize all 144 Mahjong tiles, including the dot, bamboo, and character suits, winds, dragons, and optional season/flower tiles.',
+    canonical: '/learn/mahjong-tiles',
+    summary: 'A standard Mahjong set contains 144 tiles representing three suits, honor groups (winds and dragons), and optional flower and season bonus tiles. Learning to recognize these tiles is the first step toward mastering the game.',
+    sections: [
+      {
+        heading: 'The Three Suited Tile Groups',
+        paragraphs: [
+          'The majority of tiles in a Mahjong set belong to the three suits: Dots (Tong), Bamboos (Tiao), and Characters (Wan). Each suit has ranks numbered 1 through 9, with 4 copies of each tile, totaling 108 suited tiles.',
+          'Dots represent circular copper coins. Bamboos represent stalks of bamboo (with the 1 of Bamboos usually depicted as a bird). Characters display the traditional Chinese character for ten thousand (Wan) beneath the number symbol.'
+        ]
+      },
+      {
+        heading: 'Honors: Winds and Dragons',
+        paragraphs: [
+          'Honor tiles do not have numeric ranks. There are four Winds (East, South, West, and North) and three Dragons (Red, Green, and White). With 4 copies of each, honors total 28 tiles.',
+          'Winds represent the four directions and are crucial for determining seating and round scoring. Dragons represent three traditional concepts: Red (beauty/success), Green (wealth/prosperity), and White (purity/filial piety).'
+        ]
+      },
+      {
+        heading: 'Bonus Tiles: Flowers and Seasons',
+        paragraphs: [
+          'Many Mahjong variants include four optional Flower tiles and four Season tiles (totaling 8 tiles). These are generally treated as bonus cards: when drawn, they are immediately declared, set aside, and a replacement tile is drawn from the back of the wall.'
+        ]
+      }
+    ],
+    faqs: [
+      { question: 'How many tiles are in a standard Mahjong set?', answer: 'A standard set has 144 tiles: 108 suited tiles, 28 honors, and 8 flower/season tiles.' },
+      { question: 'What does the bird tile represent?', answer: 'The bird tile represents the 1 of Bamboos suit. It is decorated as a sparrow, peacock, or crane in most standard sets.' }
+    ]
+  },
+  'how-to-win-mahjong': {
+    title: 'How to Win Mahjong: Complete Winning Hand Rules',
+    metaTitle: 'How to Win Mahjong: Complete Winning Hand Rules',
+    description: 'Understand the basic four-meld and one-pair winning hand structure, hand validation, and special winning hands in traditional Mahjong.',
+    canonical: '/learn/how-to-win-mahjong',
+    summary: 'To win a standard Mahjong hand, a player must be the first to build a legal complete hand of 14 tiles, consisting of four melds (sets) and one pair (eyes). Understanding this structure is core to hand-building strategy.',
+    sections: [
+      {
+        heading: 'The Standard 14-Tile Hand Structure',
+        paragraphs: [
+          'A complete winning hand contains exactly 14 tiles. When it is not your turn, you hold 13 tiles. When you draw a tile (or claim a discarded tile for a win), your hand size becomes 14. If these 14 tiles form four sets (melds) of three tiles each and one matching pair, you have a winning hand.',
+          'Melds can consist of: Chows (three consecutive suited tiles), Pungs (three identical tiles), or Kongs (four identical tiles, which requires drawing an extra replacement tile to maintain the 13-tile hand count).'
+        ]
+      },
+      {
+        heading: 'Meld Types: Chow, Pung, and Kong',
+        paragraphs: [
+          'Chow (Chi): A run of three consecutive tiles of the same suit (e.g., 4, 5, 6 of Bamboos). You can only claim a discarded tile for a Chow from the player to your immediate left.',
+          'Pung (Peng): Three identical tiles (e.g., three Red Dragons). You can claim a discard for a Pung from any player at the table.',
+          'Kong (Gang): Four identical tiles. If you claim a discard or hold all four in your hand, you must declare it, lay them down, and draw a tile from the dead wall.'
+        ]
+      },
+      {
+        heading: 'The Eyes (Matching Pair)',
+        paragraphs: [
+          'The final component of any winning hand is a pair of identical tiles, often called the "eyes". Any tile can form the eyes, including suited tiles, winds, or dragons. You cannot win a hand without completing the pair.'
+        ]
+      }
+    ],
+    faqs: [
+      { question: 'Can I win with a discarded tile?', answer: 'Yes, if any opponent discards your winning tile (completing your fourth meld or eyes), you can claim it for a win (Ron/Hu).' },
+      { question: 'What is a self-drawn win?', answer: 'If you draw the winning tile yourself from the wall, you declare a self-drawn win (Tsumo), and all three opponents must pay you.' }
+    ]
+  },
+  'mahjong-scoring-basics': {
+    title: 'Mahjong Scoring Basics: Points, Fan and Yaku',
+    metaTitle: 'Mahjong Scoring Basics: Points, Fan and Yaku',
+    description: 'Learn how Mahjong hands are scored across variants. Compare Cantonese fan, Japanese yaku/han/fu, and standardized MCR points.',
+    canonical: '/learn/mahjong-scoring-basics',
+    summary: 'Scoring in Mahjong varies heavily by variant, but all methods assign points based on hand patterns, hand complexity, and method of winning (discard vs self-draw).',
+    sections: [
+      {
+        heading: 'Scoring Principles Across Variants',
+        paragraphs: [
+          'While a legal hand is almost always four melds and a pair, the way its value is calculated differs. Some variants use simple additive points, while others use exponential multipliers (doubles or fan).',
+          'In Cantonese Hong Kong Mahjong, you count "Fan" (doubles) based on patterns. In Japanese Riichi, you evaluate "Han" (yaku patterns) and "Fu" (mini-points) to compute a final score. In Chinese Official MCR, you sum points from 81 defined patterns.'
+        ]
+      },
+      {
+        heading: 'Common Scoring Patterns',
+        paragraphs: [
+          'All Chows: A hand consisting entirely of runs and a pair. Usually worth minimal points but easy to complete.',
+          'All Pungs: A hand with no runs, only sets of three identical tiles. Worth significant points.',
+          'Half Flush: A hand built using tiles of a single suit combined with honors (winds/dragons).',
+          'Full Flush: A hand consisting entirely of tiles from a single suit with no honors. Very high value.'
+        ]
+      }
+    ],
+    faqs: [
+      { question: 'What is a limit hand?', answer: 'A limit hand (yakuman in Japanese, maximum fan in Cantonese) is the highest possible hand value, awarded for extremely rare layouts.' },
+      { question: 'Why does self-drawing pay more?', answer: 'When you draw the winning tile yourself, all players pay you. When you win on a discard, the player who discarded the tile typically pays the full amount.' }
+    ]
+  },
+  'common-mistakes': {
+    title: 'Common Beginner Mahjong Mistakes and How to Avoid Them',
+    metaTitle: 'Common Beginner Mahjong Mistakes and How to Avoid Them',
+    description: 'Avoid typical beginner mistakes like calling too early, failing to defend, missing furiten, discarding safe tiles, or breaking hand structure.',
+    canonical: '/learn/common-mistakes',
+    summary: 'New players often make classic mistakes that lead to lost rounds or penalties. Learning simple defensive habits and hand-building hygiene will quickly improve your play.',
+    sections: [
+      {
+        heading: 'Mistake 1: Calling Discards Too Early',
+        paragraphs: [
+          'Beginners love to shout "Pung" or "Chi" on every available discard. Opening your hand (revealing melds on the table) makes your hand public, limits your flexibility, and reduces its final score value in variants like Riichi where concealed hands are worth more.',
+          'Strategy: Try to keep your hand concealed for the first 5-6 turns unless you are close to completion or calling a high-value honor set.'
+        ]
+      },
+      {
+        heading: 'Mistake 2: Ignoring Opponent Discards',
+        paragraphs: [
+          'Many novices only focus on their own tiles, treating Mahjong like a solo puzzle. You must watch what others discard. If a player is discarding only one suit, they are likely building a flush. If they declare readiness, do not discard tiles they might need.',
+          'Strategy: Pay attention to safe discards. If a player just discarded a tile, discarding that same tile immediately is 100% safe (they cannot claim it on the same turn).'
+        ]
+      },
+      {
+        heading: 'Mistake 3: Breaking the 14-Tile Count',
+        paragraphs: [
+          'Ensure you always have the correct number of tiles. If you forget to draw a replacement tile after declaring a Kong, you will have too few tiles (Short Hand) and be disqualified from winning that round.',
+          'Strategy: Double-check your tile count. Between turns, you must have exactly 13 tiles (excluding laid-down Kongs).'
+        ]
+      }
+    ],
+    faqs: [
+      { question: 'What happens if I make a false claim?', answer: 'Making a false claim (shouting win on a tile you cannot legally use) usually results in a penalty fee paid to the other players (Chombo).' },
+      { question: 'What is furiten in Japanese Mahjong?', answer: 'It is a state where you cannot win on a discard because you have previously discarded a tile that could complete your hand. You must win by self-draw instead.' }
+    ]
+  },
+  'glossary': {
+    title: 'Mahjong Glossary: Terms, Definitions and Slang',
+    metaTitle: 'Mahjong Glossary: Terms, Definitions and Slang',
+    description: 'Reference sheet for traditional Mahjong terminology, including chi, pung, kong, meld, discard, wall, shanten, tenpai, and mahjongg.',
+    canonical: '/learn/glossary',
+    summary: 'Familiarize yourself with the traditional language of Mahjong. This glossary contains key terms, tile designations, call types, and table slang.',
+    sections: [
+      {
+        heading: 'Meld & Action Calls',
+        paragraphs: [
+          'Chow (Chi): Calling a discard to complete a sequence of three suited tiles.',
+          'Pung (Peng): Calling a discard to complete a set of three identical tiles.',
+          'Kong (Gang): Declaring a set of four identical tiles.',
+          'Mahjong (Hu/Ron): Declaring a win on an opponent\'s discard.'
+        ]
+      },
+      {
+        heading: 'Hand States',
+        paragraphs: [
+          'Concealed: A hand that has not used any opponent discards (no open melds on the table).',
+          'Tenpai: A ready hand that is exactly one tile away from a legal win.',
+          'Shanten: A measure of how many steps your hand is from tenpai. If you need 3 tiles to get ready, you are 3-shanten.'
+        ]
+      },
+      {
+        heading: 'Game Components',
+        paragraphs: [
+          'Wall: The square stack of face-down tiles from which players draw.',
+          'Dead Wall: A reserved section of tiles at the end of the wall, used for drawing replacement tiles after Kongs or bonus tiles.'
+        ]
+      }
+    ],
+    faqs: [
+      { question: 'What is the difference between Hu and Ron?', answer: 'Both mean declaring a win on a discard, with Ron being the Japanese term and Hu being the Chinese term.' },
+      { question: 'What does Tsumo mean?', answer: 'Tsumo is the Japanese term for winning on a self-drawn tile.' }
+    ]
+  },
+  'about': {
+    title: 'About Nine Gates Mahjong',
+    metaTitle: 'About Nine Gates Mahjong',
+    description: 'Read the story behind Nine Gates Mahjong, our mission to build the definitive browser-playable portal, and our dedication to tile games.',
+    canonical: '/about',
+    summary: 'Nine Gates Mahjong is a dedicated online portal built by tile game enthusiasts for players around the world. We offer high-fidelity browser games, rules trainers, and guides.',
+    sections: [
+      {
+        heading: 'Our Mission',
+        paragraphs: [
+          'We believe Mahjong is one of the greatest strategy games ever created. Our mission is to build the definitive browser-playable portal for both single-player puzzles and traditional table rules.',
+          'Our platform features state-of-the-art vector rendering for high-fidelity tile designs, smooth animations, and responsive controls across all devices. Best of all, everything is 100% free with no registration required.'
+        ]
+      },
+      {
+        heading: 'Why "Nine Gates"?',
+        paragraphs: [
+          'The name "Nine Gates" (Jiu Lian Bao Deng) is a tribute to one of the rarest, most beautiful, and legendary winning hands in traditional Mahjong. It consists of a specific sequence of suited tiles (1-1-1-2-3-4-5-6-7-8-9-9-9 plus any matching tile of the same suit).'
+        ]
+      }
+    ],
+    faqs: [
+      { question: 'Who built this site?', answer: 'Nine Gates Mahjong was created by a global team of developers, designers, and Mahjong players dedicated to preserving tile game culture.' },
+      { question: 'Is the multiplayer real-time?', answer: 'Yes, our multiplayer lobby utilizes secure WebSockets to connect players for real-time play with hidden hand privacy.' }
+    ]
+  },
+  'contact': {
+    title: 'Contact Nine Gates Mahjong',
+    metaTitle: 'Contact Nine Gates Mahjong',
+    description: 'Get in touch with Nine Gates Mahjong for support, bug reports, feature requests, business inquiries, or general feedback.',
+    canonical: '/contact',
+    summary: 'We appreciate your support and value your feedback. Contact us with any comments, bugs, or feature suggestions.',
+    sections: [
+      {
+        heading: 'How to Reach Us',
+        paragraphs: [
+          'For support, gameplay feedback, or bug reports, please email us directly at support@ninegatesmahjong.com.',
+          'Alternatively, you can open an issue or pull request directly on our GitHub repository if you are a developer looking to contribute.'
+        ]
+      }
+    ],
+    faqs: [
+      { question: 'How do I report a bug?', answer: 'Please send an email to support@ninegatesmahjong.com with details about your device, browser, and the steps to reproduce the issue.' },
+      { question: 'Are you open to business partnerships?', answer: 'Yes, for media, advertising, or licensing inquiries, please contact us at business@ninegatesmahjong.com.' }
+    ]
+  }
 });

@@ -23,11 +23,28 @@ export default function SEOHead({
   jsonLd,
   noIndex = false,
 }: SEOHeadProps) {
-  const finalCanonical = canonical || SITE_DOMAIN;
+  let finalCanonical = canonical || SITE_DOMAIN;
+  if (!finalCanonical.startsWith('http')) {
+    finalCanonical = `${SITE_DOMAIN}${finalCanonical}`;
+  }
+  if (finalCanonical === SITE_DOMAIN || finalCanonical === `${SITE_DOMAIN}/`) {
+    finalCanonical = `${SITE_DOMAIN}/`;
+  }
+
   const routePath = finalCanonical.replace(SITE_DOMAIN, '') || '/';
   const routeMeta = getSeoRoute(routePath);
   const baseSchema = buildStructuredData(routePath);
   const keywords = routeMeta.keywords.join(', ');
+  
+  const schema = { ...baseSchema };
+  if (jsonLd) {
+    if (schema['@graph'] && Array.isArray(schema['@graph'])) {
+      const exists = schema['@graph'].some((item) => item['@type'] === jsonLd['@type']);
+      if (!exists) {
+        schema['@graph'].push(jsonLd);
+      }
+    }
+  }
   
   return (
     <Helmet>
@@ -49,14 +66,8 @@ export default function SEOHead({
       <meta name="twitter:image" content={ogImage || `${SITE_DOMAIN}/hero-bg.jpg`} />
       
       <script type="application/ld+json">
-        {JSON.stringify(baseSchema)}
+        {JSON.stringify(schema)}
       </script>
-      
-      {jsonLd && (
-        <script type="application/ld+json">
-          {JSON.stringify(jsonLd)}
-        </script>
-      )}
     </Helmet>
   );
 }

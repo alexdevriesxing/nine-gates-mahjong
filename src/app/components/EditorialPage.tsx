@@ -3,6 +3,7 @@ import SEOHead from './SEOHead';
 import AdSlot from './AdSlot';
 import NativeBanner from './NativeBanner';
 import ResponsiveAdSlot from './ResponsiveAdSlot';
+import Breadcrumbs from './Breadcrumbs';
 import { EDITORIAL } from '../content/editorial';
 import VariantMahjongTrainer, { type VariantRuleset } from '../../game/react/VariantMahjongTrainer';
 
@@ -38,6 +39,7 @@ export default function EditorialPage({ slug }: { slug: string }) {
         jsonLd={faqSchema}
       />
       <main className="editorial-page" data-gaio-container="true">
+        <Breadcrumbs />
         {ruleset && (
           <div className="editorial-page__trainer">
             <VariantMahjongTrainer ruleset={ruleset} />

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAds } from '../context/AdContext';
 
 interface AdSlotProps {
@@ -31,12 +31,23 @@ export default function AdSlot({
 }: AdSlotProps) {
   const { adsEnabled } = useAds();
   const [failed, setFailed] = useState(false);
+  const [loaded, setLoaded] = useState(false);
   const key = ADSTERRA_KEYS[`${width}x${height}`]?.trim();
   const liveKey = adsEnabled && key && !failed ? key : null;
   const placementId = placement || `${width}x${height}`;
   const src = liveKey
     ? `/ad.html?key=${encodeURIComponent(liveKey)}&w=${width}&h=${height}&placement=${encodeURIComponent(placementId)}`
     : '';
+
+  useEffect(() => {
+    if (!liveKey) return;
+    const timer = setTimeout(() => {
+      if (!loaded) {
+        setFailed(true);
+      }
+    }, 8000);
+    return () => clearTimeout(timer);
+  }, [liveKey, loaded]);
 
   return (
     <aside
@@ -53,7 +64,9 @@ export default function AdSlot({
           width={width}
           height={height}
           loading={priority ? 'eager' : 'lazy'}
+          onLoad={() => setLoaded(true)}
           onError={() => setFailed(true)}
+          sandbox="allow-scripts allow-popups allow-popups-to-escape-sandbox allow-same-origin"
           referrerPolicy="strict-origin-when-cross-origin"
           title={label}
         />

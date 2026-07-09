@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+<meta charset="utf-8">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <style>
   html, body {
@@ -27,26 +28,33 @@
   document.body.style.height = `${height}px`;
 
   const adConfig = {
-    '320x50': { key: 'cdc33de3506804ba73d2d3661ed4fd0a', url: 'https://demolishwrestconclusions.com/cdc33de3506804ba73d2d3661ed4fd0a/invoke.js' },
-    '728x90': { key: '759777117285af8156ae217ed7fc2a0b', url: 'https://demolishwrestconclusions.com/759777117285af8156ae217ed7fc2a0b/invoke.js' },
-    '468x60': { key: '3d687f838f7b1a2353a56d39e059e906', url: 'https://demolishwrestconclusions.com/3d687f838f7b1a2353a56d39e059e906/invoke.js' },
-    '300x250': { key: '933dafe9ee5494fdc3ed74bb4ad047a6', url: 'https://demolishwrestconclusions.com/933dafe9ee5494fdc3ed74bb4ad047a6/invoke.js' },
-    '160x300': { key: '4492bd5c94522d00777227f98028a4c4', url: 'https://demolishwrestconclusions.com/4492bd5c94522d00777227f98028a4c4/invoke.js' },
-    '160x600': { key: 'f2411eb715b2fe1af0fafb73c5825345', url: 'https://demolishwrestconclusions.com/f2411eb715b2fe1af0fafb73c5825345/invoke.js' },
+    '320x50': { key: 'cdc33de3506804ba73d2d3661ed4fd0a' },
+    '728x90': { key: '759777117285af8156ae217ed7fc2a0b' },
+    '468x60': { key: '3d687f838f7b1a2353a56d39e059e906' },
+    '300x250': { key: '933dafe9ee5494fdc3ed74bb4ad047a6' },
+    '160x300': { key: '4492bd5c94522d00777227f98028a4c4' },
+    '160x600': { key: 'f2411eb715b2fe1af0fafb73c5825345' },
   };
 
+  const keyParam = urlParams.get('key');
   const sizeKey = `${width}x${height}`;
-  const config = adConfig[sizeKey];
+  const defaultConfig = adConfig[sizeKey];
+  
+  const finalKey = keyParam || (defaultConfig ? defaultConfig.key : null);
+  const finalUrl = finalKey ? `https://demolishwrestconclusions.com/${finalKey}/invoke.js` : null;
 
-  if (config && width > 0 && height > 0) {
+  if (finalKey && finalUrl && width > 0 && height > 0) {
     window.atOptions = {
-      'key': config.key,
+      'key': finalKey,
       'format': 'iframe',
       'height': height,
       'width': width,
       'params': {}
     };
-    document.write('<script data-cfasync="false" src="' + config.url + '"></' + 'script>');
+    const script = document.createElement('script');
+    script.dataset.cfasync = 'false';
+    script.src = finalUrl;
+    document.body.appendChild(script);
   }
 </script>
 </body>

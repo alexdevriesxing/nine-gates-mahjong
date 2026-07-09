@@ -1,3 +1,5 @@
+import { SITE_DOMAIN } from './constants';
+
 export interface SeoRouteMeta {
   path: string;
   title: string;
@@ -10,7 +12,7 @@ export interface SeoRouteMeta {
   noIndex?: boolean;
 }
 
-const SITE_URL = 'https://ninegatesmahjong.com';
+const SITE_URL = SITE_DOMAIN;
 const DEFAULT_IMAGE = `${SITE_URL}/hero-bg.jpg`;
 
 export const SEO_ROUTES: SeoRouteMeta[] = [
@@ -323,6 +325,56 @@ export const SEO_ROUTES: SeoRouteMeta[] = [
     priority: '0.8',
   },
   {
+    path: '/learn/mahjong-tiles',
+    title: 'Mahjong Tiles Guide: Suits, Honors and Flowers | Nine Gates Mahjong',
+    description: 'Learn to recognize all 144 Mahjong tiles, including the dot, bamboo, and character suits, winds, dragons, and optional season/flower tiles.',
+    canonical: `${SITE_URL}/learn/mahjong-tiles`,
+    keywords: ['mahjong tiles', 'mahjong tile faces', 'dots bamboos characters', 'dragon tiles', 'wind tiles'],
+    section: 'learn',
+    changefreq: 'monthly',
+    priority: '0.8',
+  },
+  {
+    path: '/learn/how-to-win-mahjong',
+    title: 'How to Win Mahjong: Complete Winning Hand Rules | Nine Gates Mahjong',
+    description: 'Understand the basic four-meld and one-pair winning hand structure, hand validation, and special winning hands in traditional Mahjong.',
+    canonical: `${SITE_URL}/learn/how-to-win-mahjong`,
+    keywords: ['how to win mahjong', 'winning hand structure', 'four melds and a pair', 'mahjong win rules'],
+    section: 'learn',
+    changefreq: 'monthly',
+    priority: '0.8',
+  },
+  {
+    path: '/learn/mahjong-scoring-basics',
+    title: 'Mahjong Scoring Basics: Points, Fan and Yaku | Nine Gates Mahjong',
+    description: 'Learn how Mahjong hands are scored across variants. Compare Cantonese fan, Japanese yaku/han/fu, and standardized MCR points.',
+    canonical: `${SITE_URL}/learn/mahjong-scoring-basics`,
+    keywords: ['mahjong scoring', 'mahjong points', 'fan scoring Cantonese', 'riichi yaku points'],
+    section: 'learn',
+    changefreq: 'monthly',
+    priority: '0.8',
+  },
+  {
+    path: '/learn/common-mistakes',
+    title: 'Common Beginner Mahjong Mistakes and How to Avoid Them | Nine Gates Mahjong',
+    description: 'Avoid typical beginner mistakes like calling too early, failing to defend, missing furiten, discarding safe tiles, or breaking hand structure.',
+    canonical: `${SITE_URL}/learn/common-mistakes`,
+    keywords: ['beginner mahjong mistakes', 'calling early mahjong', 'furiten help', 'mahjong safety play'],
+    section: 'learn',
+    changefreq: 'monthly',
+    priority: '0.8',
+  },
+  {
+    path: '/learn/glossary',
+    title: 'Mahjong Glossary: Terms, Definitions and Slang | Nine Gates Mahjong',
+    description: 'Reference sheet for traditional Mahjong terminology, including chi, pung, kong, meld, discard, wall, shanten, tenpai, and mahjongg.',
+    canonical: `${SITE_URL}/learn/glossary`,
+    keywords: ['mahjong glossary', 'chi pung kong meaning', 'shanten tenpai definitions', 'mahjong terminology'],
+    section: 'learn',
+    changefreq: 'monthly',
+    priority: '0.8',
+  },
+  {
     path: '/login',
     title: 'Log In | Nine Gates Mahjong',
     description: 'Log in to your Nine Gates Mahjong profile.',
@@ -386,6 +438,26 @@ export const SEO_ROUTES: SeoRouteMeta[] = [
     changefreq: 'yearly',
     priority: '0.3',
   },
+  {
+    path: '/about',
+    title: 'About Nine Gates Mahjong | Online Tile Portal',
+    description: 'Read the story behind Nine Gates Mahjong, our mission to build the definitive browser-playable portal, and our dedication to tile games.',
+    canonical: `${SITE_URL}/about`,
+    keywords: ['about nine gates mahjong', 'mahjong portal story'],
+    section: 'legal',
+    changefreq: 'yearly',
+    priority: '0.4',
+  },
+  {
+    path: '/contact',
+    title: 'Contact Us | Nine Gates Mahjong',
+    description: 'Get in touch with Nine Gates Mahjong for support, bug reports, feature requests, business inquiries, or general feedback.',
+    canonical: `${SITE_URL}/contact`,
+    keywords: ['contact nine gates mahjong', 'mahjong support'],
+    section: 'legal',
+    changefreq: 'yearly',
+    priority: '0.4',
+  },
 ];
 
 const routeByPath = new Map(SEO_ROUTES.map((route) => [route.path, route]));
@@ -425,8 +497,68 @@ function escapeJsonForScript(value: unknown) {
   return JSON.stringify(value).replace(/</g, '\\u003c');
 }
 
+export function buildBreadcrumbs(pathname: string) {
+  const clean = pathname.split('?')[0].split('#')[0].replace(/\/+$/, '') || '/';
+  if (clean === '/') return null;
+
+  const parts = clean.split('/').filter(Boolean);
+  const items: Array<{ name: string; item: string }> = [];
+
+  // Always add Home
+  items.push({ name: 'Home', item: `${SITE_URL}/` });
+
+  let currentPath = '';
+  for (let i = 0; i < parts.length; i++) {
+    const part = parts[i];
+    currentPath += `/${part}`;
+    
+    // Determine user-friendly name
+    let name = part.replace(/[-/]/g, ' ');
+    name = name.charAt(0).toUpperCase() + name.slice(1);
+    
+    // Special overrides
+    if (part === 'play') name = 'Play Games';
+    if (part === 'learn') name = 'Learn Mahjong';
+    if (part === 'real-mahjong') name = 'Real Mahjong';
+    if (part === 'mcr') name = 'Chinese Official MCR';
+    if (part === 'hong-kong') name = 'Hong Kong Mahjong';
+    if (part === 'riichi') name = 'Japanese Riichi Mahjong';
+    if (part === 'american') name = 'American Mahjongg';
+    if (part === 'taiwanese') name = 'Taiwanese Mahjong';
+    if (part === 'mahjong-vs-mahjongg') name = 'Mahjong vs Mahjongg';
+    if (part === 'how-to-play-mahjongg-solitaire') name = 'How to Play Solitaire';
+    if (part === 'how-to-play-real-mahjong') name = 'How to Play Real Mahjong';
+    if (part === 'chi-pung-kong') name = 'Chi, Pung & Kong';
+    if (part === 'beginner-strategy') name = 'Beginner Strategy';
+    if (part === 'mahjong-variants') name = 'Mahjong Variants';
+    if (part === 'mahjong-tiles') name = 'Mahjong Tiles Guide';
+    if (part === 'how-to-win-mahjong') name = 'How to Win Mahjong';
+    if (part === 'mahjong-scoring-basics') name = 'Scoring Basics';
+    if (part === 'common-mistakes') name = 'Common Mistakes';
+    if (part === 'glossary') name = 'Mahjong Glossary';
+
+    items.push({
+      name,
+      item: `${SITE_URL}${currentPath}`,
+    });
+  }
+
+  return {
+    '@type': 'BreadcrumbList',
+    '@id': `${SITE_URL}${clean}#breadcrumb`,
+    'itemListElement': items.map((entry, index) => ({
+      '@type': 'ListItem',
+      'position': index + 1,
+      'name': entry.name,
+      'item': entry.item,
+    })),
+  };
+}
+
 export function buildStructuredData(pathname: string) {
   const meta = getSeoRoute(pathname);
+  const clean = pathname.split('?')[0].split('#')[0].replace(/\/+$/, '') || '/';
+  
   const graph: Record<string, unknown>[] = [
     {
       '@type': 'Organization',
@@ -462,7 +594,12 @@ export function buildStructuredData(pathname: string) {
     },
   ];
 
-  if (meta.section === 'games') {
+  const breadcrumbs = buildBreadcrumbs(pathname);
+  if (breadcrumbs) {
+    graph.push(breadcrumbs);
+  }
+
+  if (meta.section === 'games' && clean !== '/play') {
     graph.push({
       '@type': 'VideoGame',
       '@id': `${meta.canonical}#game`,
@@ -479,6 +616,70 @@ export function buildStructuredData(pathname: string) {
         price: 0,
         priceCurrency: 'USD',
       },
+    });
+  }
+
+  const faqDataMap: Record<string, Array<{ q: string; a: string }>> = {
+    '/': [
+      {
+        q: 'What is the difference between Mahjong and Mahjongg?',
+        a: 'Traditional Mahjong is a four-player game originating from China, played with 136 or 144 tiles, involving drawing, discarding, and forming sets (melds). Mahjongg Solitaire (often spelled with double \'g\') is a single-player matching puzzle using the same tiles arranged in layered patterns like the Turtle layout.'
+      },
+      {
+        q: 'Are these games free to play without downloads?',
+        a: 'Yes! All games on Nine Gates Mahjong are 100% free and playable directly in your web browser on desktop, tablet, or mobile devices. There are no downloads, plugins, or installations required.'
+      },
+      {
+        q: 'How does the Daily Mahjongg Puzzle work?',
+        a: 'Every visitor to the site receives the exact same solvable board layout seed based on the current calendar date. This allows you to play the puzzle, complete it, and compare your completion time and score fairly against friends and the daily leaderboard.'
+      },
+      {
+        q: 'Which regional Mahjong variants can I learn here?',
+        a: 'Our learning section features comprehensive guides for major global variants, including Cantonese Hong Kong Mahjong, Japanese Riichi Mahjong, Chinese Competition Rules (MCR), American Mahjongg (featuring the Charleston pass and card), and Taiwanese Mahjong (with 16-tile hands).'
+      }
+    ]
+  };
+
+  const faqs = faqDataMap[clean];
+  if (faqs) {
+    graph.push({
+      '@type': 'FAQPage',
+      '@id': `${meta.canonical}#faq`,
+      'mainEntity': faqs.map((faq) => ({
+        '@type': 'Question',
+        'name': faq.q,
+        'acceptedAnswer': {
+          '@type': 'Answer',
+          'text': faq.a
+        }
+      }))
+    });
+  }
+
+  if (clean === '/play') {
+    graph.push({
+      '@type': 'CollectionPage',
+      '@id': `${SITE_URL}/play#collection`,
+      'url': `${SITE_URL}/play`,
+      'name': 'Free Online Mahjong Games Library',
+      'description': meta.description,
+      'isPartOf': { '@id': `${SITE_URL}/#website` }
+    });
+    
+    graph.push({
+      '@type': 'ItemList',
+      '@id': `${SITE_URL}/play#itemlist`,
+      'name': 'Playable Mahjong Games',
+      'itemListElement': [
+        { '@type': 'ListItem', 'position': 1, 'name': 'Mahjongg Solitaire', 'url': `${SITE_URL}/mahjongg-solitaire` },
+        { '@type': 'ListItem', 'position': 2, 'name': 'Daily Mahjongg Puzzle', 'url': `${SITE_URL}/daily` },
+        { '@type': 'ListItem', 'position': 3, 'name': 'Zen Mahjongg', 'url': `${SITE_URL}/zen-mahjongg` },
+        { '@type': 'ListItem', 'position': 4, 'name': 'Time Attack', 'url': `${SITE_URL}/time-attack` },
+        { '@type': 'ListItem', 'position': 5, 'name': 'Mahjong Connect', 'url': `${SITE_URL}/mahjong-connect` },
+        { '@type': 'ListItem', 'position': 6, 'name': 'Shisen-Sho', 'url': `${SITE_URL}/shisen-sho` },
+        { '@type': 'ListItem', 'position': 7, 'name': 'Mahjongg Memory', 'url': `${SITE_URL}/mahjongg-memory` },
+        { '@type': 'ListItem', 'position': 8, 'name': 'Real Mahjong vs AI', 'url': `${SITE_URL}/real-mahjong` }
+      ]
     });
   }
 

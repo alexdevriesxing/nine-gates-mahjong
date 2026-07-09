@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import ResponsiveAdSlot from './ResponsiveAdSlot';
 import SEOHead from './SEOHead';
+import Breadcrumbs from './Breadcrumbs';
 
 interface GamePageFrameProps {
   title: string;
@@ -61,6 +62,8 @@ export default function GamePageFrame({
             />
           </div>
           <main className="game-page__main">
+            <Breadcrumbs />
+            <h1 className="font-display text-3xl text-gold mb-6 select-none">{title.split('|')[0].trim()}</h1>
             {children}
             <div className="flex justify-center items-center my-6 w-full">
               <ResponsiveAdSlot

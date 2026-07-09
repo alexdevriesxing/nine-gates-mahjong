@@ -10,7 +10,6 @@ interface AdContextValue {
   reset: () => void;
 }
 
-const STORAGE_KEY = 'ngm_ad_consent';
 const AdContext = createContext<AdContextValue | null>(null);
 
 export function AdProvider({ children }: { children: ReactNode }) {
@@ -25,10 +24,6 @@ export function AdProvider({ children }: { children: ReactNode }) {
     script.async = true;
     script.dataset.ngmSocialAd = 'true';
     document.body.appendChild(script);
-    
-    return () => {
-      script.remove();
-    };
   }, []);
 
   const value = useMemo<AdContextValue>(

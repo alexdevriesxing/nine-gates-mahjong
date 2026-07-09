@@ -1,6 +1,6 @@
 # Nine Gates Mahjong
 
-Nine Gates Mahjong is a free online Mahjong and Mahjongg game portal at https://ninegatesmahjong.com/.
+Nine Gates Mahjong is a free online Mahjong and Mahjongg game portal at https://ninegatesmahjong.com/. Play directly in your web browser with no downloads, registrations, or installations required.
 
 ## Primary Free Games
 
@@ -23,6 +23,13 @@ Nine Gates Mahjong is a free online Mahjong and Mahjongg game portal at https://
 - Chi, Pung, and Kong explained: https://ninegatesmahjong.com/learn/chi-pung-kong
 - Beginner Mahjong strategy: https://ninegatesmahjong.com/learn/beginner-strategy
 - Mahjong variants guide: https://ninegatesmahjong.com/learn/mahjong-variants
+- Mahjong tiles guide: https://ninegatesmahjong.com/learn/mahjong-tiles
+- How to win Mahjong: https://ninegatesmahjong.com/learn/how-to-win-mahjong
+- Scoring basics: https://ninegatesmahjong.com/learn/mahjong-scoring-basics
+- Common beginner mistakes: https://ninegatesmahjong.com/learn/common-mistakes
+- Mahjong glossary: https://ninegatesmahjong.com/learn/glossary
+- Guided Tutorials: https://ninegatesmahjong.com/how-to-play
+- History of Mahjong: https://ninegatesmahjong.com/history
 
 ## Regional Mahjong Variants
 
@@ -31,6 +38,14 @@ Nine Gates Mahjong is a free online Mahjong and Mahjongg game portal at https://
 - Chinese Official Mahjong (MCR): https://ninegatesmahjong.com/real-mahjong/mcr
 - American Mahjongg: https://ninegatesmahjong.com/real-mahjong/american
 - Taiwanese Mahjong: https://ninegatesmahjong.com/real-mahjong/taiwanese
+
+## General & Legal
+
+- About us: https://ninegatesmahjong.com/about
+- Contact us: https://ninegatesmahjong.com/contact
+- Privacy Policy: https://ninegatesmahjong.com/privacy
+- Terms of Service: https://ninegatesmahjong.com/terms
+- XML Sitemap: https://ninegatesmahjong.com/sitemap.xml
 
 ## Summary
 

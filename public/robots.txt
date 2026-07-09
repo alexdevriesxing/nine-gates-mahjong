@@ -5,15 +5,7 @@ Disallow: /api/
 Disallow: /login
 Disallow: /register
 Disallow: /guest
+Disallow: /ad.html
+Disallow: /native.html
 
 Sitemap: https://ninegatesmahjong.com/sitemap.xml
-Host: https://ninegatesmahjong.com
-
-User-agent: GPTBot
-Disallow: /
-
-User-agent: ChatGPT-User
-Disallow: /
-
-User-agent: Google-Extended
-Disallow: /

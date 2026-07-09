@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import { lazy, Suspense, useEffect } from 'react';
 import { HelmetProvider } from 'react-helmet-async';
 import { AuthProvider } from './app/context/AuthContext';
@@ -6,6 +6,9 @@ import { AdProvider } from './app/context/AdContext';
 import { LocaleProvider } from './app/context/LocaleContext';
 import Layout from './app/components/Layout';
 import LoadingSpinner from './app/components/LoadingSpinner';
+import ErrorBoundary from './app/components/ErrorBoundary';
+
+const EditorialPage = lazy(() => import('./app/components/EditorialPage'));
 
 // =====================================================
 // Lazy-loaded Pages — Code-split for performance
@@ -77,60 +80,72 @@ export default function App() {
           <AuthProvider>
           <BrowserRouter>
             <ScrollToTop />
-            <Routes>
-            <Route element={<Layout />}>
-              {/* Homepage */}
-              <Route path="/" element={<SuspensePage><HomePage /></SuspensePage>} />
+            <ErrorBoundary>
+              <Routes>
+              <Route element={<Layout />}>
+                {/* Homepage */}
+                <Route path="/" element={<SuspensePage><HomePage /></SuspensePage>} />
 
-              {/* Game Modes */}
-              <Route path="/play" element={<SuspensePage><PlayHub /></SuspensePage>} />
-              <Route path="/mahjongg-solitaire" element={<SuspensePage><SolitairePage /></SuspensePage>} />
-              <Route path="/daily" element={<SuspensePage><DailyPuzzlePage /></SuspensePage>} />
-              <Route path="/zen-mahjongg" element={<SuspensePage><ZenMahjonggPage /></SuspensePage>} />
-              <Route path="/time-attack" element={<SuspensePage><TimeAttackPage /></SuspensePage>} />
-              <Route path="/mahjong-connect" element={<SuspensePage><MahjongConnectPage /></SuspensePage>} />
-              <Route path="/shisen-sho" element={<SuspensePage><ShisenShoPage /></SuspensePage>} />
-              <Route path="/mahjongg-memory" element={<SuspensePage><MahjonggMemoryPage /></SuspensePage>} />
+                {/* Redirects */}
+                <Route path="/games" element={<Navigate to="/play" replace />} />
 
-              {/* Real Mahjong */}
-              <Route path="/real-mahjong" element={<SuspensePage><RealMahjongPage /></SuspensePage>} />
-              <Route path="/real-mahjong/hong-kong" element={<SuspensePage><HongKongPage /></SuspensePage>} />
-              <Route path="/real-mahjong/riichi" element={<SuspensePage><RiichiPage /></SuspensePage>} />
-              <Route path="/real-mahjong/mcr" element={<SuspensePage><MCRPage /></SuspensePage>} />
-              <Route path="/real-mahjong/american" element={<SuspensePage><AmericanPage /></SuspensePage>} />
-              <Route path="/real-mahjong/taiwanese" element={<SuspensePage><TaiwanesePage /></SuspensePage>} />
+                {/* Game Modes */}
+                <Route path="/play" element={<SuspensePage><PlayHub /></SuspensePage>} />
+                <Route path="/mahjongg-solitaire" element={<SuspensePage><SolitairePage /></SuspensePage>} />
+                <Route path="/daily" element={<SuspensePage><DailyPuzzlePage /></SuspensePage>} />
+                <Route path="/zen-mahjongg" element={<SuspensePage><ZenMahjonggPage /></SuspensePage>} />
+                <Route path="/time-attack" element={<SuspensePage><TimeAttackPage /></SuspensePage>} />
+                <Route path="/mahjong-connect" element={<SuspensePage><MahjongConnectPage /></SuspensePage>} />
+                <Route path="/shisen-sho" element={<SuspensePage><ShisenShoPage /></SuspensePage>} />
+                <Route path="/mahjongg-memory" element={<SuspensePage><MahjonggMemoryPage /></SuspensePage>} />
 
-              {/* Variants Hub */}
-              <Route path="/variants" element={<SuspensePage><VariantsHub /></SuspensePage>} />
+                {/* Real Mahjong */}
+                <Route path="/real-mahjong" element={<SuspensePage><RealMahjongPage /></SuspensePage>} />
+                <Route path="/real-mahjong/hong-kong" element={<SuspensePage><HongKongPage /></SuspensePage>} />
+                <Route path="/real-mahjong/riichi" element={<SuspensePage><RiichiPage /></SuspensePage>} />
+                <Route path="/real-mahjong/mcr" element={<SuspensePage><MCRPage /></SuspensePage>} />
+                <Route path="/real-mahjong/american" element={<SuspensePage><AmericanPage /></SuspensePage>} />
+                <Route path="/real-mahjong/taiwanese" element={<SuspensePage><TaiwanesePage /></SuspensePage>} />
 
-              {/* Learning Hub */}
-              <Route path="/learn" element={<SuspensePage><LearnHub /></SuspensePage>} />
-              <Route path="/learn/mahjong-vs-mahjongg" element={<SuspensePage><MahjongVsMahjongg /></SuspensePage>} />
-              <Route path="/learn/how-to-play-mahjongg-solitaire" element={<SuspensePage><HowToPlaySolitaire /></SuspensePage>} />
-              <Route path="/learn/how-to-play-real-mahjong" element={<SuspensePage><HowToPlayRealMahjong /></SuspensePage>} />
-              <Route path="/learn/chi-pung-kong" element={<SuspensePage><ChiPungKong /></SuspensePage>} />
-              <Route path="/learn/beginner-strategy" element={<SuspensePage><BeginnerStrategy /></SuspensePage>} />
-              <Route path="/learn/mahjong-variants" element={<SuspensePage><MahjongVariantsGuide /></SuspensePage>} />
+                {/* Variants Hub */}
+                <Route path="/variants" element={<SuspensePage><VariantsHub /></SuspensePage>} />
 
-              {/* Community */}
-              <Route path="/lobby" element={<SuspensePage><LobbyPage /></SuspensePage>} />
-              <Route path="/leaderboards" element={<SuspensePage><LeaderboardsPage /></SuspensePage>} />
-              <Route path="/events" element={<SuspensePage><EventsPage /></SuspensePage>} />
-              <Route path="/how-to-play" element={<SuspensePage><TutorialsPage /></SuspensePage>} />
-              <Route path="/history" element={<SuspensePage><HistoryPage /></SuspensePage>} />
+                {/* Learning Hub */}
+                <Route path="/learn" element={<SuspensePage><LearnHub /></SuspensePage>} />
+                <Route path="/learn/mahjong-vs-mahjongg" element={<SuspensePage><MahjongVsMahjongg /></SuspensePage>} />
+                <Route path="/learn/how-to-play-mahjongg-solitaire" element={<SuspensePage><HowToPlaySolitaire /></SuspensePage>} />
+                <Route path="/learn/how-to-play-real-mahjong" element={<SuspensePage><HowToPlayRealMahjong /></SuspensePage>} />
+                <Route path="/learn/chi-pung-kong" element={<SuspensePage><ChiPungKong /></SuspensePage>} />
+                <Route path="/learn/beginner-strategy" element={<SuspensePage><BeginnerStrategy /></SuspensePage>} />
+                <Route path="/learn/mahjong-variants" element={<SuspensePage><MahjongVariantsGuide /></SuspensePage>} />
+                <Route path="/learn/mahjong-tiles" element={<SuspensePage><EditorialPage slug="mahjong-tiles" /></SuspensePage>} />
+                <Route path="/learn/how-to-win-mahjong" element={<SuspensePage><EditorialPage slug="how-to-win-mahjong" /></SuspensePage>} />
+                <Route path="/learn/mahjong-scoring-basics" element={<SuspensePage><EditorialPage slug="mahjong-scoring-basics" /></SuspensePage>} />
+                <Route path="/learn/common-mistakes" element={<SuspensePage><EditorialPage slug="common-mistakes" /></SuspensePage>} />
+                <Route path="/learn/glossary" element={<SuspensePage><EditorialPage slug="glossary" /></SuspensePage>} />
 
-              {/* Account */}
-              <Route path="/profile" element={<SuspensePage><ProfilePage /></SuspensePage>} />
-              <Route path="/login" element={<SuspensePage><LoginPage /></SuspensePage>} />
-              <Route path="/register" element={<SuspensePage><RegisterPage /></SuspensePage>} />
-              <Route path="/guest" element={<SuspensePage><GuestPage /></SuspensePage>} />
+                {/* Community */}
+                <Route path="/lobby" element={<SuspensePage><LobbyPage /></SuspensePage>} />
+                <Route path="/leaderboards" element={<SuspensePage><LeaderboardsPage /></SuspensePage>} />
+                <Route path="/events" element={<SuspensePage><EventsPage /></SuspensePage>} />
+                <Route path="/how-to-play" element={<SuspensePage><TutorialsPage /></SuspensePage>} />
+                <Route path="/history" element={<SuspensePage><HistoryPage /></SuspensePage>} />
 
-              {/* Legal */}
-              <Route path="/privacy" element={<SuspensePage><PrivacyPage /></SuspensePage>} />
-              <Route path="/terms" element={<SuspensePage><TermsPage /></SuspensePage>} />
-              <Route path="*" element={<SuspensePage><NotFoundPage /></SuspensePage>} />
-            </Route>
-            </Routes>
+                {/* Account */}
+                <Route path="/profile" element={<SuspensePage><ProfilePage /></SuspensePage>} />
+                <Route path="/login" element={<SuspensePage><LoginPage /></SuspensePage>} />
+                <Route path="/register" element={<SuspensePage><RegisterPage /></SuspensePage>} />
+                <Route path="/guest" element={<SuspensePage><GuestPage /></SuspensePage>} />
+
+                {/* Legal / Pages */}
+                <Route path="/about" element={<SuspensePage><EditorialPage slug="about" /></SuspensePage>} />
+                <Route path="/contact" element={<SuspensePage><EditorialPage slug="contact" /></SuspensePage>} />
+                <Route path="/privacy" element={<SuspensePage><PrivacyPage /></SuspensePage>} />
+                <Route path="/terms" element={<SuspensePage><TermsPage /></SuspensePage>} />
+                <Route path="*" element={<SuspensePage><NotFoundPage /></SuspensePage>} />
+              </Route>
+              </Routes>
+            </ErrorBoundary>
           </BrowserRouter>
           </AuthProvider>
         </LocaleProvider>

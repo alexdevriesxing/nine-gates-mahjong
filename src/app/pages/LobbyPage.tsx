@@ -70,18 +70,22 @@ export default function LobbyPage() {
     socketRef.current = socket;
     socket.addEventListener('open', () => setConnecting(false));
     socket.addEventListener('message', (event) => {
-      const message = JSON.parse(String(event.data));
-      if (message.type === 'ERROR') {
-        setError(message.message);
-        return;
+      try {
+        const message = JSON.parse(String(event.data));
+        if (message.type === 'ERROR') {
+          setError(message.message);
+          return;
+        }
+        const next = message as MultiplayerState;
+        if (next.playerId) sessionStorage.setItem(`ngm_room_${code}`, next.playerId);
+        sessionStorage.setItem('ngm_last_room', code);
+        setLastRoom(code);
+        setError('');
+        setState(next);
+        setRoomCode(code);
+      } catch (err) {
+        console.error('Failed to parse WebSocket message:', err);
       }
-      const next = message as MultiplayerState;
-      if (next.playerId) sessionStorage.setItem(`ngm_room_${code}`, next.playerId);
-      sessionStorage.setItem('ngm_last_room', code);
-      setLastRoom(code);
-      setError('');
-      setState(next);
-      setRoomCode(code);
     });
     socket.addEventListener('close', (event) => {
       setConnecting(false);
