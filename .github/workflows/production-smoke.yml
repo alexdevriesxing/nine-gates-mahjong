@@ -5,12 +5,6 @@ on:
   push:
     branches:
       - master
-      - agent/production-deploy-verification
-  pull_request:
-    paths:
-      - scripts/production-smoke.mjs
-      - .github/workflows/production-smoke.yml
-      - package.json
 
 permissions:
   contents: read
