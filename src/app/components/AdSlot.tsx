@@ -39,7 +39,7 @@ export default function AdSlot({
       <span>{label}</span>
       {liveKey ? (
         <iframe
-          src={`/ad-frame.htm?key=${encodeURIComponent(liveKey)}&w=${width}&h=${height}`}
+          src={`/ad-frame?key=${encodeURIComponent(liveKey)}&w=${width}&h=${height}`}
           width={width}
           height={height}
           loading="lazy"
