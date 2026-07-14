@@ -2,6 +2,7 @@ import { Outlet, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import Header from './Header';
 import Footer from './Footer';
+import PrivacyChoices from './PrivacyChoices';
 
 export default function Layout() {
   const location = useLocation();
@@ -25,6 +26,7 @@ export default function Layout() {
         </AnimatePresence>
       </main>
       <Footer />
+      <PrivacyChoices />
     </div>
   );
 }
