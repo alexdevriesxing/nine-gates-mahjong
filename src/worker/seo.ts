@@ -237,7 +237,7 @@ export function applySecurityHeaders(response: Response) {
   headers.set('Cross-Origin-Opener-Policy', 'same-origin-allow-popups');
   headers.set(
     'Content-Security-Policy-Report-Only',
-    "default-src 'self'; script-src 'self' 'unsafe-inline' https://www.highperformanceformat.com https://*.effectivecpmnetwork.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: blob: https:; font-src 'self' https://fonts.gstatic.com; connect-src 'self' wss: https:; frame-src 'self' https://www.highperformanceformat.com https://*.effectivecpmnetwork.com; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'self'; upgrade-insecure-requests"
+    "default-src 'self'; script-src 'self' 'unsafe-inline' https://www.highperformanceformat.com https://*.effectivecpmnetwork.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: blob: https:; font-src 'self' https://fonts.gstatic.com; connect-src 'self' wss: https:; frame-src 'self' https://www.highperformanceformat.com https://*.effectivecpmnetwork.com; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'self'"
   );
   return headers;
 }
