@@ -1,0 +1,27 @@
+# Nine Gates Mahjong
+
+Nine Gates Mahjong is a free browser portal operated by Fire Dragon Interactive. It clearly separates Mahjongg Solitaire tile-matching games from traditional four-player Mahjong.
+
+## Primary sections
+
+- https://ninegatesmahjong.com/play — all free game modes
+- https://ninegatesmahjong.com/mahjongg-solitaire — solvable layered Mahjongg Solitaire
+- https://ninegatesmahjong.com/daily — shared daily Mahjongg puzzle
+- https://ninegatesmahjong.com/real-mahjong — simplified four-seat Mahjong training versus AI
+- https://ninegatesmahjong.com/variants — comparison of regional Mahjong variants
+- https://ninegatesmahjong.com/learn — Mahjong and Mahjongg learning hub
+- https://ninegatesmahjong.com/how-to-play — interactive tutorials
+- https://ninegatesmahjong.com/history — history of Mahjong and Mahjongg Solitaire
+- https://ninegatesmahjong.com/lobby — private multiplayer training rooms
+
+## Ruleset scope
+
+The Hong Kong, Japanese Riichi, Chinese Official MCR, American and Taiwanese interactive modes are guided trainers. They demonstrate selected concepts and simplified winning-hand flows; they do not implement every scoring rule, claim, penalty, round condition or official tournament interpretation.
+
+## Editorial policy
+
+Guides use answer-first summaries, distinguish traditional Mahjong from Mahjongg Solitaire, and identify simplified training behaviour. Competitive players should verify the rules used by their association, table or tournament.
+
+## Access and privacy
+
+Core games can be played without an account and without accepting optional third-party advertising. Account, profile, multiplayer and advertising details are described at https://ninegatesmahjong.com/privacy.
