@@ -1,0 +1,78 @@
+name: Production validation
+
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+      - 'agent/**'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: nine-gates-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      CI: 'true'
+      NGM_BASE_URL: http://127.0.0.1:8787
+      NGM_API_ORIGIN: http://127.0.0.1:8787
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright Chrome
+        run: npx playwright install --with-deps chrome
+
+      - name: Typecheck and build
+        run: npm run build
+
+      - name: Prepare local D1 database
+        run: npx wrangler d1 execute DB --local --file=src/worker/db/migrations/0001_initial.sql
+
+      - name: Start local Cloudflare Worker
+        run: |
+          npx wrangler dev --local --port 8787 > wrangler.log 2>&1 &
+          echo $! > wrangler.pid
+          for attempt in {1..60}; do
+            if curl --fail --silent http://127.0.0.1:8787/api/health > /dev/null; then
+              exit 0
+            fi
+            sleep 1
+          done
+          cat wrangler.log
+          exit 1
+
+      - name: Run complete release matrix
+        run: npm run test:release
+
+      - name: Stop local Worker
+        if: always()
+        run: |
+          if [ -f wrangler.pid ]; then
+            kill "$(cat wrangler.pid)" 2>/dev/null || true
+          fi
+
+      - name: Upload diagnostics on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: nine-gates-validation-logs
+          path: |
+            wrangler.log
+            output/
+          if-no-files-found: ignore
