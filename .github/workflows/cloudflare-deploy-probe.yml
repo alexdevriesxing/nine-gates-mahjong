@@ -16,6 +16,7 @@ jobs:
   deploy-production:
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    environment: production
     env:
       CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
@@ -34,11 +35,11 @@ jobs:
         run: |
           missing=0
           if [ -z "$CLOUDFLARE_API_TOKEN" ]; then
-            echo "::error::Repository secret CLOUDFLARE_API_TOKEN is not configured."
+            echo "::error::Production environment secret CLOUDFLARE_API_TOKEN is not configured."
             missing=1
           fi
           if [ -z "$CLOUDFLARE_ACCOUNT_ID" ]; then
-            echo "::error::Repository secret CLOUDFLARE_ACCOUNT_ID is not configured."
+            echo "::error::Production environment secret CLOUDFLARE_ACCOUNT_ID is not configured."
             missing=1
           fi
           exit "$missing"
