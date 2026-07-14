@@ -51,8 +51,12 @@ export default {
     if (limited) return secureResponse(limited);
 
     const response = await app.fetch(request, env);
-    const contentType = response.headers.get('Content-Type') ?? '';
 
+    // A Cloudflare WebSocket upgrade response carries an attached WebSocket object.
+    // Reconstructing the Response to add headers would silently discard that object.
+    if (response.status === 101 || response.webSocket) return response;
+
+    const contentType = response.headers.get('Content-Type') ?? '';
     if (contentType.includes('text/html')) {
       return renderHtmlResponse(request, response, url.pathname);
     }
