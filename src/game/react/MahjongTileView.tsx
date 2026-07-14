@@ -13,6 +13,7 @@ interface MahjongTileViewProps {
   onClick?: () => void;
   className?: string;
   style?: CSSProperties;
+  gridIndex?: number;
 }
 
 export default function MahjongTileView({
@@ -25,6 +26,7 @@ export default function MahjongTileView({
   onClick,
   className = '',
   style,
+  gridIndex,
 }: MahjongTileViewProps) {
   const image = useMemo(
     () => TileRenderer.generateTileURI(tile.suit, tile.rank),
@@ -44,6 +46,7 @@ export default function MahjongTileView({
         disabled ? 'mahjong-tile--disabled' : ''
       } ${concealed ? 'mahjong-tile--concealed' : ''} ${className}`}
       data-tile-key={tile.key}
+      data-grid-index={gridIndex}
       style={style}
     >
       {concealed ? (
