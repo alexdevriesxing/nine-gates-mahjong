@@ -12,10 +12,18 @@
     "skipLibCheck": true,
     "noFallthroughCasesInSwitch": true,
     "forceConsistentCasingInFileNames": true,
-    "types": ["@cloudflare/workers-types"]
+    "types": ["@cloudflare/workers-types"],
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"],
+      "@app/*": ["./src/app/*"],
+      "@game/*": ["./src/game/*"],
+      "@shared/*": ["./src/shared/*"]
+    }
   },
   "include": [
     "src/worker/**/*.ts",
-    "src/game/MahjongCore.ts"
+    "src/game/MahjongCore.ts",
+    "src/shared/**/*.ts"
   ]
 }
