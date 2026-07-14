@@ -1,0 +1,29 @@
+name: Live production probe
+
+on:
+  pull_request:
+    paths:
+      - .github/workflows/live-production-probe.yml
+
+permissions:
+  contents: read
+
+jobs:
+  verify-live-production:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      NGM_PRODUCTION_ORIGIN: https://ninegatesmahjong.com
+      NGM_PRODUCTION_MAX_ATTEMPTS: '30'
+      NGM_PRODUCTION_RETRY_DELAY_MS: '10000'
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Verify live Cloudflare deployment
+        run: node scripts/production-smoke.mjs
