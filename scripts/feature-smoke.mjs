@@ -135,10 +135,15 @@ await page.getByText(/Reviewed by the Nine Gates Mahjong Editorial Team/).waitFo
 results.editorialAndSeo = true;
 
 // 404 route and noindex metadata.
+const errorsBeforeNotFound = errors.length;
 const notFoundResponse = await page.goto(`${base}/this-route-does-not-exist`, { waitUntil: 'networkidle' });
 if (notFoundResponse?.status() !== 404) throw new Error(`Unknown route returned ${notFoundResponse?.status()} instead of 404.`);
 await page.getByRole('heading', { name: /404/ }).waitFor();
 if ((await page.locator('meta[name="robots"]').getAttribute('content')) !== 'noindex,follow') throw new Error('404 route is indexable.');
+const notFoundConsoleMessages = errors.splice(errorsBeforeNotFound);
+errors.push(...notFoundConsoleMessages.filter((message) =>
+  !/Failed to load resource: the server responded with a status of 404 \(Not Found\)/.test(message)
+));
 results.notFound = true;
 
 // Guest session and guest profile.
