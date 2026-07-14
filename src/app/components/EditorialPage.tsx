@@ -13,18 +13,39 @@ const VARIANT_RULESETS = new Set<VariantRuleset>([
   'taiwanese',
 ]);
 
+const REVIEW_DATE = '2026-07-14';
+
 export default function EditorialPage({ slug }: { slug: string }) {
   const entry = EDITORIAL[slug];
   if (!entry) throw new Error(`Missing editorial entry: ${slug}`);
   const ruleset = VARIANT_RULESETS.has(slug as VariantRuleset) ? (slug as VariantRuleset) : null;
-  const faqSchema = {
+  const canonical = `https://ninegatesmahjong.com${entry.canonical}`;
+  const routeSchema = {
     '@context': 'https://schema.org',
-    '@type': 'FAQPage',
-    mainEntity: entry.faqs.map((faq) => ({
-      '@type': 'Question',
-      name: faq.question,
-      acceptedAnswer: { '@type': 'Answer', text: faq.answer },
-    })),
+    '@graph': [
+      {
+        '@type': 'Article',
+        '@id': `${canonical}#article`,
+        headline: entry.title,
+        description: entry.description,
+        mainEntityOfPage: { '@id': `${canonical}#webpage` },
+        author: { '@type': 'Organization', name: 'Nine Gates Mahjong Editorial Team' },
+        publisher: { '@id': 'https://ninegatesmahjong.com/#organization' },
+        datePublished: '2026-06-25',
+        dateModified: REVIEW_DATE,
+        inLanguage: 'en',
+        image: 'https://ninegatesmahjong.com/hero-bg.jpg',
+      },
+      {
+        '@type': 'FAQPage',
+        '@id': `${canonical}#faq`,
+        mainEntity: entry.faqs.map((faq) => ({
+          '@type': 'Question',
+          name: faq.question,
+          acceptedAnswer: { '@type': 'Answer', text: faq.answer },
+        })),
+      },
+    ],
   };
 
   return (
@@ -32,9 +53,10 @@ export default function EditorialPage({ slug }: { slug: string }) {
       <SEOHead
         title={`${entry.metaTitle} | Nine Gates Mahjong`}
         description={entry.description}
-        canonical={`https://ninegatesmahjong.com${entry.canonical}`}
+        canonical={canonical}
         ogImage="https://ninegatesmahjong.com/hero-bg.jpg"
-        jsonLd={faqSchema}
+        jsonLd={routeSchema}
+        dateModified={REVIEW_DATE}
       />
       <main className="editorial-page" data-gaio-container="true">
         {ruleset && (
@@ -43,10 +65,30 @@ export default function EditorialPage({ slug }: { slug: string }) {
           </div>
         )}
         <article>
+          <nav className="mb-5 text-sm text-ink-300" aria-label="Breadcrumb">
+            <Link className="text-gold hover:text-gold-light" to="/">Home</Link>
+            <span aria-hidden="true"> / </span>
+            <Link className="text-gold hover:text-gold-light" to={ruleset ? '/variants' : '/learn'}>
+              {ruleset ? 'Mahjong variants' : 'Learn Mahjong'}
+            </Link>
+            <span aria-hidden="true"> / </span>
+            <span>{entry.title}</span>
+          </nav>
           <header>
-            <p className="game-eyebrow">Nine Gates Mahjong guide</p>
+            <p className="game-eyebrow">{ruleset ? 'Guided Mahjong ruleset trainer' : 'Nine Gates Mahjong guide'}</p>
             <h1>{entry.title}</h1>
-            <p>{entry.summary}</p>
+            <div className="my-6 rounded-xl border border-gold/20 bg-gold/5 p-5" data-gaio-section="quick-answer">
+              <strong className="block text-gold">Quick answer</strong>
+              <p className="mt-2 text-lg leading-relaxed text-ivory">{entry.summary}</p>
+            </div>
+            <p className="text-sm text-ink-300">
+              Reviewed by the Nine Gates Mahjong Editorial Team · Updated July 14, 2026
+            </p>
+            {ruleset && (
+              <p className="mt-4 rounded-lg border border-vermilion/30 bg-vermilion/10 p-4 text-sm text-ink-100">
+                This interactive mode is a guided training hand. It demonstrates selected concepts from the named ruleset but does not replace the complete scoring rules or tournament regulations used by an official association or event.
+              </p>
+            )}
           </header>
           <div className="flex justify-center items-center my-6 w-full">
             <AdSlot width={728} height={90} className="hidden md:flex" />
@@ -77,6 +119,12 @@ export default function EditorialPage({ slug }: { slug: string }) {
                 </details>
               ))}
             </div>
+          </section>
+          <section className="rounded-xl border border-gold/15 bg-ink-900/50 p-5">
+            <h2>Editorial scope</h2>
+            <p>
+              Nine Gates separates Mahjongg Solitaire from traditional four-player Mahjong and identifies when an interactive mode simplifies a regional ruleset. Rule wording can vary by association, table and tournament, so competitive players should confirm the rules used by their organizer.
+            </p>
           </section>
           <nav className="editorial-links" aria-label="Continue learning">
             <Link to="/learn">Mahjong learning hub</Link>
