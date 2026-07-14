@@ -39,11 +39,12 @@ export default function AdSlot({
       <span>{label}</span>
       {liveKey ? (
         <iframe
-          src={`/ad.html?key=${encodeURIComponent(liveKey)}&w=${width}&h=${height}`}
+          src={`/ad-frame.htm?key=${encodeURIComponent(liveKey)}&w=${width}&h=${height}`}
           width={width}
           height={height}
           loading="lazy"
           onError={() => setFailed(true)}
+          referrerPolicy="strict-origin-when-cross-origin"
           title={label}
         />
       ) : (
