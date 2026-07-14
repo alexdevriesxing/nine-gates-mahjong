@@ -12,6 +12,7 @@ interface AdContextValue {
 
 const STORAGE_KEY = 'ngm_ad_consent';
 const SOCIAL_SCRIPT_SELECTOR = '[data-ngm-social-ad]';
+const DEFAULT_SOCIAL_BAR_URL = 'https://pl29884537.effectivecpmnetwork.com/3e/87/21/3e8721aaa237eaa7a4118f7681d665f6.js';
 const AdContext = createContext<AdContextValue | null>(null);
 
 function readStoredConsent(): ConsentChoice {
@@ -32,9 +33,8 @@ export function AdProvider({ children }: { children: ReactNode }) {
 
     if (existing) return;
 
-    const socialBarUrl = (import.meta.env.VITE_ADSTERRA_SOCIAL_BAR_URL as string | undefined)?.trim();
-    if (!socialBarUrl) return;
-
+    const socialBarUrl = (import.meta.env.VITE_ADSTERRA_SOCIAL_BAR_URL as string | undefined)?.trim()
+      || DEFAULT_SOCIAL_BAR_URL;
     const script = document.createElement('script');
     script.src = socialBarUrl;
     script.async = true;
