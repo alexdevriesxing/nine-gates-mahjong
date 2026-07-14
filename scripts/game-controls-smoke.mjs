@@ -1,4 +1,5 @@
 import { chromium } from 'playwright';
+import { canConnectTiles } from '../src/game/MahjongCore.ts';
 
 const base = process.env.NGM_BASE_URL || 'http://127.0.0.1:8787';
 const browser = await chromium.launch({ channel: 'chrome', headless: true });
@@ -65,13 +66,21 @@ const gridStart = await state();
 await page.getByRole('button', { name: /Hint/ }).click();
 await page.waitForFunction(() => JSON.parse(window.render_game_to_text?.() || '{}').selected !== null, null, { timeout: 3000 });
 const hintedState = await state();
-const hintedTile = hintedState.visibleTiles[hintedState.selected];
+const selectedIndex = hintedState.selected;
+const keys = hintedState.visibleTiles.map((tile) => tile?.key ?? null);
+const hintedTile = hintedState.visibleTiles[selectedIndex];
 if (!hintedTile?.key) throw new Error('Grid hint did not select a tile.');
 const hintedGridTile = page.locator('.grid-board .mahjong-tile--selected');
 if (await hintedGridTile.count() !== 1) throw new Error('Grid hint did not visibly select a tile.');
-const partner = page.locator(`.grid-board [data-tile-key="${hintedTile.key}"]:not(.mahjong-tile--selected)`).first();
-if (await partner.count() !== 1) throw new Error('Grid hint did not expose its matching partner.');
-await partner.click();
+let partnerIndex = -1;
+for (let index = 0; index < keys.length; index += 1) {
+  if (index !== selectedIndex && keys[index] === hintedTile.key && canConnectTiles(keys, 6, 8, selectedIndex, index)) {
+    partnerIndex = index;
+    break;
+  }
+}
+if (partnerIndex < 0) throw new Error('Grid hint did not identify a path-valid partner.');
+await page.locator('.grid-board > .mahjong-tile').nth(partnerIndex).click();
 await page.waitForFunction(
   (expectedRemaining) => JSON.parse(window.render_game_to_text?.() || '{}').remaining === expectedRemaining,
   gridStart.remaining - 2,
