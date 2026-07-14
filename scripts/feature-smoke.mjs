@@ -20,20 +20,28 @@ async function assertNoBrokenImages(page, label) {
   if (broken.length) throw new Error(`${label}: broken images ${broken.join(', ')}`);
 }
 
-// Consent choice, persistence, and fallback ad rendering.
+// Consent choice, persistence and ad gating.
 {
   const context = await browser.newContext({ viewport: { width: 1440, height: 900 } });
   const page = await context.newPage();
   const errors = trackErrors(page);
   await page.goto(base, { waitUntil: 'networkidle' });
-  if (await page.getByRole('complementary', { name: 'Privacy choices' }).count()) {
-    throw new Error('Consent banner should not be present.');
+  await page.getByRole('complementary', { name: 'Privacy choices' }).waitFor();
+  if (await page.locator('script[data-ngm-social-ad]').count()) throw new Error('Social ad loaded before consent.');
+  await page.getByRole('button', { name: 'Accept ads' }).click();
+  if ((await page.evaluate(() => localStorage.getItem('ngm_ad_consent'))) !== 'accepted') {
+    throw new Error('Advertising consent was not stored.');
   }
   await page.goto(`${base}/mahjongg-solitaire`, { waitUntil: 'networkidle' });
   if (await page.getByRole('complementary', { name: 'Privacy choices' }).count()) {
-    throw new Error('Consent banner returned on subpages.');
+    throw new Error('Consent banner returned after a stored choice.');
   }
   if (await page.locator('.ad-slot').count() < 1) throw new Error('Ad slots did not render.');
+  await page.getByRole('button', { name: /Privacy choices/ }).click();
+  await page.getByRole('button', { name: 'Continue without ads' }).click();
+  if ((await page.evaluate(() => localStorage.getItem('ngm_ad_consent'))) !== 'declined') {
+    throw new Error('Advertising decline was not stored.');
+  }
   if (errors.length) throw new Error(`Consent/ad flow: ${errors.join(' | ')}`);
   results.consentAndAds = true;
   await context.close();
@@ -44,26 +52,36 @@ await context.addInitScript(() => localStorage.setItem('ngm_ad_consent', 'declin
 const page = await context.newPage();
 const errors = trackErrors(page);
 
-// Locale persistence and RTL.
+// Interface-language persistence without falsely relabelling English documents.
 await page.goto(base, { waitUntil: 'networkidle' });
 await page.locator('.language-select select').selectOption('ar');
 let locale = await page.evaluate(() => ({
   language: localStorage.getItem('ngm_language'),
+  uiLanguage: document.documentElement.dataset.uiLanguage,
   lang: document.documentElement.lang,
   dir: document.documentElement.dir,
 }));
-if (locale.language !== 'ar' || locale.lang !== 'ar' || locale.dir !== 'rtl') throw new Error('Arabic locale/RTL did not apply.');
+if (locale.language !== 'ar' || locale.uiLanguage !== 'ar' || locale.lang !== 'en' || locale.dir !== 'ltr') {
+  throw new Error('Interface locale did not persist truthfully.');
+}
 await page.reload({ waitUntil: 'networkidle' });
-locale = await page.evaluate(() => ({ lang: document.documentElement.lang, dir: document.documentElement.dir }));
-if (locale.lang !== 'ar' || locale.dir !== 'rtl') throw new Error('Saved RTL locale did not survive reload.');
+locale = await page.evaluate(() => ({
+  uiLanguage: document.documentElement.dataset.uiLanguage,
+  lang: document.documentElement.lang,
+  dir: document.documentElement.dir,
+}));
+if (locale.uiLanguage !== 'ar' || locale.lang !== 'en' || locale.dir !== 'ltr') {
+  throw new Error('Saved interface locale did not survive reload.');
+}
 await page.locator('.language-select select').selectOption('en');
 results.localePersistence = true;
 
-// Mobile menu, language selector, and navigation.
+// Mobile menu, interface-language selector and navigation.
 await page.setViewportSize({ width: 390, height: 844 });
 await page.getByRole('button', { name: 'Open menu' }).click();
 await page.locator('.mobile-language select').selectOption('ja');
-if ((await page.evaluate(() => document.documentElement.lang)) !== 'ja') throw new Error('Mobile locale selector failed.');
+if ((await page.evaluate(() => document.documentElement.dataset.uiLanguage)) !== 'ja') throw new Error('Mobile locale selector failed.');
+if ((await page.evaluate(() => document.documentElement.lang)) !== 'en') throw new Error('Partial translation incorrectly changed document language.');
 await page.getByRole('link', { name: /プレイ/ }).first().click();
 await page.waitForURL('**/play');
 await page.getByRole('button', { name: 'Close menu' }).waitFor({ state: 'detached' });
@@ -92,7 +110,7 @@ for (const category of ['Hall of Fame', 'Real Mahjong', 'Solitaire', 'Daily Puzz
 if (rankingFirstNames.size < 4) throw new Error('Ranking categories still show effectively identical data.');
 results.rankingCategories = true;
 
-// Tutorial tabs, step controls, and practice route.
+// Tutorial tabs, step controls and practice route.
 await page.goto(`${base}/how-to-play`, { waitUntil: 'networkidle' });
 await page.getByRole('button', { name: /Real four-player Mahjong/ }).click();
 await page.getByRole('button', { name: 'Next step' }).click();
@@ -112,12 +130,20 @@ await details.locator('summary').click();
 if (!(await details.getAttribute('open') !== null)) throw new Error('FAQ accordion did not open.');
 const canonical = await page.locator('link[rel="canonical"]').getAttribute('href');
 if (canonical !== 'https://ninegatesmahjong.com/learn/mahjong-vs-mahjongg') throw new Error('Editorial canonical URL is incorrect.');
+await page.getByText('Quick answer', { exact: true }).waitFor();
+await page.getByText(/Reviewed by the Nine Gates Mahjong Editorial Team/).waitFor();
 results.editorialAndSeo = true;
 
 // 404 route and noindex metadata.
-await page.goto(`${base}/this-route-does-not-exist`, { waitUntil: 'networkidle' });
+const errorsBeforeNotFound = errors.length;
+const notFoundResponse = await page.goto(`${base}/this-route-does-not-exist`, { waitUntil: 'networkidle' });
+if (notFoundResponse?.status() !== 404) throw new Error(`Unknown route returned ${notFoundResponse?.status()} instead of 404.`);
 await page.getByRole('heading', { name: /404/ }).waitFor();
 if ((await page.locator('meta[name="robots"]').getAttribute('content')) !== 'noindex,follow') throw new Error('404 route is indexable.');
+const notFoundConsoleMessages = errors.splice(errorsBeforeNotFound);
+errors.push(...notFoundConsoleMessages.filter((message) =>
+  !/Failed to load resource: the server responded with a status of 404 \(Not Found\)/.test(message)
+));
 results.notFound = true;
 
 // Guest session and guest profile.
@@ -129,7 +155,7 @@ await page.getByText('Guest Player', { exact: true }).waitFor();
 await page.getByRole('link', { name: 'Register now' }).waitFor();
 results.guestProfile = true;
 
-// Browser account registration, avatar persistence, logout, and login.
+// Browser account registration, avatar persistence, logout and login.
 const suffix = `${Date.now()}-${Math.floor(Math.random() * 10_000)}`;
 const username = `Browser${suffix}`.slice(0, 24);
 const email = `browser-${suffix}@example.com`;

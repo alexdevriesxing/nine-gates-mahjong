@@ -1,6 +1,19 @@
 User-agent: *
 Allow: /
 Disallow: /profile
+Disallow: /login
+Disallow: /register
+Disallow: /guest
+Disallow: /api/
+
+User-agent: OAI-SearchBot
+Allow: /
+Disallow: /profile
+Disallow: /api/
+
+User-agent: ChatGPT-User
+Allow: /
+Disallow: /profile
 Disallow: /api/
 
 Sitemap: https://ninegatesmahjong.com/sitemap.xml

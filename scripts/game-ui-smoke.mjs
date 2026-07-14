@@ -10,10 +10,22 @@ await page.route('**/api/profile', (route) => route.fulfill({
   body: JSON.stringify({ user: null }),
 }));
 
+async function clickRenderedPair(groups, selectorForKey) {
+  for (const items of groups) {
+    if (items.length < 2) continue;
+    const active = page.locator(selectorForKey(items[0].key));
+    if (await active.count() < 2) continue;
+    await active.nth(0).click();
+    await active.nth(1).click();
+    return true;
+  }
+  return false;
+}
+
 async function completeByState(route, memory = false) {
   await page.goto(`${base}${route}`, { waitUntil: 'domcontentloaded' });
   await page.waitForFunction(() => typeof window.render_game_to_text === 'function', null, { timeout: 10000 });
-  for (let move = 0; move < 80; move += 1) {
+  for (let move = 0; move < 100; move += 1) {
     const state = JSON.parse(await page.evaluate(() => window.render_game_to_text?.() || '{}'));
     if (state.complete) return move;
     if (memory) {
@@ -30,21 +42,22 @@ async function completeByState(route, memory = false) {
       await page.waitForTimeout(460);
       continue;
     }
-    const candidates = state.playableTiles || state.visibleTiles?.filter(Boolean);
-    const groups = new Map();
-    candidates.forEach((tile) => groups.set(tile.key, [...(groups.get(tile.key) || []), tile]));
-    const pair = [...groups.values()].find((items) => items.length >= 2);
-    if (!pair) throw new Error(`${route}: no pair found after ${move} moves`);
-    if (state.playableTiles) {
-      const active = page.locator(`[data-tile-key="${pair[0].key}"]:not(:disabled)`);
-      await active.nth(0).click();
-      await active.nth(1).click();
-    } else {
-      const active = page.locator(`.grid-board [data-tile-key="${pair[0].key}"]`);
-      await active.nth(0).click();
-      await active.nth(1).click();
-      await page.waitForTimeout(180);
+
+    const candidates = state.playableTiles || state.visibleTiles?.filter(Boolean) || [];
+    const grouped = new Map();
+    candidates.forEach((tile) => grouped.set(tile.key, [...(grouped.get(tile.key) || []), tile]));
+    const groups = [...grouped.values()].filter((items) => items.length >= 2);
+    if (!groups.length) throw new Error(`${route}: no pair found after ${move} moves`);
+
+    const clicked = state.playableTiles
+      ? await clickRenderedPair(groups, (key) => `[data-tile-key="${key}"]:not(:disabled)`)
+      : await clickRenderedPair(groups, (key) => `.grid-board [data-tile-key="${key}"]:not(:disabled)`);
+
+    if (!clicked) {
+      await page.waitForTimeout(120);
+      continue;
     }
+    await page.waitForTimeout(state.playableTiles ? 80 : 220);
   }
   throw new Error(`${route}: did not complete`);
 }

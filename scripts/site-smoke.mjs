@@ -24,8 +24,33 @@ let checked = 0;
 
 for (const route of routes) {
   const response = await fetch(`${base}${route}`);
-  if (!response.ok) failures.push(`HTTP ${route}: ${response.status}`);
+  const expectedStatus = route === '/this-route-does-not-exist' ? 404 : 200;
+  if (response.status !== expectedStatus) failures.push(`HTTP ${route}: expected ${expectedStatus}, received ${response.status}`);
+  if ((response.headers.get('x-content-type-options') ?? '').toLowerCase() !== 'nosniff') {
+    failures.push(`HTTP ${route}: missing security headers`);
+  }
 }
+
+for (const framePath of [
+  '/native-frame',
+  '/ad-frame?key=cdc33de3506804ba73d2d3661ed4fd0a&w=320&h=50',
+]) {
+  const response = await fetch(`${base}${framePath}`);
+  if (response.status !== 200) failures.push(`Advertising frame ${framePath}: ${response.status}`);
+  if (!(response.headers.get('content-type') ?? '').includes('text/html')) {
+    failures.push(`Advertising frame ${framePath}: incorrect content type`);
+  }
+  if ((response.headers.get('x-robots-tag') ?? '').toLowerCase() !== 'noindex, nofollow') {
+    failures.push(`Advertising frame ${framePath}: missing noindex header`);
+  }
+}
+
+const initialHtmlResponse = await fetch(`${base}/mahjongg-solitaire`);
+const initialHtml = await initialHtmlResponse.text();
+if (!initialHtml.includes('Play Mahjongg Solitaire Free Online')) failures.push('Initial HTML missing route title.');
+if (!initialHtml.includes('guaranteed-solvable layered Mahjongg Solitaire board')) failures.push('Initial HTML missing route description.');
+if (!initialHtml.includes('server-seo-fallback')) failures.push('Initial HTML missing crawlable fallback content.');
+if (!initialHtml.includes('application/ld+json')) failures.push('Initial HTML missing structured data.');
 
 for (const viewport of viewports) {
   const context = await browser.newContext({ viewport });
@@ -82,4 +107,4 @@ if (failures.length) {
   console.error(JSON.stringify({ checked, failures }, null, 2));
   process.exit(1);
 }
-console.log(JSON.stringify({ checked, routes: routes.length, viewports: viewports.map((item) => item.name), failures: 0 }));
+console.log(JSON.stringify({ checked, routes: routes.length, viewports: viewports.map((item) => item.name), initialHtml: true, advertisingFrames: true, securityHeaders: true, failures: 0 }));

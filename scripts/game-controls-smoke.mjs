@@ -33,24 +33,16 @@ async function clickLayeredPair() {
   await active.nth(1).click();
 }
 
-async function clickGridPair() {
-  const current = await state();
-  const keys = current.visibleTiles.map((tile) => tile?.key ?? null);
-  let pair = null;
-  for (let first = 0; first < keys.length && !pair; first += 1) {
+function findGridPair(keys) {
+  for (let first = 0; first < keys.length; first += 1) {
     if (!keys[first]) continue;
     for (let second = first + 1; second < keys.length; second += 1) {
       if (keys[first] === keys[second] && canConnectTiles(keys, 6, 8, first, second)) {
-        pair = [first, second];
-        break;
+        return [first, second];
       }
     }
   }
-  if (!pair) throw new Error('No grid pair found.');
-  const active = page.locator('.grid-board .mahjong-tile');
-  await active.nth(pair[0]).click();
-  await active.nth(pair[1]).click();
-  await page.waitForTimeout(250);
+  return null;
 }
 
 const results = {};
@@ -80,22 +72,33 @@ if (!(await page.evaluate(() => Boolean(document.fullscreenElement)))) throw new
 await page.keyboard.press('Escape');
 results.layeredControls = true;
 
-// Flat grid controls and reset.
+// Flat grid controls, hint visibility, path-valid match, pause and reset.
 await openGame('/mahjong-connect');
 const gridStart = await state();
 await page.getByRole('button', { name: /Hint/ }).click();
-const hintedGridTile = page.locator('.grid-board .mahjong-tile--selected');
-if (await hintedGridTile.count() !== 1) throw new Error('Grid hint did not select a tile.');
-await hintedGridTile.click();
-await page.getByRole('button', { name: 'Pause' }).click();
-if (!(await state()).paused) throw new Error('Grid pause failed.');
-await page.getByRole('button', { name: 'Resume' }).click();
-await clickGridPair();
+await page.waitForFunction(() => JSON.parse(window.render_game_to_text?.() || '{}').selected !== null, null, { timeout: 3000 });
+if (await page.locator('.grid-board .mahjong-tile--selected').count() !== 1) {
+  throw new Error('Grid hint did not visibly select a tile.');
+}
+
+// Let the temporary hint selection clear before performing an independent match.
+// This avoids racing the 1.4-second hint timer against two Playwright clicks.
+await page.waitForFunction(() => JSON.parse(window.render_game_to_text?.() || '{}').selected === null, null, { timeout: 3000 });
+const readyGrid = await state();
+const keys = readyGrid.visibleTiles.map((tile) => tile?.key ?? null);
+const pair = findGridPair(keys);
+if (!pair) throw new Error('No path-valid grid pair found.');
+const gridCells = page.locator('.grid-board > .mahjong-tile, .grid-board > .grid-board__empty');
+await gridCells.nth(pair[0]).click();
+await gridCells.nth(pair[1]).click();
 await page.waitForFunction(
   (expectedRemaining) => JSON.parse(window.render_game_to_text?.() || '{}').remaining === expectedRemaining,
   gridStart.remaining - 2,
-  { timeout: 3000 },
+  { timeout: 5000 },
 );
+await page.getByRole('button', { name: 'Pause' }).click();
+if (!(await state()).paused) throw new Error('Grid pause failed.');
+await page.getByRole('button', { name: 'Resume' }).click();
 const gridSeed = (await state()).seed;
 await page.getByRole('button', { name: 'New board' }).click();
 if ((await state()).seed === gridSeed) throw new Error('Grid reset did not create a new seed.');
@@ -103,7 +106,7 @@ results.gridControls = true;
 
 // Memory mismatch recovery and successful match.
 await openGame('/mahjongg-memory');
-let memory = await state();
+const memory = await state();
 const visible = await page.locator('.grid-board .mahjong-tile').evaluateAll((tiles) =>
   tiles.map((tile) => tile.getAttribute('data-tile-key'))
 );
@@ -120,6 +123,7 @@ if ((await state()).remaining !== memory.remaining) throw new Error('Memory mism
 const groups = new Map();
 visible.forEach((key, index) => groups.set(key, [...(groups.get(key) || []), index]));
 const matching = [...groups.values()].find((indices) => indices.length >= 2);
+if (!matching) throw new Error('Could not find a memory pair.');
 await page.locator('.grid-board .mahjong-tile').nth(matching[0]).click();
 await page.locator('.grid-board .mahjong-tile').nth(matching[1]).click();
 await page.waitForTimeout(500);

@@ -5,9 +5,10 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc --noEmit && vite build",
+    "build": "npm run typecheck && npm run typecheck:worker && vite build",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
+    "typecheck:worker": "tsc --noEmit -p tsconfig.worker.json",
     "test:games": "tsx scripts/game-completion-smoke.mjs",
     "test:ui": "node scripts/game-ui-smoke.mjs",
     "test:controls": "tsx scripts/game-controls-smoke.mjs",
@@ -17,8 +18,9 @@
     "test:multiplayer": "node scripts/multiplayer-smoke.mjs",
     "test:multiplayer-ui": "node scripts/multiplayer-ui-smoke.mjs",
     "test:auth": "node scripts/auth-smoke.mjs",
-    "worker:dev": "wrangler dev src/worker/index.ts",
-    "worker:deploy": "wrangler deploy src/worker/index.ts",
+    "test:release": "npm run test:games && npm run test:ui && npm run test:controls && npm run test:variants && npm run test:features && npm run test:site && npm run test:auth && npm run test:multiplayer && npm run test:multiplayer-ui",
+    "worker:dev": "wrangler dev src/worker/entry.ts",
+    "worker:deploy": "wrangler deploy src/worker/entry.ts",
     "db:migrate": "wrangler d1 execute DB --file=src/worker/db/migrations/0001_initial.sql"
   },
   "dependencies": {

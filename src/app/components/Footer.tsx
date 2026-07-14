@@ -1,7 +1,10 @@
 import { Link } from 'react-router-dom';
 import { FOOTER_SECTIONS } from '@shared/constants';
+import { useAds } from '../context/AdContext';
 
 export default function Footer() {
+  const { consent, reset } = useAds();
+
   return (
     <footer className="bg-ink-950 border-t border-gold/10 pt-16 pb-8">
       <div className="container-wide">
@@ -36,11 +39,16 @@ export default function Footer() {
             </div>
             <span>Nine Gates Mahjong — Free online Mahjong and Mahjongg portal.</span>
           </div>
-          <div>
-            &copy; 2026 Fire Dragon Interactive ·{' '}
-            <a href="https://www.firedragoninteractive.com" target="_blank" rel="noreferrer">
-              www.firedragoninteractive.com
-            </a>
+          <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 md:justify-end">
+            <button className="text-gold hover:text-gold-light underline" type="button" onClick={reset}>
+              Privacy choices{consent ? `: ${consent}` : ''}
+            </button>
+            <span>
+              &copy; 2026 Fire Dragon Interactive ·{' '}
+              <a href="https://www.firedragoninteractive.com" target="_blank" rel="noreferrer">
+                www.firedragoninteractive.com
+              </a>
+            </span>
           </div>
         </div>
       </div>
