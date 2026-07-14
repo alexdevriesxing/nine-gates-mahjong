@@ -34,19 +34,17 @@ function rateLimitFor(request: Request, url: URL) {
   return null;
 }
 
-function isLocalRequest(request: Request, url: URL) {
-  const host = (request.headers.get('Host') ?? '').toLowerCase();
-  return Boolean(url.port)
-    || host.startsWith('127.0.0.1')
-    || host.startsWith('localhost')
-    || url.hostname === '127.0.0.1'
-    || url.hostname === 'localhost';
+function shouldApplyCanonicalRedirect(request: Request) {
+  // CF-Visitor is added on real Cloudflare edge requests. Wrangler's local runtime
+  // can internally present the configured production hostname, so hostname alone
+  // is not a reliable local-development signal.
+  return request.headers.has('CF-Visitor');
 }
 
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const url = new URL(request.url);
-    const redirect = isLocalRequest(request, url) ? null : canonicalRedirect(url);
+    const redirect = shouldApplyCanonicalRedirect(request) ? canonicalRedirect(url) : null;
     if (redirect) return secureResponse(redirect);
 
     const limited = rateLimitFor(request, url);
