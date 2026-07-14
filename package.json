@@ -15,6 +15,7 @@
     "test:features": "node scripts/feature-smoke.mjs",
     "test:variants": "node scripts/variant-ui-smoke.mjs",
     "test:site": "node scripts/site-smoke.mjs",
+    "test:production": "node scripts/production-smoke.mjs",
     "test:multiplayer": "node scripts/multiplayer-smoke.mjs",
     "test:multiplayer-ui": "node scripts/multiplayer-ui-smoke.mjs",
     "test:auth": "node scripts/auth-smoke.mjs",

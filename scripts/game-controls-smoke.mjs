@@ -6,20 +6,28 @@ const browser = await chromium.launch({ channel: 'chrome', headless: true });
 const context = await browser.newContext({ viewport: { width: 1280, height: 900 }, hasTouch: true });
 await context.addInitScript(() => localStorage.setItem('ngm_ad_consent', 'declined'));
 const page = await context.newPage();
-page.setDefaultNavigationTimeout(45000);
+page.setDefaultNavigationTimeout(45_000);
 const errors = [];
 page.on('pageerror', (error) => errors.push(String(error)));
 page.on('console', (message) => {
   if (message.type() === 'error') errors.push(message.text());
 });
 
-async function state() {
-  return JSON.parse(await page.evaluate(() => window.render_game_to_text?.() || '{}'));
+async function state(targetPage = page) {
+  return JSON.parse(await targetPage.evaluate(() => window.render_game_to_text?.() || '{}'));
 }
 
-async function openGame(route) {
-  await page.goto(`${base}${route}`, { waitUntil: 'commit' });
-  await page.waitForFunction(() => typeof window.render_game_to_text === 'function', null, { timeout: 20000 });
+async function openGame(route, targetPage = page) {
+  const response = await targetPage.goto(`${base}${route}`, {
+    waitUntil: 'domcontentloaded',
+    timeout: 45_000,
+  });
+  if (!response?.ok()) throw new Error(`${route}: navigation returned ${response?.status()}.`);
+  await targetPage.waitForFunction(
+    () => typeof window.render_game_to_text === 'function',
+    null,
+    { timeout: 45_000 },
+  );
 }
 
 async function clickLayeredPair() {
@@ -80,9 +88,6 @@ await page.waitForFunction(() => JSON.parse(window.render_game_to_text?.() || '{
 if (await page.locator('.grid-board .mahjong-tile--selected').count() !== 1) {
   throw new Error('Grid hint did not visibly select a tile.');
 }
-
-// Let the temporary hint selection clear before performing an independent match.
-// This avoids racing the 1.4-second hint timer against two Playwright clicks.
 await page.waitForFunction(() => JSON.parse(window.render_game_to_text?.() || '{}').selected === null, null, { timeout: 3000 });
 const readyGrid = await state();
 const keys = readyGrid.visibleTiles.map((tile) => tile?.key ?? null);
@@ -156,21 +161,30 @@ await page.getByRole('button', { name: 'New hand' }).click();
 if ((await state()).handNumber !== handNumber + 1) throw new Error('New hand control failed.');
 results.realMahjongControls = true;
 
-// Mobile touch sanity for every original game.
-await page.setViewportSize({ width: 390, height: 844 });
+// Mobile touch sanity runs in a fresh page to avoid retaining completed game canvases,
+// timers and fullscreen state from the desktop control audit.
+const mobilePage = await context.newPage();
+mobilePage.setDefaultNavigationTimeout(45_000);
+const mobileErrors = [];
+mobilePage.on('pageerror', (error) => mobileErrors.push(String(error)));
+mobilePage.on('console', (message) => {
+  if (message.type() === 'error') mobileErrors.push(message.text());
+});
+await mobilePage.setViewportSize({ width: 390, height: 844 });
 for (const route of [
   '/mahjongg-solitaire', '/daily', '/zen-mahjongg', '/time-attack',
   '/mahjong-connect', '/shisen-sho', '/mahjongg-memory', '/real-mahjong',
 ]) {
-  await openGame(route);
-  const overflow = await page.evaluate(() => document.documentElement.scrollWidth - innerWidth);
+  await openGame(route, mobilePage);
+  const overflow = await mobilePage.evaluate(() => document.documentElement.scrollWidth - innerWidth);
   if (overflow > 4) throw new Error(`${route}: mobile horizontal overflow ${overflow}px`);
-  const tile = page.locator('.mahjong-tile:not(:disabled)').first();
+  const tile = mobilePage.locator('.mahjong-tile:not(:disabled)').first();
   if (await tile.count()) await tile.tap();
 }
 results.mobileTouchRoutes = 8;
 
-if (errors.length) throw new Error(errors.join(' | '));
+if (errors.length || mobileErrors.length) throw new Error([...errors, ...mobileErrors].join(' | '));
+await mobilePage.close();
 await context.close();
 await browser.close();
 console.log(JSON.stringify(results));
