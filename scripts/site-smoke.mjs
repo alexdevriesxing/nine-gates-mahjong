@@ -1,6 +1,7 @@
 import { chromium } from 'playwright';
 
 const base = process.env.NGM_BASE_URL || 'http://127.0.0.1:8787';
+const notFoundRoute = '/this-route-does-not-exist';
 const routes = [
   '/', '/play', '/mahjongg-solitaire', '/daily', '/zen-mahjongg', '/time-attack',
   '/mahjong-connect', '/shisen-sho', '/mahjongg-memory', '/real-mahjong',
@@ -10,7 +11,7 @@ const routes = [
   '/learn/how-to-play-real-mahjong', '/learn/chi-pung-kong', '/learn/beginner-strategy',
   '/learn/mahjong-variants', '/how-to-play', '/history', '/events', '/lobby',
   '/leaderboards', '/login', '/register', '/privacy', '/terms',
-  '/this-route-does-not-exist',
+  notFoundRoute,
 ];
 const viewports = [
   { name: 'desktop', width: 1440, height: 900 },
@@ -24,7 +25,7 @@ let checked = 0;
 
 for (const route of routes) {
   const response = await fetch(`${base}${route}`);
-  const expectedStatus = route === '/this-route-does-not-exist' ? 404 : 200;
+  const expectedStatus = route === notFoundRoute ? 404 : 200;
   if (response.status !== expectedStatus) failures.push(`HTTP ${route}: expected ${expectedStatus}, received ${response.status}`);
   if ((response.headers.get('x-content-type-options') ?? '').toLowerCase() !== 'nosniff') {
     failures.push(`HTTP ${route}: missing security headers`);
@@ -71,15 +72,18 @@ for (const viewport of viewports) {
   page.on('console', (message) => {
     if (message.type() === 'error') errors.push(message.text());
   });
-  await page.goto(base, { waitUntil: 'domcontentloaded', timeout: 20000 });
 
   for (const route of routes) {
     errors.length = 0;
-    await page.evaluate((nextRoute) => {
-      history.pushState(null, '', nextRoute);
-      window.dispatchEvent(new PopStateEvent('popstate'));
-    }, route);
-    await page.waitForTimeout(120);
+    const navigation = await page.goto(`${base}${route}`, {
+      waitUntil: 'domcontentloaded',
+      timeout: 20000,
+    });
+    const expectedStatus = route === notFoundRoute ? 404 : 200;
+    if (navigation?.status() !== expectedStatus) {
+      failures.push(`${viewport.name} ${route}: navigation returned ${navigation?.status()} instead of ${expectedStatus}`);
+    }
+
     await page.locator('h1').first().waitFor({ state: 'attached', timeout: 7000 }).catch(() => {});
     checked += 1;
     const rootText = await page.locator('#root').innerText().catch(() => '');
@@ -87,7 +91,7 @@ for (const viewport of viewports) {
     if (/under construction/i.test(rootText)) failures.push(`${viewport.name} ${route}: placeholder content`);
     const h1Count = await page.locator('h1').count();
     if (h1Count === 0 && route !== '/guest') failures.push(`${viewport.name} ${route}: missing H1`);
-    if (route === '/this-route-does-not-exist') {
+    if (route === notFoundRoute) {
       await page.getByRole('heading', { name: /404/ }).waitFor({ state: 'visible', timeout: 7000 }).catch(() => {});
       const notFoundText = await page.locator('#root').innerText().catch(() => '');
       if (!/404/i.test(notFoundText)) failures.push(`${viewport.name} ${route}: missing not-found state`);
@@ -96,7 +100,11 @@ for (const viewport of viewports) {
     }
     const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
     if (overflow > 4) failures.push(`${viewport.name} ${route}: horizontal overflow ${overflow}px`);
-    if (errors.length) failures.push(`${viewport.name} ${route}: ${errors.join(' | ')}`);
+
+    const unexpectedErrors = route === notFoundRoute
+      ? errors.filter((message) => !/Failed to load resource: the server responded with a status of 404 \(Not Found\)/.test(message))
+      : errors;
+    if (unexpectedErrors.length) failures.push(`${viewport.name} ${route}: ${unexpectedErrors.join(' | ')}`);
   }
   await context.close();
 }
