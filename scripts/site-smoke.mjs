@@ -31,6 +31,20 @@ for (const route of routes) {
   }
 }
 
+for (const framePath of [
+  '/native-frame',
+  '/ad-frame?key=cdc33de3506804ba73d2d3661ed4fd0a&w=320&h=50',
+]) {
+  const response = await fetch(`${base}${framePath}`);
+  if (response.status !== 200) failures.push(`Advertising frame ${framePath}: ${response.status}`);
+  if (!(response.headers.get('content-type') ?? '').includes('text/html')) {
+    failures.push(`Advertising frame ${framePath}: incorrect content type`);
+  }
+  if ((response.headers.get('x-robots-tag') ?? '').toLowerCase() !== 'noindex, nofollow') {
+    failures.push(`Advertising frame ${framePath}: missing noindex header`);
+  }
+}
+
 const initialHtmlResponse = await fetch(`${base}/mahjongg-solitaire`);
 const initialHtml = await initialHtmlResponse.text();
 if (!initialHtml.includes('Play Mahjongg Solitaire Free Online')) failures.push('Initial HTML missing route title.');
@@ -93,4 +107,4 @@ if (failures.length) {
   console.error(JSON.stringify({ checked, failures }, null, 2));
   process.exit(1);
 }
-console.log(JSON.stringify({ checked, routes: routes.length, viewports: viewports.map((item) => item.name), initialHtml: true, securityHeaders: true, failures: 0 }));
+console.log(JSON.stringify({ checked, routes: routes.length, viewports: viewports.map((item) => item.name), initialHtml: true, advertisingFrames: true, securityHeaders: true, failures: 0 }));
