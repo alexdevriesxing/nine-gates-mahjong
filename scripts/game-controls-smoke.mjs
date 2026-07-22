@@ -80,6 +80,20 @@ if (!(await page.evaluate(() => Boolean(document.fullscreenElement)))) throw new
 await page.keyboard.press('Escape');
 results.layeredControls = true;
 
+// Alternate layered layouts reset the board and remain visible in text state.
+for (const [buttonName, expectedLayout] of [
+  ['Jade Courtyard', 'courtyard'],
+  ['Four-Storey Pagoda', 'pagoda'],
+  ['Fortress', 'fortress'],
+]) {
+  await page.getByRole('button', { name: new RegExp(buttonName) }).click();
+  await page.waitForFunction(
+    (layout) => JSON.parse(window.render_game_to_text?.() || '{}').layout === layout,
+    expectedLayout,
+  );
+}
+results.solitaireLayouts = true;
+
 // Flat grid controls, hint visibility, path-valid match, pause and reset.
 await openGame('/mahjong-connect');
 const gridStart = await state();

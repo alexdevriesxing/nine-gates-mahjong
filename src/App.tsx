@@ -33,6 +33,8 @@ const RiichiPage = lazy(() => import('./app/pages/variants/RiichiPage'));
 const MCRPage = lazy(() => import('./app/pages/variants/MCRPage'));
 const AmericanPage = lazy(() => import('./app/pages/variants/AmericanPage'));
 const TaiwanesePage = lazy(() => import('./app/pages/variants/TaiwanesePage'));
+const SichuanPage = lazy(() => import('./app/pages/variants/SichuanPage'));
+const ZungJungPage = lazy(() => import('./app/pages/variants/ZungJungPage'));
 const MahjongVsMahjongg = lazy(() => import('./app/pages/learn/MahjongVsMahjongg'));
 const HowToPlaySolitaire = lazy(() => import('./app/pages/learn/HowToPlaySolitaire'));
 const HowToPlayRealMahjong = lazy(() => import('./app/pages/learn/HowToPlayRealMahjong'));
@@ -99,6 +101,8 @@ export default function App() {
               <Route path="/real-mahjong/mcr" element={<SuspensePage><MCRPage /></SuspensePage>} />
               <Route path="/real-mahjong/american" element={<SuspensePage><AmericanPage /></SuspensePage>} />
               <Route path="/real-mahjong/taiwanese" element={<SuspensePage><TaiwanesePage /></SuspensePage>} />
+              <Route path="/real-mahjong/sichuan" element={<SuspensePage><SichuanPage /></SuspensePage>} />
+              <Route path="/real-mahjong/zung-jung" element={<SuspensePage><ZungJungPage /></SuspensePage>} />
 
               {/* Variants Hub */}
               <Route path="/variants" element={<SuspensePage><VariantsHub /></SuspensePage>} />

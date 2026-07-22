@@ -1,7 +1,7 @@
 const origin = (process.env.NGM_PRODUCTION_ORIGIN || 'https://ninegatesmahjong.com').replace(/\/$/, '');
 const maxAttempts = Number.parseInt(process.env.NGM_PRODUCTION_MAX_ATTEMPTS || '30', 10);
 const retryDelayMs = Number.parseInt(process.env.NGM_PRODUCTION_RETRY_DELAY_MS || '10000', 10);
-const expectedReleaseMarker = 'Core games can be played without an account and without accepting optional third-party advertising.';
+const expectedReleaseMarker = 'https://ninegatesmahjong.com/real-mahjong/sichuan';
 
 function sleep(milliseconds) {
   return new Promise((resolve) => setTimeout(resolve, milliseconds));
@@ -69,6 +69,14 @@ assert(solitaire.response.status === 200, `Solitaire route returned ${solitaire.
 assert(solitaire.body.includes('Play Mahjongg Solitaire Free Online'), 'Solitaire initial HTML is missing route-specific metadata.');
 assert(solitaire.body.includes('guaranteed-solvable layered Mahjongg Solitaire board'), 'Solitaire initial HTML is missing the route description.');
 
+const sichuan = await request('/real-mahjong/sichuan', { accept: 'text/html' });
+assert(sichuan.response.status === 200, `Sichuan trainer route returned ${sichuan.response.status}.`);
+assert(sichuan.body.includes('Sichuan Bloody Rules Mahjong and Dingque Trainer'), 'Sichuan route is missing its edge-rendered metadata.');
+
+const zungJung = await request('/real-mahjong/zung-jung', { accept: 'text/html' });
+assert(zungJung.response.status === 200, `Zung Jung trainer route returned ${zungJung.response.status}.`);
+assert(zungJung.body.includes('Zung Jung Mahjong Rules and Pattern Trainer'), 'Zung Jung route is missing its edge-rendered metadata.');
+
 const missing = await request('/production-smoke-route-that-does-not-exist', { accept: 'text/html' });
 assert(missing.response.status === 404, `Unknown route returned ${missing.response.status} instead of 404.`);
 assert(missing.body.includes('Page Not Found'), 'Unknown route body is missing its not-found metadata.');
@@ -89,6 +97,8 @@ console.log(JSON.stringify({
   releaseMarkerAttempts: release.attempts,
   homeStatus: home.response.status,
   solitaireStatus: solitaire.response.status,
+  sichuanStatus: sichuan.response.status,
+  zungJungStatus: zungJung.response.status,
   notFoundStatus: missing.response.status,
   nativeFrameStatus: nativeFrame.response.status,
   wwwRedirectStatus: wwwResponse.status,

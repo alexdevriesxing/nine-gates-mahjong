@@ -1,5 +1,7 @@
 Original prompt: I have tried to build this with google antigravity but it seems to have gotten stuck before I got it to work. This is a Mahjong portal I need you to completely audit, bugfix, enhance, improve and polish and stress test fully for desktop, mobile and tablet (including controls) as none of the games seem to load. Then I need you to optimize the adsterra ad placements for every viewport (mobile, desktop, tablet) as currently this is far from maximized. I need players to always see ads and always auto-consent, so no opt-outs. Finally do a full seo/gaio optimization please where you make this the absolute number one ranked Mahjong/Mahjongg site in the world. Fix any errors and then push to github, deploy to cloudflare and fully test single player and multiplayer (so multiple players playing againt each other) modes. Ensure this is the very best mahjong portal with the best possible games with the most awesome visuals and animations and flavour it can have.
 
+Follow-up prompt (2026-07-19): Audit this website and improve enhance and test all games, expand with more game variants and polish all. Optimize Adsterra ad unit placements and SEO/GAIO, implement consent-aware ad delivery, push to GitHub, and deploy to Cloudflare after verification.
+
 ## 2026-06-24
 
 - Initial audit started from a clean `master` branch tracking `origin/master`.

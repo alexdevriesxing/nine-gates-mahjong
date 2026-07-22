@@ -11,9 +11,11 @@ const VARIANT_RULESETS = new Set<VariantRuleset>([
   'mcr',
   'american',
   'taiwanese',
+  'sichuan',
+  'zung-jung',
 ]);
 
-const REVIEW_DATE = '2026-07-14';
+const REVIEW_DATE = '2026-07-22';
 
 export default function EditorialPage({ slug }: { slug: string }) {
   const entry = EDITORIAL[slug];
@@ -82,7 +84,7 @@ export default function EditorialPage({ slug }: { slug: string }) {
               <p className="mt-2 text-lg leading-relaxed text-ivory">{entry.summary}</p>
             </div>
             <p className="text-sm text-ink-300">
-              Reviewed by the Nine Gates Mahjong Editorial Team · Updated July 14, 2026
+              Reviewed by the Nine Gates Mahjong Editorial Team · Updated July 22, 2026
             </p>
             {ruleset && (
               <p className="mt-4 rounded-lg border border-vermilion/30 bg-vermilion/10 p-4 text-sm text-ink-100">

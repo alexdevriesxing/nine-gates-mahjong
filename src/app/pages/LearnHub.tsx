@@ -8,7 +8,7 @@ const guides = [
   ['How to Play Real Mahjong', 'Follow the draw-and-discard turn, build melds, and complete a legal hand.', '/learn/how-to-play-real-mahjong', 'Foundations'],
   ['Chi, Pung, and Kong', 'See exactly how sequences, triplets, and four-of-a-kind melds work.', '/learn/chi-pung-kong', 'Rules'],
   ['Beginner Strategy', 'Improve tile efficiency, discard choices, hand shape, and table awareness.', '/learn/beginner-strategy', 'Strategy'],
-  ['Mahjong Variants', 'Compare Hong Kong, Riichi, MCR, American, and Taiwanese Mahjong.', '/learn/mahjong-variants', 'World rules'],
+  ['Mahjong Variants', 'Compare Hong Kong, Riichi, MCR, American, Taiwanese, Sichuan, and Zung Jung Mahjong.', '/learn/mahjong-variants', 'World rules'],
   ['Guided How-to-Play Lessons', 'Move through interactive, step-by-step lessons before entering a game.', '/how-to-play', 'Interactive'],
   ['The History of Mahjong', 'Read about Mahjong’s origins, cultures, global spread, and relationship with gambling.', '/history', 'Culture'],
 ];

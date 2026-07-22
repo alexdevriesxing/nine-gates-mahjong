@@ -14,9 +14,19 @@ Nine Gates Mahjong is a free browser portal operated by Fire Dragon Interactive.
 - https://ninegatesmahjong.com/history — history of Mahjong and Mahjongg Solitaire
 - https://ninegatesmahjong.com/lobby — private multiplayer training rooms
 
+## Playable ruleset trainers
+
+- https://ninegatesmahjong.com/real-mahjong/hong-kong
+- https://ninegatesmahjong.com/real-mahjong/riichi
+- https://ninegatesmahjong.com/real-mahjong/mcr
+- https://ninegatesmahjong.com/real-mahjong/american
+- https://ninegatesmahjong.com/real-mahjong/taiwanese
+- https://ninegatesmahjong.com/real-mahjong/sichuan
+- https://ninegatesmahjong.com/real-mahjong/zung-jung
+
 ## Ruleset scope
 
-The Hong Kong, Japanese Riichi, Chinese Official MCR, American and Taiwanese interactive modes are guided trainers. They demonstrate selected concepts and simplified winning-hand flows; they do not implement every scoring rule, claim, penalty, round condition or official tournament interpretation.
+The Hong Kong, Japanese Riichi, Chinese Official MCR, American, Taiwanese, Sichuan Bloody Rules and Zung Jung interactive modes are guided trainers. They demonstrate selected concepts and simplified winning-hand flows; they do not implement every scoring rule, claim, penalty, round condition or official tournament interpretation.
 
 ## Editorial policy
 

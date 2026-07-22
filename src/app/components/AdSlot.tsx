@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useAds } from '../context/AdContext';
 
 interface AdSlotProps {
@@ -29,6 +29,10 @@ export default function AdSlot({
   const [failed, setFailed] = useState(false);
   const key = ADSTERRA_KEYS[`${width}x${height}`]?.trim();
   const liveKey = adsEnabled && key && !failed ? key : null;
+
+  useEffect(() => {
+    setFailed(false);
+  }, [adsEnabled, key, width, height]);
 
   return (
     <aside

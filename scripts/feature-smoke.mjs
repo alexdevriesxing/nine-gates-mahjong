@@ -28,6 +28,9 @@ async function assertNoBrokenImages(page, label) {
   await page.goto(base, { waitUntil: 'networkidle' });
   await page.getByRole('complementary', { name: 'Privacy choices' }).waitFor();
   if (await page.locator('script[data-ngm-social-ad]').count()) throw new Error('Social ad loaded before consent.');
+  if (await page.locator('link[rel="preconnect"][href*="effectivecpmnetwork.com"], link[rel="preconnect"][href*="demolishwrestconclusions.com"]').count()) {
+    throw new Error('Ad network preconnect occurred before consent.');
+  }
   await page.getByRole('button', { name: 'Accept ads' }).click();
   if ((await page.evaluate(() => localStorage.getItem('ngm_ad_consent'))) !== 'accepted') {
     throw new Error('Advertising consent was not stored.');
@@ -41,6 +44,9 @@ async function assertNoBrokenImages(page, label) {
   await page.getByRole('button', { name: 'Continue without ads' }).click();
   if ((await page.evaluate(() => localStorage.getItem('ngm_ad_consent'))) !== 'declined') {
     throw new Error('Advertising decline was not stored.');
+  }
+  if (await page.locator('script[data-ngm-social-ad], .ad-slot iframe').count()) {
+    throw new Error('Third-party advertising remained active after consent withdrawal.');
   }
   if (errors.length) throw new Error(`Consent/ad flow: ${errors.join(' | ')}`);
   results.consentAndAds = true;

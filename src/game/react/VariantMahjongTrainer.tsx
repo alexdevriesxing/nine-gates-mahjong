@@ -4,11 +4,19 @@ import {
   findWinningMahjongDraws,
   isWinningMahjongHand,
   sortMahjongTiles,
+  type MahjongSuit,
   type MahjongTileInstance,
 } from '../MahjongCore';
 import MahjongTileView from './MahjongTileView';
 
-export type VariantRuleset = 'hong-kong' | 'riichi' | 'mcr' | 'american' | 'taiwanese';
+export type VariantRuleset =
+  | 'hong-kong'
+  | 'riichi'
+  | 'mcr'
+  | 'american'
+  | 'taiwanese'
+  | 'sichuan'
+  | 'zung-jung';
 
 interface RulesetConfig {
   title: string;
@@ -19,6 +27,7 @@ interface RulesetConfig {
   target: string;
   charleston?: boolean;
   riichi?: boolean;
+  voidSuit?: boolean;
 }
 
 const RULESETS: Record<VariantRuleset, RulesetConfig> = {
@@ -64,6 +73,23 @@ const RULESETS: Record<VariantRuleset, RulesetConfig> = {
     meldCount: 5,
     target: 'Winning target: seventeen tiles arranged as five melds and one pair.',
   },
+  sichuan: {
+    title: 'Sichuan Missing-Suit Trainer',
+    eyebrow: 'Dingque and Blood Battle foundations',
+    focus: 'Declare one suit as missing, discard every tile from it first, then finish a legal two-suit hand.',
+    handSize: 13,
+    meldCount: 4,
+    target: 'Blood Battle target: four melds and a pair using no honors and at most two suits.',
+    voidSuit: true,
+  },
+  'zung-jung': {
+    title: 'Zung Jung Pattern Trainer',
+    eyebrow: 'Additive competitive scoring',
+    focus: 'Complete a flexible standard hand, then evaluate every qualifying pattern instead of stopping at one label.',
+    handSize: 13,
+    meldCount: 4,
+    target: 'Scoring target: a legal hand whose compatible Zung Jung patterns are added together.',
+  },
 };
 
 interface TrainerState {
@@ -71,10 +97,11 @@ interface TrainerState {
   hand: MahjongTileInstance[];
   playerDiscards: MahjongTileInstance[];
   opponentDiscards: MahjongTileInstance[][];
-  phase: 'charleston' | 'discard' | 'draw' | 'won' | 'wall-empty';
+  phase: 'void-suit' | 'charleston' | 'discard' | 'draw' | 'won' | 'wall-empty';
   charlestonPass: number;
   selectedIds: string[];
   riichiDeclared: boolean;
+  voidSuit: MahjongSuit | null;
   turns: number;
   lastAction: string;
 }
@@ -102,6 +129,14 @@ const AMERICAN_READY_KEYS = [
   'dragons:red',
 ];
 
+const SICHUAN_READY_KEYS = [
+  'characters:1', 'characters:2', 'characters:3',
+  'characters:4', 'characters:5', 'characters:6',
+  'circles:2', 'circles:3', 'circles:4',
+  'circles:7', 'circles:7', 'circles:7',
+  'circles:9',
+];
+
 function drawKey(wall: MahjongTileInstance[], key: string) {
   const index = wall.findIndex((tile) => tile.key === key);
   if (index < 0) throw new Error(`Practice wall is missing ${key}.`);
@@ -109,22 +144,24 @@ function drawKey(wall: MahjongTileInstance[], key: string) {
 }
 
 function createGuidedHand(ruleset: VariantRuleset, includeDiscard: boolean) {
-  const wall = createMahjongWall();
+  const wall = createMahjongWall().filter(
+    (tile) => ruleset !== 'sichuan' || ['characters', 'circles', 'bamboo'].includes(tile.suit)
+  );
   const keys =
     ruleset === 'taiwanese'
       ? TAIWANESE_READY_KEYS
       : ruleset === 'american'
         ? AMERICAN_READY_KEYS
-        : STANDARD_READY_KEYS;
+        : ruleset === 'sichuan'
+          ? SICHUAN_READY_KEYS
+          : STANDARD_READY_KEYS;
   const hand = keys.map((key) => drawKey(wall, key));
-  if (includeDiscard) hand.push(drawKey(wall, 'dragons:white'));
+  if (includeDiscard) hand.push(drawKey(wall, ruleset === 'sichuan' ? 'bamboo:9' : 'dragons:white'));
 
-  const winningTile = drawKey(wall, 'dragons:red');
-  const opponentTiles = [
-    drawKey(wall, 'winds:north'),
-    drawKey(wall, 'winds:west'),
-    drawKey(wall, 'winds:south'),
-  ];
+  const winningTile = drawKey(wall, ruleset === 'sichuan' ? 'circles:9' : 'dragons:red');
+  const opponentTiles = ruleset === 'sichuan'
+    ? [drawKey(wall, 'bamboo:1'), drawKey(wall, 'bamboo:2'), drawKey(wall, 'bamboo:3')]
+    : [drawKey(wall, 'winds:north'), drawKey(wall, 'winds:west'), drawKey(wall, 'winds:south')];
   wall.unshift(...opponentTiles, winningTile);
 
   return { wall, hand: sortMahjongTiles(hand) };
@@ -138,14 +175,17 @@ function createTrainerState(ruleset: VariantRuleset): TrainerState {
     hand: guided.hand,
     playerDiscards: [],
     opponentDiscards: [[], [], []],
-    phase: config.charleston ? 'charleston' : 'discard',
+    phase: config.charleston ? 'charleston' : config.voidSuit ? 'void-suit' : 'discard',
     charlestonPass: 0,
     selectedIds: [],
     riichiDeclared: false,
+    voidSuit: null,
     turns: 0,
     lastAction: config.charleston
       ? 'Select three tiles for the right pass.'
-      : 'Choose the least useful tile and discard it.',
+      : config.voidSuit
+        ? 'Declare the suit you will remove from your hand. Bamboo is the guided choice.'
+        : 'Choose the least useful tile and discard it.',
   };
 }
 
@@ -162,7 +202,7 @@ export default function VariantMahjongTrainer({ ruleset }: { ruleset: VariantRul
 
   const waits = useMemo(
     () =>
-      state.phase === 'draw' || state.phase === 'charleston'
+      state.phase === 'draw' || state.phase === 'charleston' || state.phase === 'void-suit'
         ? []
         : findWinningMahjongDraws(
             state.hand.filter((tile) => !state.selectedIds.includes(tile.id)),
@@ -185,6 +225,21 @@ export default function VariantMahjongTrainer({ ruleset }: { ruleset: VariantRul
         ...current,
         selectedIds:
           limit === 1 ? [tileId] : current.selectedIds.length < limit ? [...current.selectedIds, tileId] : current.selectedIds,
+      };
+    });
+  };
+
+  const declareVoidSuit = (suit: Extract<MahjongSuit, 'characters' | 'circles' | 'bamboo'>) => {
+    setState((current) => {
+      if (current.phase !== 'void-suit') return current;
+      const suitCount = current.hand.filter((tile) => tile.suit === suit).length;
+      return {
+        ...current,
+        voidSuit: suit,
+        phase: 'discard',
+        lastAction: suitCount > 0
+          ? `${suitCount} ${suit} tile${suitCount === 1 ? '' : 's'} must be discarded before any other suit.`
+          : `${suit} declared missing. The hand already satisfies that part of dingque.`,
       };
     });
   };
@@ -224,6 +279,16 @@ export default function VariantMahjongTrainer({ ruleset }: { ruleset: VariantRul
       if (current.phase !== 'discard' || current.selectedIds.length !== 1) return current;
       const tile = current.hand.find((candidate) => candidate.id === current.selectedIds[0]);
       if (!tile) return current;
+      if (
+        current.voidSuit &&
+        current.hand.some((candidate) => candidate.suit === current.voidSuit) &&
+        tile.suit !== current.voidSuit
+      ) {
+        return {
+          ...current,
+          lastAction: `Dingque requires discarding every ${current.voidSuit} tile first.`,
+        };
+      }
       const hand = current.hand.filter((candidate) => candidate.id !== tile.id);
       if (declareRiichi && findWinningMahjongDraws(hand, config.meldCount).length === 0) return current;
 
@@ -270,6 +335,16 @@ export default function VariantMahjongTrainer({ ruleset }: { ruleset: VariantRul
   const showHint = () => {
     setState((current) => {
       if (current.phase !== 'discard') return current;
+      const forcedVoidTile = current.voidSuit
+        ? current.hand.find((tile) => tile.suit === current.voidSuit)
+        : null;
+      if (forcedVoidTile) {
+        return {
+          ...current,
+          selectedIds: [forcedVoidTile.id],
+          lastAction: `Hint: discard this ${current.voidSuit} tile to satisfy your declared missing suit.`,
+        };
+      }
       const hintCandidates = [...current.hand].sort((a, b) =>
         Number(b.key === 'dragons:white') - Number(a.key === 'dragons:white')
       );
@@ -314,6 +389,7 @@ export default function VariantMahjongTrainer({ ruleset }: { ruleset: VariantRul
         wallRemaining: state.wall.length,
         turns: state.turns,
         riichiDeclared: state.riichiDeclared,
+        voidSuit: state.voidSuit,
         charlestonPass: state.charlestonPass,
         selectedIds: state.selectedIds,
         waits: waits.map(({ key, name }) => ({ key, name })),
@@ -367,6 +443,7 @@ export default function VariantMahjongTrainer({ ruleset }: { ruleset: VariantRul
           <strong>{state.phase === 'won' ? 'Hand complete' : state.lastAction}</strong>
           {waits.length > 0 && <span>Current wait: {waits.map((tile) => tile.name).join(', ')}</span>}
           {state.riichiDeclared && <span className="badge badge-vermilion">Riichi declared</span>}
+          {state.voidSuit && <span className="badge badge-gold">Missing suit: {state.voidSuit}</span>}
         </div>
         <div className="variant-trainer__hand">
           {state.hand.map((tile) => (
@@ -383,7 +460,23 @@ export default function VariantMahjongTrainer({ ruleset }: { ruleset: VariantRul
       </div>
 
       <div className="real-table-actions">
-        {state.phase === 'charleston' ? (
+        {state.phase === 'void-suit' ? (
+          <div className="variant-trainer__declaration" role="group" aria-label="Declare missing suit">
+            {(['characters', 'circles', 'bamboo'] as const).map((suit) => {
+              const count = state.hand.filter((tile) => tile.suit === suit).length;
+              return (
+                <button
+                  className={suit === 'bamboo' ? 'btn-primary' : 'btn-secondary'}
+                  key={suit}
+                  type="button"
+                  onClick={() => declareVoidSuit(suit)}
+                >
+                  Declare {suit} as missing ({count})
+                </button>
+              );
+            })}
+          </div>
+        ) : state.phase === 'charleston' ? (
           <button className="btn-primary" disabled={state.selectedIds.length !== 3} onClick={passCharleston}>
             Pass {PASS_NAMES[state.charlestonPass]} ({state.selectedIds.length}/3)
           </button>

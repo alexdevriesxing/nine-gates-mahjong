@@ -60,7 +60,9 @@ export function AdProvider({ children }: { children: ReactNode }) {
       decline: () => choose('declined'),
       reset: () => {
         window.localStorage.removeItem(STORAGE_KEY);
-        setConsent(null);
+        // Reload so third-party code that ran under prior consent cannot keep
+        // global listeners alive after the visitor reopens privacy choices.
+        window.location.reload();
       },
     };
   }, [consent]);

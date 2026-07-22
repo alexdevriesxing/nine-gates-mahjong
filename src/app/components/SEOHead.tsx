@@ -21,6 +21,8 @@ function labelSegment(segment: string) {
     'mahjongg-solitaire': 'Mahjongg Solitaire',
     mcr: 'Chinese Official MCR',
     riichi: 'Japanese Riichi',
+    sichuan: 'Sichuan Bloody Rules',
+    'zung-jung': 'Zung Jung Mahjong',
   };
   return aliases[segment] ?? segment.split('-').map((word) => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
 }
@@ -69,7 +71,7 @@ export default function SEOHead({
   ogImage,
   jsonLd,
   noIndex = false,
-  dateModified = '2026-07-14',
+  dateModified = '2026-07-22',
 }: SEOHeadProps) {
   const finalCanonical = canonical || SITE_DOMAIN;
   const finalOgTitle = ogTitle || title;

@@ -80,13 +80,29 @@ interface BoardPosition {
   z: number;
 }
 
-export function createFortressPositions(): BoardPosition[] {
+export type SolitaireLayout = 'fortress' | 'courtyard' | 'pagoda';
+
+export const SOLITAIRE_LAYOUTS: Array<{ id: SolitaireLayout; name: string; description: string }> = [
+  { id: 'fortress', name: 'Fortress', description: 'A compact three-tier stronghold.' },
+  { id: 'courtyard', name: 'Jade Courtyard', description: 'An open upper ring with a central pavilion.' },
+  { id: 'pagoda', name: 'Four-Storey Pagoda', description: 'A taller 82-tile climb with narrowing tiers.' },
+];
+
+function createLayeredPositions(layout: SolitaireLayout): BoardPosition[] {
   const positions: BoardPosition[] = [];
-  const addLayer = (z: number, rows: number, columns: number, xOffset: number, yOffset: number) => {
+  const addLayer = (
+    z: number,
+    rows: number,
+    columns: number,
+    xOffset: number,
+    yOffset: number,
+    frameOnly = false
+  ) => {
     for (let row = 0; row < rows; row += 1) {
       for (let column = 0; column < columns; column += 1) {
+        if (frameOnly && row > 0 && row < rows - 1 && column > 0 && column < columns - 1) continue;
         positions.push({
-          id: `p-${z}-${row}-${column}`,
+          id: `p-${layout}-${z}-${row}-${column}`,
           x: xOffset + column * 2,
           y: yOffset + row * 2,
           z,
@@ -96,9 +112,23 @@ export function createFortressPositions(): BoardPosition[] {
   };
 
   addLayer(0, 6, 8, 0, 0);
-  addLayer(1, 4, 4, 4, 2);
-  addLayer(2, 2, 2, 6, 4);
+  if (layout === 'fortress') {
+    addLayer(1, 4, 4, 4, 2);
+    addLayer(2, 2, 2, 6, 4);
+  } else if (layout === 'courtyard') {
+    addLayer(1, 4, 6, 2, 2, true);
+    addLayer(2, 2, 2, 6, 4);
+  } else {
+    addLayer(1, 4, 6, 2, 2);
+    addLayer(2, 2, 4, 4, 4);
+    addLayer(3, 1, 2, 6, 5);
+  }
+
   return positions;
+}
+
+export function createFortressPositions(): BoardPosition[] {
+  return createLayeredPositions('fortress');
 }
 
 function overlaps(a: BoardPosition, b: BoardPosition): boolean {
@@ -119,34 +149,42 @@ export function isPositionFree(position: BoardPosition, active: BoardPosition[])
 }
 
 function createRemovalPairs(positions: BoardPosition[], rng: () => number): [BoardPosition, BoardPosition][] {
-  const active = [...positions];
-  const pairs: [BoardPosition, BoardPosition][] = [];
+  // Pair removal order is also the inverse deal order. Some layered shapes have
+  // unlucky greedy paths, so retry with the seeded RNG instead of publishing a
+  // board that can deadlock or rejecting an otherwise valid layout.
+  for (let attempt = 0; attempt < 96; attempt += 1) {
+    const active = [...positions];
+    const pairs: [BoardPosition, BoardPosition][] = [];
 
-  while (active.length > 0) {
-    const free = active.filter((position) => isPositionFree(position, active));
-    if (free.length < 2) {
-      throw new Error('The Mahjong layout cannot be removed in pairs.');
+    while (active.length > 0) {
+      const free = active.filter((position) => isPositionFree(position, active));
+      if (free.length < 2) break;
+
+      const shuffledFree = shuffle(free, rng);
+      const first = shuffledFree[0];
+      const second =
+        shuffledFree.find((candidate) => candidate.z !== first.z || Math.abs(candidate.x - first.x) > 2) ??
+        shuffledFree[1];
+      pairs.push([first, second]);
+
+      for (const selected of [first, second]) {
+        const index = active.findIndex((position) => position.id === selected.id);
+        active.splice(index, 1);
+      }
     }
 
-    const shuffledFree = shuffle(free, rng);
-    const first = shuffledFree[0];
-    const second =
-      shuffledFree.find((candidate) => candidate.z !== first.z || Math.abs(candidate.x - first.x) > 2) ??
-      shuffledFree[1];
-    pairs.push([first, second]);
-
-    for (const selected of [first, second]) {
-      const index = active.findIndex((position) => position.id === selected.id);
-      active.splice(index, 1);
-    }
+    if (active.length === 0) return pairs;
   }
 
-  return pairs;
+  throw new Error('The Mahjong layout cannot be removed in pairs.');
 }
 
-export function createSolvableSolitaireBoard(seed = Date.now()): SolitaireTileInstance[] {
+export function createSolvableSolitaireBoard(
+  seed = Date.now(),
+  layout: SolitaireLayout = 'fortress'
+): SolitaireTileInstance[] {
   const rng = seededRandom(seed);
-  const positions = createFortressPositions();
+  const positions = createLayeredPositions(layout);
   const removalPairs = createRemovalPairs(positions, rng);
   const faces = shuffle(
     Array.from({ length: removalPairs.length }, (_, index) => MAHJONG_FACES[index % MAHJONG_FACES.length]),

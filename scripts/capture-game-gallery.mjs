@@ -17,6 +17,8 @@ const routes = [
   ['mcr', '/real-mahjong/mcr'],
   ['american', '/real-mahjong/american'],
   ['taiwanese', '/real-mahjong/taiwanese'],
+  ['sichuan', '/real-mahjong/sichuan'],
+  ['zung-jung', '/real-mahjong/zung-jung'],
 ];
 const viewports = [
   { name: 'desktop', width: 1440, height: 900, columns: 3 },
@@ -36,6 +38,9 @@ for (const viewport of viewports) {
     const page = await context.newPage();
     await page.goto(`${base}${route}`, { waitUntil: 'domcontentloaded', timeout: 20000 });
     await page.waitForTimeout(350);
+    if (route === '/real-mahjong/sichuan') {
+      await page.getByRole('button', { name: /Declare bamboo as missing/ }).click();
+    }
     const hint = page.getByRole('button', { name: /Hint/ });
     if (route !== '/real-mahjong' && route !== '/real-mahjong/american' && await hint.count()) {
       await hint.click();

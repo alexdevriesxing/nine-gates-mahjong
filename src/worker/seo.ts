@@ -60,8 +60,8 @@ const ROUTES: Record<string, RouteMeta> = {
     kind: 'trainer',
   },
   '/variants': {
-    title: 'Mahjong Variants Compared | Hong Kong, Riichi, MCR and More',
-    description: 'Compare Hong Kong Mahjong, Japanese Riichi, Chinese Official MCR, American Mahjongg and Taiwanese Mahjong, then try guided training hands.',
+    title: 'Mahjong Variants | Seven Playable Regional Rule Trainers',
+    description: 'Compare and practice Hong Kong, Riichi, MCR, American, Taiwanese, Sichuan Bloody Rules, and Zung Jung Mahjong.',
     kind: 'article',
   },
   '/real-mahjong/hong-kong': {
@@ -87,6 +87,16 @@ const ROUTES: Record<string, RouteMeta> = {
   '/real-mahjong/taiwanese': {
     title: 'Taiwanese Mahjong Guide and Guided Trainer',
     description: 'Learn selected Taiwanese Mahjong concepts and practice a simplified guided hand with the larger hand-size target.',
+    kind: 'trainer',
+  },
+  '/real-mahjong/sichuan': {
+    title: 'Sichuan Bloody Rules Mahjong and Dingque Trainer',
+    description: 'Learn Sichuan Blood Battle Mahjong with a playable dingque missing-suit trainer, the 108-tile suited set, no-chow calls and multi-winner flow.',
+    kind: 'trainer',
+  },
+  '/real-mahjong/zung-jung': {
+    title: 'Zung Jung Mahjong Rules and Pattern Trainer',
+    description: 'Learn Zung Jung Mahjong with guided standard-hand practice, additive pattern-scoring concepts and clear comparisons with MCR and Riichi.',
     kind: 'trainer',
   },
   '/learn': {
@@ -121,7 +131,7 @@ const ROUTES: Record<string, RouteMeta> = {
   },
   '/learn/mahjong-variants': {
     title: 'Mahjong Variants Guide | Hong Kong, Riichi, MCR and More',
-    description: 'Compare major Mahjong variants by hand size, declarations, scoring complexity and playing style.',
+    description: 'Compare Hong Kong, Riichi, MCR, American, Taiwanese, Sichuan Bloody Rules and Zung Jung Mahjong.',
     kind: 'article',
   },
   '/how-to-play': {
@@ -203,6 +213,8 @@ function labelSegment(segment: string) {
     'mahjongg-solitaire': 'Mahjongg Solitaire',
     mcr: 'Chinese Official MCR',
     riichi: 'Japanese Riichi',
+    sichuan: 'Sichuan Bloody Rules',
+    'zung-jung': 'Zung Jung Mahjong',
   };
   return aliases[segment] ?? segment.split('-').map((word) => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
 }
@@ -283,7 +295,7 @@ export function renderHtmlResponse(request: Request, response: Response, pathnam
         headline: meta.title,
         description: meta.description,
         inLanguage: 'en',
-        dateModified: '2026-07-14',
+        dateModified: '2026-07-22',
         isPartOf: { '@id': `${SITE_ORIGIN}/#website` },
         publisher: { '@id': `${SITE_ORIGIN}/#organization` },
         image: DEFAULT_IMAGE,
