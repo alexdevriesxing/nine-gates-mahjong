@@ -27,6 +27,7 @@ interface RoomGame {
   turn: number;
   phase: 'draw' | 'discard';
   winner: number | null;
+  exhaustiveDraw: boolean;
   lastAction: string;
 }
 
@@ -57,10 +58,21 @@ function json(data: unknown, init: ResponseInit = {}) {
   return new Response(JSON.stringify(data), { ...init, headers });
 }
 
+async function readJson<T>(request: Request): Promise<T | null> {
+  const contentLength = Number.parseInt(request.headers.get('Content-Length') ?? '0', 10);
+  if (Number.isFinite(contentLength) && contentLength > 32_768) return null;
+  try {
+    return await request.json<T>();
+  } catch {
+    return null;
+  }
+}
+
 function createRoomCode() {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  const random = crypto.getRandomValues(new Uint8Array(6));
   let code = '';
-  for (let index = 0; index < 6; index += 1) code += chars[Math.floor(Math.random() * chars.length)];
+  for (const byte of random) code += chars[byte % chars.length];
   return code;
 }
 
@@ -75,7 +87,7 @@ const BLOCKED_CHAT_WORDS = [
 ];
 
 function sanitizeChat(value: string | undefined) {
-  let message = (value ?? '').trim().replace(/\s+/g, ' ').slice(0, 160);
+  let message = (typeof value === 'string' ? value : '').trim().replace(/\s+/g, ' ').slice(0, 160);
   message = message.replace(/(?:https?:\/\/|www\.)\S+/giu, '[link removed]');
   for (const word of BLOCKED_CHAT_WORDS) {
     const pattern = new RegExp(`\\b${word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'giu');
@@ -182,6 +194,7 @@ function createGame(): RoomGame {
     turn: 0,
     phase: 'discard',
     winner: null,
+    exhaustiveDraw: false,
     lastAction: 'East begins with a discard.',
   };
 }
@@ -199,6 +212,9 @@ export class MahjongRoom {
     this.state.blockConcurrencyWhile(async () => {
       this.room = (await this.state.storage.get<RoomData>('room')) ?? null;
       if (this.room && !this.room.messages) this.room.messages = [];
+      if (this.room?.game && typeof this.room.game.exhaustiveDraw !== 'boolean') {
+        this.room.game.exhaustiveDraw = false;
+      }
     });
   }
 
@@ -227,7 +243,10 @@ export class MahjongRoom {
     const authenticated = await currentUser(request, this.env);
     const name = authenticated ? String(authenticated.display_name) : sanitizeName(url.searchParams.get('name'));
     const requestedId = url.searchParams.get('playerId');
-    const playerId = authenticated ? `user-${authenticated.id}` : requestedId || crypto.randomUUID();
+    const validGuestId = requestedId && /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(requestedId)
+      ? requestedId
+      : null;
+    const playerId = authenticated ? `user-${authenticated.id}` : validGuestId || crypto.randomUUID();
     const pair = new WebSocketPair();
     const client = pair[0];
     const server = pair[1];
@@ -240,7 +259,20 @@ export class MahjongRoom {
       return new Response(null, { status: 101, webSocket: client });
     }
 
-    this.room!.seats[seatIndex] = { id: playerId, name, ready: false, connected: true, isAI: false };
+    for (const [existingSocket, meta] of this.sockets) {
+      if (meta.playerId !== playerId) continue;
+      this.sockets.delete(existingSocket);
+      existingSocket.close(1000, 'Reconnected from another tab');
+    }
+
+    const previousSeat = this.room!.seats[seatIndex];
+    this.room!.seats[seatIndex] = {
+      id: playerId,
+      name,
+      ready: previousSeat?.ready ?? false,
+      connected: true,
+      isAI: false,
+    };
     this.sockets.set(server, { playerId });
     server.addEventListener('message', (event) => void this.onMessage(server, String(event.data)));
     server.addEventListener('close', () => void this.onDisconnect(server));
@@ -254,6 +286,10 @@ export class MahjongRoom {
   private async onMessage(socket: WebSocket, raw: string) {
     const meta = this.sockets.get(socket);
     if (!meta || !this.room) return;
+    if (raw.length > 4096) {
+      this.sendError(socket, 'Message is too large.');
+      return;
+    }
     let message: { type?: string; tileId?: string; text?: string };
     try {
       message = JSON.parse(raw);
@@ -330,7 +366,11 @@ export class MahjongRoom {
 
   private draw(seatIndex: number) {
     const game = this.room?.game;
-    if (!game || game.winner !== null || game.turn !== seatIndex || game.phase !== 'draw' || game.wall.length === 0) {
+    if (!game || game.winner !== null || game.exhaustiveDraw || game.turn !== seatIndex || game.phase !== 'draw') {
+      return;
+    }
+    if (game.wall.length === 0) {
+      this.finishDraw();
       return;
     }
     const tile = game.wall.shift()!;
@@ -342,7 +382,7 @@ export class MahjongRoom {
 
   private discard(seatIndex: number, tileId: string) {
     const game = this.room?.game;
-    if (!game || game.winner !== null || game.turn !== seatIndex || game.phase !== 'discard') return;
+    if (!game || game.winner !== null || game.exhaustiveDraw || game.turn !== seatIndex || game.phase !== 'discard') return;
     const tile = game.hands[seatIndex].find((candidate) => candidate.id === tileId);
     if (!tile) return;
     game.hands[seatIndex] = game.hands[seatIndex].filter((candidate) => candidate.id !== tileId);
@@ -350,13 +390,14 @@ export class MahjongRoom {
     game.turn = (seatIndex + 1) % 4;
     game.phase = 'draw';
     game.lastAction = `${this.room!.seats[seatIndex]!.name} discards ${tile.name}.`;
+    if (game.wall.length === 0) this.finishDraw();
   }
 
   private async runAITurns() {
     const game = this.room?.game;
     if (!game) return;
     let guard = 0;
-    while (game.winner === null && this.room!.seats[game.turn]?.isAI && game.wall.length > 0 && guard < 8) {
+    while (game.winner === null && !game.exhaustiveDraw && this.room!.seats[game.turn]?.isAI && game.wall.length > 0 && guard < 8) {
       guard += 1;
       const seatIndex = game.turn;
       this.draw(seatIndex);
@@ -372,6 +413,13 @@ export class MahjongRoom {
     game.lastAction = `${this.room!.seats[seatIndex]!.name} declares Mahjong.`;
     this.room!.status = 'finished';
     void this.recordRatedResult(seatIndex);
+  }
+
+  private finishDraw() {
+    const game = this.room!.game!;
+    game.exhaustiveDraw = true;
+    game.lastAction = 'The wall is exhausted. The hand ends without a winner.';
+    this.room!.status = 'finished';
   }
 
   private async recordRatedResult(winnerIndex: number) {
@@ -447,6 +495,7 @@ export class MahjongRoom {
             turn: game.turn,
             phase: game.phase,
             winner: game.winner,
+            exhaustiveDraw: game.exhaustiveDraw,
             lastAction: game.lastAction,
             yourSeat: seatIndex,
           }
@@ -484,11 +533,12 @@ export default {
     }
 
     if (url.pathname === '/api/auth/register' && request.method === 'POST') {
-      const body = await request.json<{ username?: string; email?: string; password?: string }>();
-      const username = sanitizeName(body.username ?? '');
-      const email = (body.email ?? '').trim().toLowerCase();
-      const password = body.password ?? '';
-      if (username.length < 3 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || password.length < 10) {
+      const body = await readJson<{ username?: string; email?: string; password?: string }>(request);
+      if (!body) return json({ error: 'Invalid JSON request body.' }, { status: 400 });
+      const username = sanitizeName(typeof body.username === 'string' ? body.username : '');
+      const email = (typeof body.email === 'string' ? body.email : '').trim().toLowerCase();
+      const password = typeof body.password === 'string' ? body.password : '';
+      if (username.length < 3 || email.length > 254 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || password.length < 10 || password.length > 128) {
         return json({ error: 'Invalid registration details.' }, { status: 400 });
       }
       const existing = await env.DB.prepare('SELECT id FROM users WHERE username = ? OR email = ?').bind(username, email).first();
@@ -508,10 +558,12 @@ export default {
     }
 
     if (url.pathname === '/api/auth/login' && request.method === 'POST') {
-      const body = await request.json<{ email?: string; password?: string }>();
-      const email = (body.email ?? '').trim().toLowerCase();
+      const body = await readJson<{ email?: string; password?: string }>(request);
+      if (!body) return json({ error: 'Invalid JSON request body.' }, { status: 400 });
+      const email = (typeof body.email === 'string' ? body.email : '').trim().toLowerCase();
+      const password = typeof body.password === 'string' ? body.password : '';
       const record = await env.DB.prepare('SELECT id, password_hash, password_salt FROM users WHERE email = ?').bind(email).first<{ id: string; password_hash: string; password_salt: string }>();
-      if (!record || !(await verifyPassword(body.password ?? '', record.password_hash, record.password_salt))) {
+      if (email.length > 254 || password.length > 128 || !record || !(await verifyPassword(password, record.password_hash, record.password_salt))) {
         return json({ error: 'Invalid email or password.' }, { status: 401 });
       }
       const sessionId = await createSession(record.id, env);
@@ -535,9 +587,16 @@ export default {
     if (url.pathname === '/api/profile' && request.method === 'PUT') {
       const row = await currentUser(request, env);
       if (!row) return json({ error: 'Unauthorized' }, { status: 401 });
-      const body = await request.json<{ avatarTile?: string; displayName?: string }>();
-      const displayName = body.displayName ? sanitizeName(body.displayName) : row.display_name;
-      const avatarTile = body.avatarTile?.slice(0, 40) || row.avatar_tile;
+      const body = await readJson<{ avatarTile?: string; displayName?: string }>(request);
+      if (!body) return json({ error: 'Invalid JSON request body.' }, { status: 400 });
+      const displayName = typeof body.displayName === 'string' && body.displayName
+        ? sanitizeName(body.displayName)
+        : row.display_name;
+      const requestedAvatar = typeof body.avatarTile === 'string' ? body.avatarTile.slice(0, 40) : undefined;
+      if (requestedAvatar && !/^(?:dragons:(?:red|green|white)|winds:(?:east|south|west|north)|(?:bamboo|circles|characters):[1-9])$/.test(requestedAvatar)) {
+        return json({ error: 'Invalid avatar tile.' }, { status: 400 });
+      }
+      const avatarTile = requestedAvatar || row.avatar_tile;
       await env.DB.prepare('UPDATE profiles SET display_name = ?, avatar_tile = ?, updated_at = CURRENT_TIMESTAMP WHERE user_id = ?')
         .bind(displayName, avatarTile, row.id).run();
       const updated = await currentUser(request, env);

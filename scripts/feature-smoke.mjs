@@ -35,11 +35,20 @@ async function assertNoBrokenImages(page, label) {
   if ((await page.evaluate(() => localStorage.getItem('ngm_ad_consent'))) !== 'accepted') {
     throw new Error('Advertising consent was not stored.');
   }
+  const adHints = await page.locator('link[data-ngm-ad-hint][rel="preconnect"]').count();
+  if (adHints < 2) throw new Error('Consent-aware Adsterra connection hints were not installed.');
+  await page.setViewportSize({ width: 1600, height: 900 });
   await page.goto(`${base}/mahjongg-solitaire`, { waitUntil: 'networkidle' });
   if (await page.getByRole('complementary', { name: 'Privacy choices' }).count()) {
     throw new Error('Consent banner returned after a stored choice.');
   }
   if (await page.locator('.ad-slot').count() < 1) throw new Error('Ad slots did not render.');
+  if (await page.locator('iframe[src*="placement=160x600"]').count() !== 1) {
+    throw new Error('The desktop game layout requested a duplicate or missing 160x600 placement.');
+  }
+  if (await page.locator('iframe[src*="placement=160x300"]').count() !== 1) {
+    throw new Error('The wide desktop secondary rail did not use its distinct 160x300 placement.');
+  }
   await page.getByRole('button', { name: /Privacy choices/ }).click();
   await page.getByRole('button', { name: 'Continue without ads' }).click();
   if ((await page.evaluate(() => localStorage.getItem('ngm_ad_consent'))) !== 'declined') {
@@ -84,6 +93,10 @@ results.localePersistence = true;
 
 // Mobile menu, interface-language selector and navigation.
 await page.setViewportSize({ width: 390, height: 844 });
+await page.getByRole('button', { name: 'Open menu' }).click();
+await page.getByRole('dialog', { name: 'Menu' }).waitFor();
+await page.keyboard.press('Escape');
+await page.getByRole('dialog', { name: 'Menu' }).waitFor({ state: 'detached' });
 await page.getByRole('button', { name: 'Open menu' }).click();
 await page.locator('.mobile-language select').selectOption('ja');
 if ((await page.evaluate(() => document.documentElement.dataset.uiLanguage)) !== 'ja') throw new Error('Mobile locale selector failed.');

@@ -1,13 +1,16 @@
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import SEOHead from '../components/SEOHead';
 
 export default function NotFoundPage() {
+  const location = useLocation();
+  const canonical = `https://ninegatesmahjong.com${location.pathname}`;
+
   return (
     <>
       <SEOHead
         title="Page Not Found | Nine Gates Mahjong"
         description="The requested Nine Gates Mahjong page could not be found."
-        canonical="https://ninegatesmahjong.com/404"
+        canonical={canonical}
         noIndex
       />
       <main className="not-found-page">

@@ -11,7 +11,7 @@ const routes = [
   '/learn/mahjong-vs-mahjongg', '/learn/how-to-play-mahjongg-solitaire',
   '/learn/how-to-play-real-mahjong', '/learn/chi-pung-kong', '/learn/beginner-strategy',
   '/learn/mahjong-variants', '/how-to-play', '/history', '/events', '/lobby',
-  '/leaderboards', '/login', '/register', '/privacy', '/terms',
+  '/leaderboards', '/login', '/register', '/profile', '/guest', '/privacy', '/terms',
   notFoundRoute,
 ];
 const viewports = [
@@ -35,7 +35,7 @@ for (const route of routes) {
 
 for (const framePath of [
   '/native-frame',
-  '/ad-frame?key=cdc33de3506804ba73d2d3661ed4fd0a&w=320&h=50',
+  '/ad-frame?placement=320x50',
 ]) {
   const response = await fetch(`${base}${framePath}`);
   if (response.status !== 200) failures.push(`Advertising frame ${framePath}: ${response.status}`);
@@ -47,12 +47,26 @@ for (const framePath of [
   }
 }
 
+const invalidFrame = await fetch(`${base}/ad-frame?key=cdc33de3506804ba73d2d3661ed4fd0a&w=320&h=50`);
+if (invalidFrame.status !== 400) failures.push(`Unapproved advertising frame parameters returned ${invalidFrame.status}`);
+if ((invalidFrame.headers.get('x-robots-tag') ?? '').toLowerCase() !== 'noindex, nofollow') {
+  failures.push('Invalid advertising frame is missing noindex header');
+}
+
+for (const retiredPath of ['/ad.html', '/ad-frame.htm', '/native.html', '/native-frame.htm']) {
+  const response = await fetch(`${base}${retiredPath}`);
+  if (response.status !== 410) failures.push(`Retired advertising endpoint ${retiredPath}: ${response.status}`);
+}
+
 const initialHtmlResponse = await fetch(`${base}/mahjongg-solitaire`);
 const initialHtml = await initialHtmlResponse.text();
 if (!initialHtml.includes('Play Mahjongg Solitaire Free Online')) failures.push('Initial HTML missing route title.');
 if (!initialHtml.includes('guaranteed-solvable layered Mahjongg Solitaire board')) failures.push('Initial HTML missing route description.');
 if (!initialHtml.includes('server-seo-fallback')) failures.push('Initial HTML missing crawlable fallback content.');
 if (!initialHtml.includes('application/ld+json')) failures.push('Initial HTML missing structured data.');
+if (!initialHtml.includes('WebApplication') || !initialHtml.includes('GameApplication')) {
+  failures.push('Initial game HTML is missing eligible web-game structured data.');
+}
 
 for (const viewport of viewports) {
   const context = await browser.newContext({ viewport });
@@ -92,6 +106,14 @@ for (const viewport of viewports) {
     if (/under construction/i.test(rootText)) failures.push(`${viewport.name} ${route}: placeholder content`);
     const h1Count = await page.locator('h1').count();
     if (h1Count === 0 && route !== '/guest') failures.push(`${viewport.name} ${route}: missing H1`);
+    const mainCount = await page.locator('main').count();
+    if (mainCount !== 1) failures.push(`${viewport.name} ${route}: expected one main landmark, found ${mainCount}`);
+    const canonicalCount = await page.locator('link[rel="canonical"]').count();
+    if (canonicalCount !== 1) failures.push(`${viewport.name} ${route}: expected one canonical link, found ${canonicalCount}`);
+    if (['/login', '/register', '/profile'].includes(route)) {
+      const robots = await page.locator('meta[name="robots"]').getAttribute('content');
+      if (robots !== 'noindex,follow') failures.push(`${viewport.name} ${route}: private route is indexable`);
+    }
     if (route === notFoundRoute) {
       await page.getByRole('heading', { name: /404/ }).waitFor({ state: 'visible', timeout: 7000 }).catch(() => {});
       const notFoundText = await page.locator('#root').innerText().catch(() => '');
@@ -116,4 +138,4 @@ if (failures.length) {
   console.error(JSON.stringify({ checked, failures }, null, 2));
   process.exit(1);
 }
-console.log(JSON.stringify({ checked, routes: routes.length, viewports: viewports.map((item) => item.name), initialHtml: true, advertisingFrames: true, securityHeaders: true, failures: 0 }));
+console.log(JSON.stringify({ checked, routes: routes.length, viewports: viewports.map((item) => item.name), initialHtml: true, advertisingFrames: true, retiredAdvertisingEndpoints: true, structuredData: true, landmarks: true, securityHeaders: true, failures: 0 }));

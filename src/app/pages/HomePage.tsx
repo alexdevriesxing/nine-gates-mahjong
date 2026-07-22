@@ -29,17 +29,17 @@ export default function HomePage() {
   const isVariantsInView = useInView(variantsRef, { once: true, margin: '-100px' });
 
   return (
-    <div className="w-full -mt-[72px]"> {/* Negative margin to underlap the fixed header */}
+    <main className="w-full -mt-[72px]"> {/* Negative margin to underlap the fixed header */}
       <SEOHead 
-        title="Nine Gates Mahjong — The Definitive Online Mahjong Portal"
-        description="Play Mahjongg Solitaire, solve daily puzzles, learn real Mahjong, and take your seat at serious table variants played around the world."
-        canonical="https://ninegatesmahjong.com"
+        title="Nine Gates Mahjong — Free Mahjongg Games and Mahjong Training"
+        description="Play free Mahjongg Solitaire and daily puzzles, learn traditional Mahjong, practice guided regional variants, and create private multiplayer rooms."
+        canonical="https://ninegatesmahjong.com/"
       />
 
       {/* HERO SECTION */}
       <section 
         className="relative min-h-screen flex items-center justify-center overflow-hidden bg-ink-950 bg-cover bg-center bg-no-repeat"
-        style={{ backgroundImage: "url('/hero-bg.jpg')" }}
+        style={{ backgroundImage: "url('/hero-bg.webp')" }}
       >
         {/* Dark vignette overlay for readability and blending */}
         <div className="absolute inset-0 bg-gradient-to-b from-ink-950/80 via-ink-950/40 to-ink-950" />
@@ -73,10 +73,10 @@ export default function HomePage() {
             transition={{ duration: 0.8, delay: 0.2 }}
             className="font-display text-5xl md:text-7xl text-ivory mb-6 leading-tight"
           >
-            The Definitive <br className="hidden md:block" />
+            Free Mahjongg Games <br className="hidden md:block" />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-gold-light via-gold to-gold-dark gold-shimmer">
-              Online Mahjong
-            </span> Portal
+              and Guided Mahjong
+            </span> Training
           </motion.h1>
           
           <motion.p 
@@ -85,7 +85,7 @@ export default function HomePage() {
             transition={{ duration: 0.8, delay: 0.4 }}
             className="text-ink-200 text-xl md:text-2xl mb-12 max-w-3xl mx-auto font-light"
           >
-            Play Mahjongg Solitaire, solve daily puzzles, learn real Mahjong, and take your seat at serious table variants played around the world.
+            Play free Mahjongg Solitaire and daily puzzles, learn traditional Mahjong step by step, or create a private room for a real four-player match.
           </motion.p>
           
           <motion.div 
@@ -146,8 +146,12 @@ export default function HomePage() {
             <motion.div variants={fadeUpVar} className="lacquer-panel group overflow-hidden flex flex-col h-full !p-0">
               <div className="relative overflow-hidden h-60 bg-ink-950 flex items-center justify-center shrink-0">
                 <img 
-                  src="/images/casual_path.png" 
+                  src="/images/casual_path.webp"
                   alt="Casual Mahjongg" 
+                  width="1024"
+                  height="1024"
+                  loading="lazy"
+                  decoding="async"
                   className="w-full h-full object-cover transition-transform group-hover:scale-105 duration-700 ease-out" 
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-ink-950 via-transparent to-transparent opacity-85" />
@@ -171,8 +175,12 @@ export default function HomePage() {
             <motion.div variants={fadeUpVar} className="lacquer-panel group bg-gradient-to-br from-lacquer to-ink-900 overflow-hidden flex flex-col h-full !p-0">
               <div className="relative overflow-hidden h-60 bg-ink-950 flex items-center justify-center shrink-0">
                 <img 
-                  src="/images/real_path.png" 
+                  src="/images/real_path.webp"
                   alt="Real Mahjong" 
+                  width="1024"
+                  height="1024"
+                  loading="lazy"
+                  decoding="async"
                   className="w-full h-full object-cover transition-transform group-hover:scale-105 duration-700 ease-out" 
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-ink-950 via-transparent to-transparent opacity-85" />
@@ -346,6 +354,6 @@ export default function HomePage() {
           </div>
         </div>
       </section>
-    </div>
+    </main>
   );
 }

@@ -39,11 +39,12 @@ export default function PlayHub() {
   return (
     <>
       <SEOHead 
-        title="Play Mahjong Games | Nine Gates Mahjong" 
-        description="Choose from a collection of premium online Mahjong games: Classic Solitaire, Daily challenges, Time Attack, and authentic 4-player Real Mahjong."
+        title="Free Online Mahjongg Games | Nine Gates Mahjong"
+        description="Choose from Mahjongg Solitaire, Daily Mahjongg, Zen Mahjongg, Time Attack, Mahjong Connect, Shisen-Sho, Memory and Mahjong training modes."
+        canonical="https://ninegatesmahjong.com/play"
       />
       
-      <div className="container-wide py-12 md:py-24">
+      <main className="container-wide py-12 md:py-24">
         {/* Header */}
         <div className="text-center mb-12 max-w-2xl mx-auto">
           <motion.h1 
@@ -109,7 +110,7 @@ export default function PlayHub() {
         <div className="mt-16" data-gaio-section="ads">
           <NativeBanner />
         </div>
-      </div>
+      </main>
     </>
   );
 }

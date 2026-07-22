@@ -57,6 +57,7 @@ export default function EditorialPage({ slug }: { slug: string }) {
         description={entry.description}
         canonical={canonical}
         ogImage="https://ninegatesmahjong.com/hero-bg.jpg"
+        ogType="article"
         jsonLd={routeSchema}
         dateModified={REVIEW_DATE}
       />

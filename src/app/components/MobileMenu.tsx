@@ -1,4 +1,5 @@
-import { Link } from 'react-router-dom';
+import { useEffect, useRef } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
 import { LANGUAGES, useLocale } from '../context/LocaleContext';
@@ -10,9 +11,25 @@ interface MobileMenuProps {
 export default function MobileMenu({ onClose }: MobileMenuProps) {
   const { isLoggedIn, displayName, logout } = useAuth();
   const { language, setLanguage, t } = useLocale();
+  const location = useLocation();
+  const closeButtonRef = useRef<HTMLButtonElement | null>(null);
+
+  useEffect(() => {
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    closeButtonRef.current?.focus();
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener('keydown', onKeyDown);
+    };
+  }, [onClose]);
 
   return (
-    <div className="fixed inset-0 z-[60] flex justify-end">
+    <div className="fixed inset-0 z-[60] flex justify-end" role="dialog" aria-modal="true" aria-labelledby="mobile-menu-title">
       {/* Overlay */}
       <motion.div
         className="absolute inset-0 bg-ink-950/60 backdrop-blur-sm"
@@ -31,8 +48,8 @@ export default function MobileMenu({ onClose }: MobileMenuProps) {
         transition={{ type: 'spring', damping: 25, stiffness: 200 }}
       >
         <div className="flex justify-between items-center mb-10">
-          <div className="font-display text-gold text-xl tracking-wider">MENU</div>
-          <button onClick={onClose} className="text-gold p-2" aria-label="Close menu">
+          <div id="mobile-menu-title" className="font-display text-gold text-xl tracking-wider">Menu</div>
+          <button ref={closeButtonRef} onClick={onClose} className="text-gold p-2" aria-label="Close menu">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <line x1="18" y1="6" x2="6" y2="18"></line>
               <line x1="6" y1="6" x2="18" y2="18"></line>
@@ -56,6 +73,7 @@ export default function MobileMenu({ onClose }: MobileMenuProps) {
               key={link.path}
               to={link.path}
               onClick={onClose}
+              aria-current={location.pathname === link.path ? 'page' : undefined}
               className="py-4 text-xl font-semibold text-ivory hover:text-gold transition-colors border-b border-gold/5"
             >
               {link.label}

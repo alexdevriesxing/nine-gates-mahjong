@@ -140,6 +140,8 @@ function LayeredMahjongGame({ mode }: { mode: 'solitaire' | 'daily' | 'zen' }) {
       setCombo(0);
       setElapsed(0);
       setPaused(false);
+      if (hintTimer.current) clearTimeout(hintTimer.current);
+      hintTimer.current = null;
       completionRecorded.current = false;
     },
     [mode, layout]
@@ -151,6 +153,10 @@ function LayeredMahjongGame({ mode }: { mode: 'solitaire' | 'daily' | 'zen' }) {
     }, 1000);
     return () => window.clearInterval(timer);
   }, [paused, complete]);
+
+  useEffect(() => () => {
+    if (hintTimer.current) clearTimeout(hintTimer.current);
+  }, []);
 
   useEffect(() => {
     if (!complete || completionRecorded.current) return;
@@ -347,6 +353,8 @@ function GridMahjongGame({ mode }: { mode: 'time-attack' | 'connect' | 'shisen-s
   const [seconds, setSeconds] = useState(mode === 'time-attack' ? 120 : 0);
   const [paused, setPaused] = useState(false);
   const completionRecorded = useRef(false);
+  const hintTimer = useRef<number | null>(null);
+  const actionTimer = useRef<number | null>(null);
   const remaining = tiles.filter(Boolean).length;
   const complete = remaining === 0;
   const timedOut = mode === 'time-attack' && seconds <= 0 && !complete;
@@ -364,6 +372,10 @@ function GridMahjongGame({ mode }: { mode: 'time-attack' | 'connect' | 'shisen-s
     setMoves(0);
     setSeconds(mode === 'time-attack' ? 120 : 0);
     setPaused(false);
+    if (hintTimer.current) window.clearTimeout(hintTimer.current);
+    if (actionTimer.current) window.clearTimeout(actionTimer.current);
+    hintTimer.current = null;
+    actionTimer.current = null;
     completionRecorded.current = false;
   }, [mode, pairCount]);
 
@@ -374,6 +386,11 @@ function GridMahjongGame({ mode }: { mode: 'time-attack' | 'connect' | 'shisen-s
     }, 1000);
     return () => window.clearInterval(timer);
   }, [mode, paused, complete, timedOut]);
+
+  useEffect(() => () => {
+    if (hintTimer.current) window.clearTimeout(hintTimer.current);
+    if (actionTimer.current) window.clearTimeout(actionTimer.current);
+  }, []);
 
   useEffect(() => {
     if (!complete || completionRecorded.current) return;
@@ -472,9 +489,11 @@ function GridMahjongGame({ mode }: { mode: 'time-attack' | 'connect' | 'shisen-s
     }
     setRevealed((current) => new Set([...current, ...match]));
     setSelected(match[0]);
-    window.setTimeout(() => {
+    if (hintTimer.current) window.clearTimeout(hintTimer.current);
+    hintTimer.current = window.setTimeout(() => {
       setSelected(null);
       if (isMemory) setRevealed(new Set());
+      hintTimer.current = null;
     }, 1400);
     setScore((value) => Math.max(0, value - 100));
   }, [findGridMatch, isMemory]);
@@ -516,13 +535,15 @@ function GridMahjongGame({ mode }: { mode: 'time-attack' | 'connect' | 'shisen-s
     if (canMatch(selected, index)) {
       const nextCombo = combo + 1;
       setLocked(true);
-      window.setTimeout(() => {
+      if (actionTimer.current) window.clearTimeout(actionTimer.current);
+      actionTimer.current = window.setTimeout(() => {
         setTiles((current) => current.map((candidate, tileIndex) =>
           tileIndex === selected || tileIndex === index ? null : candidate
         ));
         setRevealed(new Set());
         setSelected(null);
         setLocked(false);
+        actionTimer.current = null;
       }, isMemory ? 420 : 160);
       setScore((value) => value + 100 + nextCombo * 20);
       setCombo(nextCombo);
@@ -530,10 +551,12 @@ function GridMahjongGame({ mode }: { mode: 'time-attack' | 'connect' | 'shisen-s
     } else {
       setCombo(0);
       setLocked(true);
-      window.setTimeout(() => {
+      if (actionTimer.current) window.clearTimeout(actionTimer.current);
+      actionTimer.current = window.setTimeout(() => {
         setRevealed(new Set());
         setSelected(null);
         setLocked(false);
+        actionTimer.current = null;
       }, isMemory ? 700 : 220);
       if (!isMemory) setSelected(index);
     }

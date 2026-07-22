@@ -1,6 +1,5 @@
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { lazy, Suspense, useEffect } from 'react';
-import { HelmetProvider } from 'react-helmet-async';
 import { AuthProvider } from './app/context/AuthContext';
 import { AdProvider } from './app/context/AdContext';
 import { LocaleProvider } from './app/context/LocaleContext';
@@ -73,8 +72,7 @@ function ScrollToTop() {
 // =====================================================
 export default function App() {
   return (
-    <HelmetProvider>
-      <AdProvider>
+    <AdProvider>
         <LocaleProvider>
           <AuthProvider>
           <BrowserRouter>
@@ -138,7 +136,6 @@ export default function App() {
           </BrowserRouter>
           </AuthProvider>
         </LocaleProvider>
-      </AdProvider>
-    </HelmetProvider>
+    </AdProvider>
   );
 }

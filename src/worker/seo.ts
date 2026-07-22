@@ -220,9 +220,13 @@ function labelSegment(segment: string) {
 }
 
 export function canonicalRedirect(url: URL) {
-  if (url.hostname !== 'www.ninegatesmahjong.com' && url.protocol === 'https:') return null;
   if (!['ninegatesmahjong.com', 'www.ninegatesmahjong.com'].includes(url.hostname)) return null;
-  const canonical = new URL(url.pathname + url.search, SITE_ORIGIN);
+  const normalizedPath = url.pathname === '/' ? '/' : url.pathname.replace(/\/+$/, '');
+  const alreadyCanonical = url.hostname === 'ninegatesmahjong.com'
+    && url.protocol === 'https:'
+    && normalizedPath === url.pathname;
+  if (alreadyCanonical) return null;
+  const canonical = new URL(normalizedPath + url.search, SITE_ORIGIN);
   return Response.redirect(canonical.toString(), 308);
 }
 
@@ -267,7 +271,8 @@ export function renderHtmlResponse(request: Request, response: Response, pathnam
       item: `${SITE_ORIGIN}/${segments.slice(0, index + 1).join('/')}`,
     })),
   ];
-  const routeType = meta.kind === 'game' || meta.kind === 'trainer' ? 'VideoGame' : meta.kind === 'article' ? 'Article' : 'WebPage';
+  const isGame = meta.kind === 'game' || meta.kind === 'trainer';
+  const routeType = isGame ? ['VideoGame', 'WebApplication'] : meta.kind === 'article' ? 'Article' : 'WebPage';
   const schema = {
     '@context': 'https://schema.org',
     '@graph': [
@@ -297,11 +302,15 @@ export function renderHtmlResponse(request: Request, response: Response, pathnam
         inLanguage: 'en',
         dateModified: '2026-07-22',
         isPartOf: { '@id': `${SITE_ORIGIN}/#website` },
+        breadcrumb: { '@id': `${canonical}#breadcrumb` },
         publisher: { '@id': `${SITE_ORIGIN}/#organization` },
         image: DEFAULT_IMAGE,
-        ...(routeType === 'VideoGame' ? {
-          applicationCategory: 'Game',
+        ...(meta.kind === 'article' ? { mainEntityOfPage: canonical } : {}),
+        ...(isGame ? {
+          applicationCategory: 'GameApplication',
           operatingSystem: 'Any modern web browser',
+          browserRequirements: 'Requires JavaScript and a modern web browser with local storage enabled.',
+          isAccessibleForFree: true,
           offers: { '@type': 'Offer', price: 0, priceCurrency: 'USD' },
         } : {}),
       },
@@ -323,12 +332,18 @@ export function renderHtmlResponse(request: Request, response: Response, pathnam
     </main>`;
 
   const rewritten = new HTMLRewriter()
+    .on('head', { element(element) {
+      if (pathname === '/') {
+        element.append('<link rel="preload" as="image" href="/hero-bg.webp" type="image/webp" fetchpriority="high">', { html: true });
+      }
+    } })
     .on('title', { element(element) { element.setInnerContent(meta.title); } })
     .on('meta[name="description"]', { element(element) { element.setAttribute('content', meta.description); } })
     .on('meta[name="robots"]', { element(element) { element.setAttribute('content', meta.noIndex ? 'noindex,follow' : 'index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1'); } })
     .on('link[rel="canonical"]', { element(element) { element.setAttribute('href', canonical); } })
     .on('meta[property="og:title"]', { element(element) { element.setAttribute('content', meta.title); } })
     .on('meta[property="og:description"]', { element(element) { element.setAttribute('content', meta.description); } })
+    .on('meta[property="og:type"]', { element(element) { element.setAttribute('content', meta.kind === 'article' ? 'article' : 'website'); } })
     .on('meta[property="og:url"]', { element(element) { element.setAttribute('content', canonical); } })
     .on('meta[property="og:image"]', { element(element) { element.setAttribute('content', DEFAULT_IMAGE); } })
     .on('meta[name="twitter:title"]', { element(element) { element.setAttribute('content', meta.title); } })
