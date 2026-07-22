@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { TileRenderer } from '../../game/TileRenderer';
@@ -17,6 +17,11 @@ export default function ProfilePage() {
   const [successMsg, setSuccessMsg] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
   const [savingAvatar, setSavingAvatar] = useState('');
+  const successTimer = useRef<number | null>(null);
+
+  useEffect(() => () => {
+    if (successTimer.current) window.clearTimeout(successTimer.current);
+  }, []);
 
   const handleSelectAvatar = async (tile: string) => {
     setErrorMsg('');
@@ -24,7 +29,11 @@ export default function ProfilePage() {
     try {
       await updateAvatar(tile);
       setSuccessMsg('Avatar updated successfully!');
-      setTimeout(() => setSuccessMsg(''), 3000);
+      if (successTimer.current) window.clearTimeout(successTimer.current);
+      successTimer.current = window.setTimeout(() => {
+        setSuccessMsg('');
+        successTimer.current = null;
+      }, 3000);
     } catch (reason) {
       setErrorMsg(reason instanceof Error ? reason.message : 'Avatar update failed.');
     } finally {
@@ -43,22 +52,25 @@ export default function ProfilePage() {
 
   if (!user && !guestSession) {
     return (
-      <div className="container-wide py-32 text-center">
-        <h1 className="text-3xl text-ivory mb-4">You are not logged in</h1>
-        <p className="text-ivory-light mb-6">Log in or start a guest session to view a player profile.</p>
-        <div className="flex flex-wrap justify-center gap-3">
-          <Link className="btn-primary" to="/login">Log in</Link>
-          <Link className="btn-secondary" to="/guest">Play as guest</Link>
-        </div>
-      </div>
+      <>
+        <SEOHead title="Player Profile | Nine Gates Mahjong" description="View your Nine Gates Mahjong profile, rating, progress and avatar." canonical="https://ninegatesmahjong.com/profile" noIndex />
+        <main className="container-wide py-32 text-center">
+          <h1 className="text-3xl text-ivory mb-4">You are not logged in</h1>
+          <p className="text-ivory-light mb-6">Log in or start a guest session to view a player profile.</p>
+          <div className="flex flex-wrap justify-center gap-3">
+            <Link className="btn-primary" to="/login">Log in</Link>
+            <Link className="btn-secondary" to="/guest">Play as guest</Link>
+          </div>
+        </main>
+      </>
     );
   }
 
   return (
     <>
-      <SEOHead title="Your Profile | Nine Gates Mahjong" description="Manage your profile and avatar." />
+      <SEOHead title="Player Profile | Nine Gates Mahjong" description="View your Nine Gates Mahjong profile, rating, progress and avatar." canonical="https://ninegatesmahjong.com/profile" noIndex />
       
-      <div className="container-narrow py-32">
+      <main className="container-narrow py-32">
         <div className="glass-card p-8 md:p-12 mb-8 border border-gold/20 relative overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-br from-lacquer-dark/30 to-ink-950/80 pointer-events-none" />
           
@@ -146,7 +158,7 @@ export default function ProfilePage() {
             </>
           )}
         </div>
-      </div>
+      </main>
     </>
   );
 }

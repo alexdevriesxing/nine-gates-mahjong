@@ -12,7 +12,7 @@ export default function LoginPage() {
   const navigate = useNavigate();
   return (
     <>
-      <SEOHead title="Log In | Nine Gates Mahjong" description="Log in to your Nine Gates profile to save ratings, wins, streaks, and tournament records." canonical="https://ninegatesmahjong.com/login" />
+      <SEOHead title="Log In | Nine Gates Mahjong" description="Log in to your Nine Gates profile to save ratings, wins, streaks, and tournament records." canonical="https://ninegatesmahjong.com/login" noIndex />
       <main className="account-page">
         <form onSubmit={async (event) => {
           event.preventDefault();

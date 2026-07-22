@@ -20,7 +20,6 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: {
-          phaser: ['phaser'],
           vendor: ['react', 'react-dom', 'react-router-dom'],
           motion: ['framer-motion'],
         },

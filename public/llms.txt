@@ -2,6 +2,8 @@
 
 Nine Gates Mahjong is a free browser portal operated by Fire Dragon Interactive. It clearly separates Mahjongg Solitaire tile-matching games from traditional four-player Mahjong.
 
+Last reviewed: 2026-07-22 (production audit release)
+
 ## Primary sections
 
 - https://ninegatesmahjong.com/play — all free game modes
@@ -14,13 +16,25 @@ Nine Gates Mahjong is a free browser portal operated by Fire Dragon Interactive.
 - https://ninegatesmahjong.com/history — history of Mahjong and Mahjongg Solitaire
 - https://ninegatesmahjong.com/lobby — private multiplayer training rooms
 
+## Playable ruleset trainers
+
+- https://ninegatesmahjong.com/real-mahjong/hong-kong
+- https://ninegatesmahjong.com/real-mahjong/riichi
+- https://ninegatesmahjong.com/real-mahjong/mcr
+- https://ninegatesmahjong.com/real-mahjong/american
+- https://ninegatesmahjong.com/real-mahjong/taiwanese
+- https://ninegatesmahjong.com/real-mahjong/sichuan
+- https://ninegatesmahjong.com/real-mahjong/zung-jung
+
 ## Ruleset scope
 
-The Hong Kong, Japanese Riichi, Chinese Official MCR, American and Taiwanese interactive modes are guided trainers. They demonstrate selected concepts and simplified winning-hand flows; they do not implement every scoring rule, claim, penalty, round condition or official tournament interpretation.
+The Hong Kong, Japanese Riichi, Chinese Official MCR, American, Taiwanese, Sichuan Bloody Rules and Zung Jung interactive modes are guided trainers. They demonstrate selected concepts and simplified winning-hand flows; they do not implement every scoring rule, claim, penalty, round condition or official tournament interpretation.
 
 ## Editorial policy
 
 Guides use answer-first summaries, distinguish traditional Mahjong from Mahjongg Solitaire, and identify simplified training behaviour. Competitive players should verify the rules used by their association, table or tournament.
+
+Pages use canonical URLs, crawlable answer summaries, visible review dates, and structured data that matches the on-page subject. The XML sitemap at https://ninegatesmahjong.com/sitemap.xml is the complete list of public indexable routes.
 
 ## Access and privacy
 

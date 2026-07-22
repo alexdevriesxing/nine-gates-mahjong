@@ -8,6 +8,7 @@ interface SEOHeadProps {
   ogTitle?: string;
   ogDescription?: string;
   ogImage?: string;
+  ogType?: 'website' | 'article';
   jsonLd?: Record<string, unknown>;
   noIndex?: boolean;
   dateModified?: string;
@@ -21,6 +22,8 @@ function labelSegment(segment: string) {
     'mahjongg-solitaire': 'Mahjongg Solitaire',
     mcr: 'Chinese Official MCR',
     riichi: 'Japanese Riichi',
+    sichuan: 'Sichuan Bloody Rules',
+    'zung-jung': 'Zung Jung Mahjong',
   };
   return aliases[segment] ?? segment.split('-').map((word) => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
 }
@@ -67,9 +70,10 @@ export default function SEOHead({
   ogTitle,
   ogDescription,
   ogImage,
+  ogType = 'website',
   jsonLd,
   noIndex = false,
-  dateModified = '2026-07-14',
+  dateModified = '2026-07-22',
 }: SEOHeadProps) {
   const finalCanonical = canonical || SITE_DOMAIN;
   const finalOgTitle = ogTitle || title;
@@ -151,7 +155,7 @@ export default function SEOHead({
     upsertMeta('meta[property="og:locale"]', { property: 'og:locale', content: 'en_US', 'data-rh': 'true' });
     upsertMeta('meta[property="og:title"]', { property: 'og:title', content: finalOgTitle, 'data-rh': 'true' });
     upsertMeta('meta[property="og:description"]', { property: 'og:description', content: finalOgDescription, 'data-rh': 'true' });
-    upsertMeta('meta[property="og:type"]', { property: 'og:type', content: 'website', 'data-rh': 'true' });
+    upsertMeta('meta[property="og:type"]', { property: 'og:type', content: ogType, 'data-rh': 'true' });
     upsertMeta('meta[property="og:url"]', { property: 'og:url', content: finalCanonical, 'data-rh': 'true' });
     upsertMeta('meta[property="og:image"]', { property: 'og:image', content: finalImage, 'data-rh': 'true' });
     upsertMeta('meta[property="og:image:alt"]', { property: 'og:image:alt', content: `${SITE_NAME} Mahjong tiles and game table`, 'data-rh': 'true' });
@@ -163,7 +167,7 @@ export default function SEOHead({
 
     upsertSchema('ngm-base-schema', baseSchema);
     upsertSchema('ngm-route-schema', jsonLd ?? null);
-  }, [baseSchema, description, finalCanonical, finalImage, finalOgDescription, finalOgTitle, jsonLd, noIndex, title]);
+  }, [baseSchema, description, finalCanonical, finalImage, finalOgDescription, finalOgTitle, jsonLd, noIndex, ogType, title]);
 
   return null;
 }

@@ -60,8 +60,8 @@ const ROUTES: Record<string, RouteMeta> = {
     kind: 'trainer',
   },
   '/variants': {
-    title: 'Mahjong Variants Compared | Hong Kong, Riichi, MCR and More',
-    description: 'Compare Hong Kong Mahjong, Japanese Riichi, Chinese Official MCR, American Mahjongg and Taiwanese Mahjong, then try guided training hands.',
+    title: 'Mahjong Variants | Seven Playable Regional Rule Trainers',
+    description: 'Compare and practice Hong Kong, Riichi, MCR, American, Taiwanese, Sichuan Bloody Rules, and Zung Jung Mahjong.',
     kind: 'article',
   },
   '/real-mahjong/hong-kong': {
@@ -87,6 +87,16 @@ const ROUTES: Record<string, RouteMeta> = {
   '/real-mahjong/taiwanese': {
     title: 'Taiwanese Mahjong Guide and Guided Trainer',
     description: 'Learn selected Taiwanese Mahjong concepts and practice a simplified guided hand with the larger hand-size target.',
+    kind: 'trainer',
+  },
+  '/real-mahjong/sichuan': {
+    title: 'Sichuan Bloody Rules Mahjong and Dingque Trainer',
+    description: 'Learn Sichuan Blood Battle Mahjong with a playable dingque missing-suit trainer, the 108-tile suited set, no-chow calls and multi-winner flow.',
+    kind: 'trainer',
+  },
+  '/real-mahjong/zung-jung': {
+    title: 'Zung Jung Mahjong Rules and Pattern Trainer',
+    description: 'Learn Zung Jung Mahjong with guided standard-hand practice, additive pattern-scoring concepts and clear comparisons with MCR and Riichi.',
     kind: 'trainer',
   },
   '/learn': {
@@ -121,7 +131,7 @@ const ROUTES: Record<string, RouteMeta> = {
   },
   '/learn/mahjong-variants': {
     title: 'Mahjong Variants Guide | Hong Kong, Riichi, MCR and More',
-    description: 'Compare major Mahjong variants by hand size, declarations, scoring complexity and playing style.',
+    description: 'Compare Hong Kong, Riichi, MCR, American, Taiwanese, Sichuan Bloody Rules and Zung Jung Mahjong.',
     kind: 'article',
   },
   '/how-to-play': {
@@ -203,14 +213,20 @@ function labelSegment(segment: string) {
     'mahjongg-solitaire': 'Mahjongg Solitaire',
     mcr: 'Chinese Official MCR',
     riichi: 'Japanese Riichi',
+    sichuan: 'Sichuan Bloody Rules',
+    'zung-jung': 'Zung Jung Mahjong',
   };
   return aliases[segment] ?? segment.split('-').map((word) => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
 }
 
 export function canonicalRedirect(url: URL) {
-  if (url.hostname !== 'www.ninegatesmahjong.com' && url.protocol === 'https:') return null;
   if (!['ninegatesmahjong.com', 'www.ninegatesmahjong.com'].includes(url.hostname)) return null;
-  const canonical = new URL(url.pathname + url.search, SITE_ORIGIN);
+  const normalizedPath = url.pathname === '/' ? '/' : url.pathname.replace(/\/+$/, '');
+  const alreadyCanonical = url.hostname === 'ninegatesmahjong.com'
+    && url.protocol === 'https:'
+    && normalizedPath === url.pathname;
+  if (alreadyCanonical) return null;
+  const canonical = new URL(normalizedPath + url.search, SITE_ORIGIN);
   return Response.redirect(canonical.toString(), 308);
 }
 
@@ -255,7 +271,8 @@ export function renderHtmlResponse(request: Request, response: Response, pathnam
       item: `${SITE_ORIGIN}/${segments.slice(0, index + 1).join('/')}`,
     })),
   ];
-  const routeType = meta.kind === 'game' || meta.kind === 'trainer' ? 'VideoGame' : meta.kind === 'article' ? 'Article' : 'WebPage';
+  const isGame = meta.kind === 'game' || meta.kind === 'trainer';
+  const routeType = isGame ? ['VideoGame', 'WebApplication'] : meta.kind === 'article' ? 'Article' : 'WebPage';
   const schema = {
     '@context': 'https://schema.org',
     '@graph': [
@@ -283,13 +300,17 @@ export function renderHtmlResponse(request: Request, response: Response, pathnam
         headline: meta.title,
         description: meta.description,
         inLanguage: 'en',
-        dateModified: '2026-07-14',
+        dateModified: '2026-07-22',
         isPartOf: { '@id': `${SITE_ORIGIN}/#website` },
+        breadcrumb: { '@id': `${canonical}#breadcrumb` },
         publisher: { '@id': `${SITE_ORIGIN}/#organization` },
         image: DEFAULT_IMAGE,
-        ...(routeType === 'VideoGame' ? {
-          applicationCategory: 'Game',
+        ...(meta.kind === 'article' ? { mainEntityOfPage: canonical } : {}),
+        ...(isGame ? {
+          applicationCategory: 'GameApplication',
           operatingSystem: 'Any modern web browser',
+          browserRequirements: 'Requires JavaScript and a modern web browser with local storage enabled.',
+          isAccessibleForFree: true,
           offers: { '@type': 'Offer', price: 0, priceCurrency: 'USD' },
         } : {}),
       },
@@ -311,12 +332,18 @@ export function renderHtmlResponse(request: Request, response: Response, pathnam
     </main>`;
 
   const rewritten = new HTMLRewriter()
+    .on('head', { element(element) {
+      if (pathname === '/') {
+        element.append('<link rel="preload" as="image" href="/hero-bg.webp" type="image/webp" fetchpriority="high">', { html: true });
+      }
+    } })
     .on('title', { element(element) { element.setInnerContent(meta.title); } })
     .on('meta[name="description"]', { element(element) { element.setAttribute('content', meta.description); } })
     .on('meta[name="robots"]', { element(element) { element.setAttribute('content', meta.noIndex ? 'noindex,follow' : 'index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1'); } })
     .on('link[rel="canonical"]', { element(element) { element.setAttribute('href', canonical); } })
     .on('meta[property="og:title"]', { element(element) { element.setAttribute('content', meta.title); } })
     .on('meta[property="og:description"]', { element(element) { element.setAttribute('content', meta.description); } })
+    .on('meta[property="og:type"]', { element(element) { element.setAttribute('content', meta.kind === 'article' ? 'article' : 'website'); } })
     .on('meta[property="og:url"]', { element(element) { element.setAttribute('content', canonical); } })
     .on('meta[property="og:image"]', { element(element) { element.setAttribute('content', DEFAULT_IMAGE); } })
     .on('meta[name="twitter:title"]', { element(element) { element.setAttribute('content', meta.title); } })

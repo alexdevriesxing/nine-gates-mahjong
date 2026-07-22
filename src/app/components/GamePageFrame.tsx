@@ -26,12 +26,14 @@ export default function GamePageFrame({
         ogImage="https://ninegatesmahjong.com/hero-bg.jpg"
         jsonLd={{
           '@context': 'https://schema.org',
-          '@type': 'VideoGame',
+          '@type': ['VideoGame', 'WebApplication'],
           name: title.split('|')[0].trim(),
           description,
           url: `https://ninegatesmahjong.com${canonical}`,
-          applicationCategory: 'Game',
+          applicationCategory: 'GameApplication',
           operatingSystem: 'Any modern web browser',
+          browserRequirements: 'Requires JavaScript and a modern browser with local storage enabled.',
+          isAccessibleForFree: true,
           offers: { '@type': 'Offer', price: 0, priceCurrency: 'USD' },
         }}
       />
@@ -53,7 +55,7 @@ export default function GamePageFrame({
             {afterGame}
           </main>
           <div className="game-page__rail game-page__rail--right">
-            <AdSlot width={160} height={600} sticky />
+            <AdSlot width={160} height={300} sticky />
           </div>
         </div>
       </div>

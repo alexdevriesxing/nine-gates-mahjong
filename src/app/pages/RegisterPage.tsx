@@ -13,7 +13,7 @@ export default function RegisterPage() {
   const navigate = useNavigate();
   return (
     <>
-      <SEOHead title="Create a Mahjong Profile | Nine Gates Mahjong" description="Register a free Nine Gates Mahjong profile for ratings, Hall of Fame wins, daily streaks, multiplayer rooms, and events." canonical="https://ninegatesmahjong.com/register" />
+      <SEOHead title="Create a Mahjong Profile | Nine Gates Mahjong" description="Register a free Nine Gates Mahjong profile for ratings, Hall of Fame wins, daily streaks, multiplayer rooms, and events." canonical="https://ninegatesmahjong.com/register" noIndex />
       <main className="account-page">
         <form onSubmit={async (event) => {
           event.preventDefault();

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
@@ -14,8 +14,9 @@ export default function Header() {
   const { language, setLanguage, t } = useLocale();
 
   const isHome = location.pathname === '/';
+  const closeMobileMenu = useCallback(() => setIsMobileMenuOpen(false), []);
 
-  const getAvatarURI = () => {
+  const avatarUri = useMemo(() => {
     try {
       if (!avatarTile) return '';
       const [suit, rank] = avatarTile.split(':');
@@ -23,7 +24,7 @@ export default function Header() {
     } catch {
       return '';
     }
-  };
+  }, [avatarTile]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -54,7 +55,14 @@ export default function Header() {
       >
         <div className="container-wide flex items-center justify-between">
           <Link to="/" className="flex items-center gap-3 group transition-all duration-300">
-            <img src="/logo_dark.png" alt="Nine Gates Mahjong" className="h-9 md:h-10 w-auto object-contain transition-transform group-hover:scale-[1.02] duration-300" />
+            <img
+              src="/logo_dark.webp"
+              alt="Nine Gates Mahjong"
+              width="991"
+              height="313"
+              decoding="async"
+              className="h-9 md:h-10 w-auto object-contain transition-transform group-hover:scale-[1.02] duration-300"
+            />
           </Link>
 
           <nav className="hidden xl:flex items-center gap-6">
@@ -70,6 +78,7 @@ export default function Header() {
               <Link
                 key={link.path}
                 to={link.path}
+                aria-current={location.pathname === link.path ? 'page' : undefined}
                 className="text-ivory font-semibold tracking-wide hover:text-gold transition-colors text-sm uppercase"
               >
                 {link.label}
@@ -92,7 +101,7 @@ export default function Header() {
               <Link to="/profile" className="flex items-center gap-3 text-ivory hover:text-gold transition-colors ml-4 bg-ink-900/50 pr-4 pl-1 py-1 rounded-full border border-gold/20 backdrop-blur-md">
                 <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-gold/50 shadow-md bg-ink-950 flex items-center justify-center">
                   {avatarTile ? (
-                    <img src={getAvatarURI()} alt="Avatar" className="w-[140%] h-[140%] object-cover object-center transform scale-110" />
+                    <img src={avatarUri} alt="Avatar" className="w-[140%] h-[140%] object-cover object-center transform scale-110" />
                   ) : (
                     <span className="font-bold">{displayName.charAt(0).toUpperCase()}</span>
                   )}
@@ -124,7 +133,7 @@ export default function Header() {
 
       <AnimatePresence>
         {isMobileMenuOpen && (
-          <MobileMenu onClose={() => setIsMobileMenuOpen(false)} />
+          <MobileMenu onClose={closeMobileMenu} />
         )}
       </AnimatePresence>
     </>

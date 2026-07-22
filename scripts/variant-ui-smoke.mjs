@@ -21,7 +21,7 @@ async function state() {
   return JSON.parse(await page.evaluate(() => window.render_game_to_text?.() || '{}'));
 }
 
-async function completeGuidedVariant(route, american = false, riichi = false) {
+async function completeGuidedVariant(route, american = false, riichi = false, sichuan = false) {
   await page.goto(`${base}${route}`, { waitUntil: 'commit' });
   await page.waitForFunction(() => typeof window.render_game_to_text === 'function', null, { timeout: 20000 });
 
@@ -32,6 +32,14 @@ async function completeGuidedVariant(route, american = false, riichi = false) {
       await tiles.nth(1).click();
       await tiles.nth(2).click();
       await page.getByRole('button', { name: /^Pass / }).click();
+    }
+  }
+
+  if (sichuan) {
+    await page.getByRole('button', { name: /Declare bamboo as missing/ }).click();
+    const declared = await state();
+    if (declared.voidSuit !== 'bamboo' || declared.phase !== 'discard') {
+      throw new Error(`${route}: missing-suit declaration failed`);
     }
   }
 
@@ -73,6 +81,8 @@ const results = {
   mcr: await completeGuidedVariant('/real-mahjong/mcr'),
   american: await completeGuidedVariant('/real-mahjong/american', true),
   taiwanese: await completeGuidedVariant('/real-mahjong/taiwanese'),
+  sichuan: await completeGuidedVariant('/real-mahjong/sichuan', false, false, true),
+  zungJung: await completeGuidedVariant('/real-mahjong/zung-jung'),
 };
 
 if (errors.length) throw new Error(errors.join(' | '));

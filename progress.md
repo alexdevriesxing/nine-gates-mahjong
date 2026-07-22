@@ -1,5 +1,7 @@
 Original prompt: I have tried to build this with google antigravity but it seems to have gotten stuck before I got it to work. This is a Mahjong portal I need you to completely audit, bugfix, enhance, improve and polish and stress test fully for desktop, mobile and tablet (including controls) as none of the games seem to load. Then I need you to optimize the adsterra ad placements for every viewport (mobile, desktop, tablet) as currently this is far from maximized. I need players to always see ads and always auto-consent, so no opt-outs. Finally do a full seo/gaio optimization please where you make this the absolute number one ranked Mahjong/Mahjongg site in the world. Fix any errors and then push to github, deploy to cloudflare and fully test single player and multiplayer (so multiple players playing againt each other) modes. Ensure this is the very best mahjong portal with the best possible games with the most awesome visuals and animations and flavour it can have.
 
+Follow-up prompt (2026-07-19): Audit this website and improve enhance and test all games, expand with more game variants and polish all. Optimize Adsterra ad unit placements and SEO/GAIO, implement consent-aware ad delivery, push to GitHub, and deploy to Cloudflare after verification.
+
 ## 2026-06-24
 
 - Initial audit started from a clean `master` branch tracking `origin/master`.
@@ -49,4 +51,33 @@ Original prompt: I have tried to build this with google antigravity but it seems
 - Deployed the final gap-fix build to Cloudflare as version `dc1e6907-78b7-4c2a-884c-bb5cd92c28be`.
 - Final production matrix passes on `https://ninegatesmahjong.com`: 99 route/viewport checks, all seven original game completions, controls and touch input, five ruleset trainers, feature flows, account lifecycle, authoritative multiplayer, and two-browser multiplayer UI.
 - Captured and visually reviewed all 13 live games at desktop and mobile sizes; targeted initial-viewport checks confirmed no fixed-header overlap or horizontal overflow.
-- Corrected the advertising configuration to use independent Adsterra keys for 320x50, 728x90, and 160x600 placements. No publisher credentials are currently configured, so production intentionally renders the tested house-ad fallback until the owner supplies those keys.
+- Corrected the advertising configuration to use independent Adsterra keys by placement size with environment overrides. Production renders those units only after consent and uses the tested house-ad fallback otherwise.
+
+## 2026-07-22
+
+- Rebased the expansion pass onto the hardened production `master` so its edge-rendered SEO, security headers, rate limiting, protected advertising frames, truthful locale handling, and deployment workflows remain intact.
+- Added playable Sichuan Bloody Rules and Zung Jung guided trainers.
+  - Sichuan enforces a missing-suit declaration, removes honors, forces declared-suit discards, and teaches the Blood Battle flow.
+  - Zung Jung teaches the standard winning structure and compatible additive-pattern scoring concepts.
+- Added Jade Courtyard and Four-Storey Pagoda layouts alongside the original Fortress board, with deterministic solvability coverage across 240 generated boards.
+- Expanded routes, navigation, editorial content, structured data, edge metadata, sitemap, `llms.txt`, and release markers for both new variants.
+- Preserved consent-aware advertising, strengthened consent withdrawal with a clean reload, and verified that no third-party ad script, frame, or preconnect is active without permission.
+- Validated the niche rules copy against the Mahjong International League Sichuan rules and the Zung Jung designer/competition references.
+- Final integrated local matrix passes: production and Worker typechecks, all original game completions, three solitaire layouts, desktop/touch controls, seven variant trainers, 105 route/viewport checks, edge metadata and security headers, feature flows, account lifecycle, authoritative multiplayer, and two-browser multiplayer UI.
+- Captured and visually reviewed all 15 game/trainer shells at desktop and mobile sizes; no clipping, overlap, or horizontal overflow was found.
+- Published branch `codex/mahjong-portal-expansion` to GitHub and deployed Cloudflare Worker version `c9ca42b0-a5a1-4574-b6bd-f10ac9c19f82`.
+- The hardened production smoke passed after the new release marker propagated, including canonical/www routing, edge metadata for Sichuan and Zung Jung, security headers, protected ad frames, and correct 404 status.
+- The complete production matrix passes on `https://ninegatesmahjong.com`: all original games, three solitaire layouts, desktop/touch controls, seven ruleset trainers, consent and feature flows, 105 route/viewport checks, account lifecycle, authoritative multiplayer, and two-browser multiplayer UI.
+- Hardened the browser suites to ignore the intentional 404 console message by status code regardless of Chrome's environment-specific reason-phrase formatting.
+- Completed a second full production audit and bug-fixing pass across gameplay, multiplayer, authentication, advertising, accessibility, performance, and search discovery.
+- Fixed single-player and authoritative multiplayer wall exhaustion so a game now ends in an explicit exhaustive draw instead of stalling; hardened reconnect identity handling and replaced predictable room codes with Web Crypto randomness.
+- Added bounded JSON parsing and runtime validation for account, profile, chat, room, and WebSocket inputs, including a server-enforced avatar allowlist and duplicate-socket handling.
+- Consolidated all Adsterra inventory into one typed placement registry, removed four bypassable legacy ad documents, restricted the Worker ad frame to approved placement IDs, and made post-consent network preconnects and Social Bar loading reversible on consent withdrawal.
+- Removed the duplicate wide-screen 160x600 impression and replaced it with a distinct 160x300 right rail; confirmed the responsive 468x60, 160x600, and 160x300 game layout visually at 1600px and the house-ad layout at 390px.
+- Aligned canonical URLs, private-route noindex behavior, article Open Graph types, home/play metadata, trailing-slash redirects, sitemap dates, visible home copy, `llms.txt`, and edge/client structured data. Web games are now co-typed as `VideoGame` and `WebApplication` with `GameApplication` and free-offer fields.
+- Converted the hero, logo, and eleven large card/path assets to WebP, removed roughly 10.5 MB of superseded PNGs, added intrinsic image sizing/lazy decoding, and scoped the hero preload to the home route so game pages do not fetch it unnecessarily.
+- Removed the unused Phaser implementation and Helmet dependency, updated the active toolchain, and pinned the patched Sharp release. `npm audit` reports zero known vulnerabilities.
+- Improved the mobile menu into an accessible modal dialog with focus, Escape, and scroll-lock behavior; restored a skip link, eliminated nested main landmarks, added active-navigation semantics, and cleaned up component timers.
+- Expanded the release regression suite to 37 routes and 111 desktop/tablet/mobile checks, private-route robots assertions, protected/retired ad-frame behavior, eligible web-app schema, unique wide ad placement checks, post-consent preconnects, and mobile-menu keyboard behavior.
+- Final local release matrix passes in full: build and both typechecks, 240 solitaire boards across three layouts, all original games and controls, seven trainers, 111 responsive route checks, feature/consent flows, auth lifecycle, authoritative multiplayer, and two-browser multiplayer UI.
+- Visually reviewed the final home hero and Mahjongg Solitaire at 390px, 1440px, and 1600px; the game UI remains readable and contained with zero runtime console errors.

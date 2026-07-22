@@ -198,7 +198,7 @@ export const EDITORIAL: Record<string, EditorialEntry> = {
   'mahjong-variants': {
     title: 'Mahjong Variants Around the World',
     metaTitle: 'Mahjong Variants Guide: Hong Kong, Riichi, MCR and More',
-    description: 'Compare Hong Kong Mahjong, Japanese Riichi, Chinese Official MCR, American Mahjongg, and Taiwanese Mahjong.',
+    description: 'Compare Hong Kong, Riichi, MCR, American, Taiwanese, Sichuan Bloody Rules, and Zung Jung Mahjong.',
     canonical: '/learn/mahjong-variants',
     summary: 'Major Mahjong variants share the tile set and draw-discard rhythm but differ in hand size, calls, minimum winning requirements, and scoring.',
     sections: [
@@ -209,16 +209,17 @@ export const EDITORIAL: Record<string, EditorialEntry> = {
         ],
       },
       {
-        heading: 'Five important variants',
+        heading: 'Seven important variants',
         paragraphs: [
           'Hong Kong Mahjong is a direct social introduction with fan-based scoring. Japanese Riichi adds yaku requirements, riichi declarations, dora, furiten, and detailed defensive play. Chinese Official or MCR uses a broad list of standardized patterns and an eight-point minimum.',
           'American Mahjongg uses jokers, racks, a Charleston pass, and an annually changing card of legal hands. Taiwanese Mahjong commonly uses sixteen tiles between turns, producing five melds and a pair in the finished hand.',
+          'Sichuan Bloody Rules removes honors, forces a missing-suit declaration, and continues after the first win. Zung Jung keeps the familiar hand flow and applies a balanced additive pattern-scoring system.',
         ],
       },
       {
         heading: 'Which variant should you learn?',
         paragraphs: [
-          'Choose Hong Kong for an approachable family-table style, Riichi for deep competitive defense, MCR for pattern variety, American Mahjongg for social card-driven play, or Taiwanese Mahjong for a larger and faster hand structure. Learning one variant makes the tile vocabulary of the others much easier.',
+          'Choose Hong Kong for an approachable family-table style, Riichi for deep competitive defense, MCR for pattern variety, American Mahjongg for social card-driven play, Taiwanese for a larger hand, Sichuan for forced suit strategy, or Zung Jung for transparent additive scoring. Learning one variant makes the tile vocabulary of the others much easier.',
         ],
       },
     ],
@@ -248,7 +249,7 @@ const variant = (
       heading: `${region} style at a glance`,
       paragraphs: [
         summary,
-        'The familiar numbered suits, winds, dragons, draw-and-discard turn, and four-player table remain at the center. What changes is the value system and the strategic meaning of calls, concealed play, and risk.',
+        'The familiar draw-and-discard turn, set building, and four-player table remain at the center. What changes is the tile mix, value system, and strategic meaning of calls, concealed play, and risk.',
       ],
     },
     {
@@ -326,6 +327,40 @@ Object.assign(EDITORIAL, {
     [
       { question: 'Why does Taiwanese Mahjong use more tiles in the hand?', answer: 'Its standard structure adds a fifth meld, producing sixteen tiles between turns and seventeen after drawing.' },
       { question: 'Are Taiwanese rules identical everywhere?', answer: 'No. House rules for tai, flowers, special hands, and payments vary, so confirm the table rules.' },
+    ]
+  ),
+  sichuan: variant(
+    'sichuan',
+    'Sichuan Bloody Rules Mahjong',
+    'Sichuan Blood Battle',
+    'Learn Sichuan Bloody Rules Mahjong, including the 108 suited-tile set, dingque missing-suit declaration, no-chow calls, and play continuing after the first win.',
+    'Sichuan Bloody Rules removes all honor tiles, requires every player to declare and clear one missing suit, and lets the remaining players continue after the first winner leaves the hand.',
+    [
+      'The game uses 108 suited tiles; winds and dragons are excluded.',
+      'After the deal, each player declares a missing suit (dingque) and must discard that suit before other tiles.',
+      'Players may call pungs and kongs, but not chows from another player’s discard.',
+      'Under Blood Battle to the End, play continues until three players win or the wall is exhausted.',
+    ],
+    [
+      { question: 'What is dingque in Sichuan Mahjong?', answer: 'Dingque is the declaration of one missing suit. A player must discard every tile of that suit and cannot win while any remain.' },
+      { question: 'Why does play continue after someone wins?', answer: 'Blood Battle keeps the remaining players active, allowing up to three winners and creating separate scoring events in one hand.' },
+    ]
+  ),
+  'zung-jung': variant(
+    'zung-jung',
+    'Zung Jung Mahjong',
+    'International additive scoring',
+    'Learn Zung Jung Mahjong’s accessible additive scoring, standard hand flow, compatible pattern combinations, and competitive World Series heritage.',
+    'Zung Jung is a modern competitive scoring system designed to value recognizable Mahjong patterns with transparent additive points and relatively few special procedural rules.',
+    [
+      'The normal four-meld-and-a-pair structure and familiar draw-discard rhythm apply.',
+      'Compatible scoring patterns add together instead of being reduced to a single best label.',
+      'Only the winning hand is scored; payment details depend on the table or tournament format.',
+      'The system emphasizes readable pattern values and practical competition play.',
+    ],
+    [
+      { question: 'What does Zung Jung mean?', answer: 'The name refers to the Confucian Doctrine of the Mean and reflects the system’s goal of balanced, proportionate scoring.' },
+      { question: 'Is Zung Jung the same as MCR?', answer: 'No. Both are competition-friendly systems, but they use different pattern lists, values, combination rules, and tournament procedures.' },
     ]
   ),
 });

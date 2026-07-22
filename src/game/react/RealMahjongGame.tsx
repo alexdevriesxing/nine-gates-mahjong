@@ -26,6 +26,7 @@ interface TableState {
   phase: 'draw' | 'discard';
   log: string[];
   winner: number | null;
+  exhaustiveDraw: boolean;
   handNumber: number;
   lastAction: string;
 }
@@ -45,6 +46,7 @@ function createTableState(handNumber = 1): TableState {
     phase: 'discard',
     log: ['The gates open. East begins with a discard.'],
     winner: null,
+    exhaustiveDraw: false,
     handNumber,
     lastAction: 'East is choosing a discard',
   };
@@ -66,7 +68,7 @@ export default function RealMahjongGame() {
   const [speechSeat, setSpeechSeat] = useState<number | null>(null);
   const [animationSpeed, setAnimationSpeed] = useState(1);
   const playerHand = useMemo(() => sortMahjongTiles(state.hands[0]), [state.hands]);
-  const isPlayerTurn = state.turn === 0 && state.winner === null;
+  const isPlayerTurn = state.turn === 0 && state.winner === null && !state.exhaustiveDraw;
 
   const startNewHand = useCallback(() => {
     setState((current) => createTableState(current.handNumber + 1));
@@ -76,8 +78,16 @@ export default function RealMahjongGame() {
 
   const drawPlayerTile = () => {
     setState((current) => {
-      if (current.turn !== 0 || current.phase !== 'draw' || current.wall.length === 0 || current.winner !== null) {
+      if (current.turn !== 0 || current.phase !== 'draw' || current.winner !== null || current.exhaustiveDraw) {
         return current;
+      }
+      if (current.wall.length === 0) {
+        return {
+          ...current,
+          exhaustiveDraw: true,
+          lastAction: 'The wall is exhausted. The hand ends without a winner.',
+          log: ['The wall is exhausted. The hand is a draw.', ...current.log].slice(0, 14),
+        };
       }
       const [drawn, ...wall] = current.wall;
       const hand = sortMahjongTiles([...current.hands[0], drawn]);
@@ -98,33 +108,47 @@ export default function RealMahjongGame() {
 
   const discardPlayerTile = (tileId: string) => {
     setState((current) => {
-      if (current.turn !== 0 || current.phase !== 'discard' || current.winner !== null) return current;
+      if (current.turn !== 0 || current.phase !== 'discard' || current.winner !== null || current.exhaustiveDraw) return current;
       const tile = current.hands[0].find((candidate) => candidate.id === tileId);
       if (!tile) return current;
       const hands = [...current.hands];
       hands[0] = current.hands[0].filter((candidate) => candidate.id !== tileId);
       const discards = current.discards.map((pool) => [...pool]);
       discards[0].push(tile);
+      const exhaustiveDraw = current.wall.length === 0;
       return {
         ...current,
         hands,
         discards,
         turn: 1,
         phase: 'draw',
-        lastAction: `You discarded ${tile.name}`,
-        log: [`You discard ${tile.name}.`, ...current.log].slice(0, 14),
+        exhaustiveDraw,
+        lastAction: exhaustiveDraw ? 'The wall is exhausted. The hand ends without a winner.' : `You discarded ${tile.name}`,
+        log: [
+          `You discard ${tile.name}.`,
+          ...(exhaustiveDraw ? ['The wall is exhausted. The hand is a draw.'] : []),
+          ...current.log,
+        ].slice(0, 14),
       };
     });
     setSelectedId(null);
   };
 
   useEffect(() => {
-    if (state.turn === 0 || state.winner !== null) return;
+    if (state.turn === 0 || state.winner !== null || state.exhaustiveDraw) return;
     const seat = state.turn;
     setSpeechSeat(seat);
     const timer = window.setTimeout(() => {
       setState((current) => {
-        if (current.turn !== seat || current.winner !== null || current.wall.length === 0) return current;
+        if (current.turn !== seat || current.winner !== null || current.exhaustiveDraw) return current;
+        if (current.wall.length === 0) {
+          return {
+            ...current,
+            exhaustiveDraw: true,
+            lastAction: 'The wall is exhausted. The hand ends without a winner.',
+            log: ['The wall is exhausted. The hand is a draw.', ...current.log].slice(0, 14),
+          };
+        }
         const [drawn, ...wall] = current.wall;
         const fullHand = sortMahjongTiles([...current.hands[seat], drawn]);
         if (isWinningMahjongHand(fullHand)) {
@@ -145,6 +169,7 @@ export default function RealMahjongGame() {
         const discards = current.discards.map((pool) => [...pool]);
         discards[seat].push(discarded);
         const nextTurn = (seat + 1) % 4;
+        const exhaustiveDraw = wall.length === 0;
         return {
           ...current,
           wall,
@@ -152,14 +177,21 @@ export default function RealMahjongGame() {
           discards,
           turn: nextTurn,
           phase: 'draw',
-          lastAction: `${PLAYER_NAMES[seat]} discarded ${discarded.name}`,
-          log: [`${PLAYER_NAMES[seat]} discards ${discarded.name}.`, ...current.log].slice(0, 14),
+          exhaustiveDraw,
+          lastAction: exhaustiveDraw
+            ? 'The wall is exhausted. The hand ends without a winner.'
+            : `${PLAYER_NAMES[seat]} discarded ${discarded.name}`,
+          log: [
+            `${PLAYER_NAMES[seat]} discards ${discarded.name}.`,
+            ...(exhaustiveDraw ? ['The wall is exhausted. The hand is a draw.'] : []),
+            ...current.log,
+          ].slice(0, 14),
         };
       });
       setSpeechSeat(null);
     }, 850 / animationSpeed);
     return () => window.clearTimeout(timer);
-  }, [state.turn, state.winner, animationSpeed]);
+  }, [state.turn, state.winner, state.exhaustiveDraw, animationSpeed]);
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
@@ -184,6 +216,7 @@ export default function RealMahjongGame() {
         currentTurn: SEATS[state.turn],
         phase: state.phase,
         winner: state.winner === null ? null : PLAYER_NAMES[state.winner],
+        exhaustiveDraw: state.exhaustiveDraw,
         playerHand: playerHand.map(({ id, key, name }) => ({ id, key, name })),
         discardPools: state.discards.map((tiles, index) => ({
           seat: SEATS[index],
@@ -293,10 +326,14 @@ export default function RealMahjongGame() {
         </ol>
       </div>
 
-      {state.winner !== null && (
-        <div className="game-overlay game-overlay--victory">
-          <strong>{state.winner === 0 ? 'Nine Gates!' : 'Mahjong'}</strong>
-          <span>{PLAYER_NAMES[state.winner]} wins hand {state.handNumber}.</span>
+      {(state.winner !== null || state.exhaustiveDraw) && (
+        <div className={`game-overlay ${state.winner !== null ? 'game-overlay--victory' : ''}`}>
+          <strong>{state.exhaustiveDraw ? 'Wall exhausted' : state.winner === 0 ? 'Nine Gates!' : 'Mahjong'}</strong>
+          <span>
+            {state.exhaustiveDraw
+              ? `Hand ${state.handNumber} ends without a winner.`
+              : `${PLAYER_NAMES[state.winner!]} wins hand ${state.handNumber}.`}
+          </span>
           <button className="btn-primary" onClick={startNewHand}>Deal next hand</button>
         </div>
       )}

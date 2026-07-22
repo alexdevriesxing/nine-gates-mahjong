@@ -6,8 +6,8 @@ export default function VariantsHub() {
   return (
     <>
       <SEOHead
-        title="Mahjong Variants | Hong Kong, Riichi, MCR, American and Taiwanese"
-        description="Compare major Mahjong variants by region, rules, scoring complexity, player style, and current online play status."
+        title="Mahjong Variants | Seven Playable Regional Rule Trainers"
+        description="Compare and practice Hong Kong, Riichi, MCR, American, Taiwanese, Sichuan Bloody Rules, and Zung Jung Mahjong."
         canonical="https://ninegatesmahjong.com/variants"
       />
       <main className="hub-page hub-page--variants">

@@ -1,4 +1,8 @@
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
+import {
+  ADSTERRA_PRECONNECT_ORIGINS,
+  ADSTERRA_SOCIAL_BAR_URL,
+} from '@shared/ads';
 
 type ConsentChoice = 'accepted' | 'declined' | null;
 
@@ -12,7 +16,7 @@ interface AdContextValue {
 
 const STORAGE_KEY = 'ngm_ad_consent';
 const SOCIAL_SCRIPT_SELECTOR = '[data-ngm-social-ad]';
-const DEFAULT_SOCIAL_BAR_URL = 'https://pl29884537.effectivecpmnetwork.com/3e/87/21/3e8721aaa237eaa7a4118f7681d665f6.js';
+const AD_HINT_SELECTOR = '[data-ngm-ad-hint]';
 const AdContext = createContext<AdContextValue | null>(null);
 
 function readStoredConsent(): ConsentChoice {
@@ -28,13 +32,33 @@ export function AdProvider({ children }: { children: ReactNode }) {
 
     if (consent !== 'accepted') {
       existing?.remove();
+      document.querySelectorAll(AD_HINT_SELECTOR).forEach((element) => element.remove());
       return;
+    }
+
+    for (const origin of ADSTERRA_PRECONNECT_ORIGINS) {
+      if (document.head.querySelector(`link[data-ngm-ad-hint][href="${origin}"]`)) continue;
+      const preconnect = document.createElement('link');
+      preconnect.rel = 'preconnect';
+      preconnect.href = origin;
+      preconnect.crossOrigin = 'anonymous';
+      preconnect.dataset.ngmAdHint = 'true';
+      document.head.appendChild(preconnect);
     }
 
     if (existing) return;
 
-    const socialBarUrl = (import.meta.env.VITE_ADSTERRA_SOCIAL_BAR_URL as string | undefined)?.trim()
-      || DEFAULT_SOCIAL_BAR_URL;
+    const configuredUrl = (import.meta.env.VITE_ADSTERRA_SOCIAL_BAR_URL as string | undefined)?.trim();
+    const candidateUrl = configuredUrl || ADSTERRA_SOCIAL_BAR_URL;
+    let socialBarUrl = ADSTERRA_SOCIAL_BAR_URL;
+    try {
+      const parsed = new URL(candidateUrl);
+      if (parsed.protocol === 'https:' && parsed.hostname.endsWith('.effectivecpmnetwork.com')) {
+        socialBarUrl = parsed.toString();
+      }
+    } catch {
+      // Keep the verified built-in Adsterra URL when deployment configuration is invalid.
+    }
     const script = document.createElement('script');
     script.src = socialBarUrl;
     script.async = true;
@@ -44,6 +68,7 @@ export function AdProvider({ children }: { children: ReactNode }) {
 
     return () => {
       script.remove();
+      document.querySelectorAll(AD_HINT_SELECTOR).forEach((element) => element.remove());
     };
   }, [consent]);
 
@@ -60,7 +85,9 @@ export function AdProvider({ children }: { children: ReactNode }) {
       decline: () => choose('declined'),
       reset: () => {
         window.localStorage.removeItem(STORAGE_KEY);
-        setConsent(null);
+        // Reload so third-party code that ran under prior consent cannot keep
+        // global listeners alive after the visitor reopens privacy choices.
+        window.location.reload();
       },
     };
   }, [consent]);

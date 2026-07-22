@@ -31,6 +31,7 @@ interface MultiplayerState {
     turn: number;
     phase: 'draw' | 'discard';
     winner: number | null;
+    exhaustiveDraw: boolean;
     lastAction: string;
     yourSeat: number;
   };
@@ -150,7 +151,7 @@ export default function LobbyPage() {
           description: 'Real-time four-seat Mahjong rooms with server-authoritative turns.',
         }}
       />
-      <div className="lobby-page">
+      <main className="lobby-page">
         <section className="lobby-hero">
           <p className="game-eyebrow">Live four-seat rooms</p>
           <h1>Multiplayer Mahjong Lobby</h1>
@@ -267,6 +268,7 @@ export default function LobbyPage() {
                   </button>
                 </div>
                 {game.winner !== null && <div className="room-winner">{state.room.seats[game.winner]?.name} wins the hand.</div>}
+                {game.exhaustiveDraw && <div className="room-winner">The wall is exhausted. The hand ends without a winner.</div>}
               </div>
             ) : null}
             <GameChat
@@ -282,7 +284,7 @@ export default function LobbyPage() {
           <AdSlot width={728} height={90} className="hidden md:flex" />
           <AdSlot width={320} height={50} className="flex md:hidden" />
         </div>
-      </div>
+      </main>
     </>
   );
 }

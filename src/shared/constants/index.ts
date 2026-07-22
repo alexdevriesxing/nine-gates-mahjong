@@ -306,6 +306,38 @@ export const MAHJONG_VARIANTS: MahjongVariant[] = [
     status: 'playable',
     path: '/real-mahjong/taiwanese',
   },
+  {
+    id: 'sichuan',
+    name: 'Sichuan Bloody Rules',
+    region: 'Sichuan, China',
+    regionFlag: '🇨🇳',
+    complexity: 'advanced',
+    playerType: 'Aggressive players who enjoy forced suit decisions and multi-winner hands',
+    style:
+      'Fast, combative, suit-focused. Declares a missing suit, removes honors, and continues after the first win.',
+    description:
+      'Sichuan Bloody Rules uses only suited tiles and makes every player clear a declared missing suit before they can win.',
+    whyPlay:
+      'A bold strategic reset: no honors, no discard chows, a forced suit commitment, and Blood Battle scoring that keeps the table alive.',
+    status: 'playable',
+    path: '/real-mahjong/sichuan',
+  },
+  {
+    id: 'zung-jung',
+    name: 'Zung Jung Mahjong',
+    region: 'International',
+    regionFlag: '🌐',
+    complexity: 'intermediate',
+    playerType: 'Players who want transparent, additive competitive scoring',
+    style:
+      'Balanced, readable, competition-minded. Compatible scoring patterns add together cleanly.',
+    description:
+      'Zung Jung is a modern scoring system built to make pattern value proportional, teachable, and practical for competition.',
+    whyPlay:
+      'It preserves classic hand-building while offering a concise scoring vocabulary and fewer procedural exceptions than many tournament systems.',
+    status: 'playable',
+    path: '/real-mahjong/zung-jung',
+  },
 ];
 
 // ===== Guest Name Generation =====
@@ -385,6 +417,8 @@ export const FOOTER_SECTIONS = [
       { label: 'Chinese Official (MCR)', path: '/real-mahjong/mcr' },
       { label: 'American Mahjongg', path: '/real-mahjong/american' },
       { label: 'Taiwanese Mahjong', path: '/real-mahjong/taiwanese' },
+      { label: 'Sichuan Bloody Rules', path: '/real-mahjong/sichuan' },
+      { label: 'Zung Jung Mahjong', path: '/real-mahjong/zung-jung' },
     ],
   },
   {

@@ -6,7 +6,9 @@ import {
   findSolitaireMatch,
   isSolitaireTileFree,
   reshuffleSolvableSolitaireBoard,
+  SOLITAIRE_LAYOUTS,
   type MahjongTileInstance,
+  type SolitaireLayout,
   type SolitaireTileInstance,
 } from '../MahjongCore';
 import { formatTime, getDailySeed, seededRandom, shuffle } from '@shared/utils';
@@ -27,9 +29,9 @@ const MODE_COPY: Record<
   { title: string; eyebrow: string; description: string }
 > = {
   solitaire: {
-    title: 'Fortress Mahjongg Solitaire',
+    title: 'Mahjongg Solitaire',
     eyebrow: 'Classic layered puzzle',
-    description: 'Match identical free tiles. A tile is free when nothing covers it and one side is open.',
+    description: 'Choose a layout and match identical free tiles. A tile is free when nothing covers it and one side is open.',
   },
   daily: {
     title: 'Daily Mahjongg Challenge',
@@ -106,9 +108,10 @@ function GameHeader({
 
 function LayeredMahjongGame({ mode }: { mode: 'solitaire' | 'daily' | 'zen' }) {
   const initialSeed = mode === 'daily' ? getDailySeed() : Date.now();
+  const [layout, setLayout] = useState<SolitaireLayout>('fortress');
   const [seed, setSeed] = useState(initialSeed);
   const [tiles, setTiles] = useState<SolitaireTileInstance[]>(() =>
-    createSolvableSolitaireBoard(initialSeed)
+    createSolvableSolitaireBoard(initialSeed, 'fortress')
   );
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [hintedIds, setHintedIds] = useState<string[]>([]);
@@ -123,9 +126,13 @@ function LayeredMahjongGame({ mode }: { mode: 'solitaire' | 'daily' | 'zen' }) {
   const complete = remaining === 0;
 
   const reset = useCallback(
-    (nextSeed = mode === 'daily' ? getDailySeed() : Date.now()) => {
+    (
+      nextSeed = mode === 'daily' ? getDailySeed() : Date.now(),
+      nextLayout: SolitaireLayout = layout
+    ) => {
       setSeed(nextSeed);
-      setTiles(createSolvableSolitaireBoard(nextSeed));
+      setLayout(nextLayout);
+      setTiles(createSolvableSolitaireBoard(nextSeed, nextLayout));
       setSelectedId(null);
       setHintedIds([]);
       setHistory([]);
@@ -133,9 +140,11 @@ function LayeredMahjongGame({ mode }: { mode: 'solitaire' | 'daily' | 'zen' }) {
       setCombo(0);
       setElapsed(0);
       setPaused(false);
+      if (hintTimer.current) clearTimeout(hintTimer.current);
+      hintTimer.current = null;
       completionRecorded.current = false;
     },
-    [mode]
+    [mode, layout]
   );
 
   useEffect(() => {
@@ -144,6 +153,10 @@ function LayeredMahjongGame({ mode }: { mode: 'solitaire' | 'daily' | 'zen' }) {
     }, 1000);
     return () => window.clearInterval(timer);
   }, [paused, complete]);
+
+  useEffect(() => () => {
+    if (hintTimer.current) clearTimeout(hintTimer.current);
+  }, []);
 
   useEffect(() => {
     if (!complete || completionRecorded.current) return;
@@ -168,6 +181,7 @@ function LayeredMahjongGame({ mode }: { mode: 'solitaire' | 'daily' | 'zen' }) {
         mode,
         coordinateSystem: 'Board x increases left-to-right; y increases top-to-bottom; z is layer height.',
         seed,
+        layout,
         score,
         combo,
         elapsed,
@@ -185,7 +199,7 @@ function LayeredMahjongGame({ mode }: { mode: 'solitaire' | 'daily' | 'zen' }) {
     return () => {
       delete window.render_game_to_text;
     };
-  }, [mode, seed, score, combo, elapsed, paused, complete, remaining, selectedId, tiles]);
+  }, [mode, seed, layout, score, combo, elapsed, paused, complete, remaining, selectedId, tiles]);
 
   const showHint = useCallback(() => {
     const match = findSolitaireMatch(tiles);
@@ -256,6 +270,24 @@ function LayeredMahjongGame({ mode }: { mode: 'solitaire' | 'daily' | 'zen' }) {
         }
       />
 
+      {mode !== 'daily' && (
+        <div className="solitaire-layout-picker" role="group" aria-label="Solitaire layout">
+          {SOLITAIRE_LAYOUTS.map((candidate) => (
+            <button
+              key={candidate.id}
+              className={layout === candidate.id ? 'is-active' : ''}
+              type="button"
+              aria-pressed={layout === candidate.id}
+              title={candidate.description}
+              onClick={() => reset(Date.now(), candidate.id)}
+            >
+              <strong>{candidate.name}</strong>
+              <span>{candidate.description}</span>
+            </button>
+          ))}
+        </div>
+      )}
+
       <div className={`layered-board ${paused ? 'layered-board--paused' : ''}`}>
         <div className="board-ambient" aria-hidden="true" />
         {tiles.map((tile) => {
@@ -321,6 +353,8 @@ function GridMahjongGame({ mode }: { mode: 'time-attack' | 'connect' | 'shisen-s
   const [seconds, setSeconds] = useState(mode === 'time-attack' ? 120 : 0);
   const [paused, setPaused] = useState(false);
   const completionRecorded = useRef(false);
+  const hintTimer = useRef<number | null>(null);
+  const actionTimer = useRef<number | null>(null);
   const remaining = tiles.filter(Boolean).length;
   const complete = remaining === 0;
   const timedOut = mode === 'time-attack' && seconds <= 0 && !complete;
@@ -338,6 +372,10 @@ function GridMahjongGame({ mode }: { mode: 'time-attack' | 'connect' | 'shisen-s
     setMoves(0);
     setSeconds(mode === 'time-attack' ? 120 : 0);
     setPaused(false);
+    if (hintTimer.current) window.clearTimeout(hintTimer.current);
+    if (actionTimer.current) window.clearTimeout(actionTimer.current);
+    hintTimer.current = null;
+    actionTimer.current = null;
     completionRecorded.current = false;
   }, [mode, pairCount]);
 
@@ -348,6 +386,11 @@ function GridMahjongGame({ mode }: { mode: 'time-attack' | 'connect' | 'shisen-s
     }, 1000);
     return () => window.clearInterval(timer);
   }, [mode, paused, complete, timedOut]);
+
+  useEffect(() => () => {
+    if (hintTimer.current) window.clearTimeout(hintTimer.current);
+    if (actionTimer.current) window.clearTimeout(actionTimer.current);
+  }, []);
 
   useEffect(() => {
     if (!complete || completionRecorded.current) return;
@@ -446,9 +489,11 @@ function GridMahjongGame({ mode }: { mode: 'time-attack' | 'connect' | 'shisen-s
     }
     setRevealed((current) => new Set([...current, ...match]));
     setSelected(match[0]);
-    window.setTimeout(() => {
+    if (hintTimer.current) window.clearTimeout(hintTimer.current);
+    hintTimer.current = window.setTimeout(() => {
       setSelected(null);
       if (isMemory) setRevealed(new Set());
+      hintTimer.current = null;
     }, 1400);
     setScore((value) => Math.max(0, value - 100));
   }, [findGridMatch, isMemory]);
@@ -490,13 +535,15 @@ function GridMahjongGame({ mode }: { mode: 'time-attack' | 'connect' | 'shisen-s
     if (canMatch(selected, index)) {
       const nextCombo = combo + 1;
       setLocked(true);
-      window.setTimeout(() => {
+      if (actionTimer.current) window.clearTimeout(actionTimer.current);
+      actionTimer.current = window.setTimeout(() => {
         setTiles((current) => current.map((candidate, tileIndex) =>
           tileIndex === selected || tileIndex === index ? null : candidate
         ));
         setRevealed(new Set());
         setSelected(null);
         setLocked(false);
+        actionTimer.current = null;
       }, isMemory ? 420 : 160);
       setScore((value) => value + 100 + nextCombo * 20);
       setCombo(nextCombo);
@@ -504,10 +551,12 @@ function GridMahjongGame({ mode }: { mode: 'time-attack' | 'connect' | 'shisen-s
     } else {
       setCombo(0);
       setLocked(true);
-      window.setTimeout(() => {
+      if (actionTimer.current) window.clearTimeout(actionTimer.current);
+      actionTimer.current = window.setTimeout(() => {
         setRevealed(new Set());
         setSelected(null);
         setLocked(false);
+        actionTimer.current = null;
       }, isMemory ? 700 : 220);
       if (!isMemory) setSelected(index);
     }

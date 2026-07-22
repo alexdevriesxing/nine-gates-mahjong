@@ -6,6 +6,7 @@ dist/
 .wrangler/
 output/
 test-actions.json
+.playwright-cli/
 
 # Environment variables
 .env

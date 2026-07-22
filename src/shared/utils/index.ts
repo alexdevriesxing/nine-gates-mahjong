@@ -21,9 +21,9 @@ export function seededRandom(seed: number): () => number {
  */
 export function getDailySeed(date?: Date): number {
   const d = date || new Date();
-  const year = d.getFullYear();
-  const month = d.getMonth() + 1;
-  const day = d.getDate();
+  const year = d.getUTCFullYear();
+  const month = d.getUTCMonth() + 1;
+  const day = d.getUTCDate();
   return year * 10000 + month * 100 + day;
 }
 
@@ -50,8 +50,9 @@ export function formatScore(score: number): string {
  * Format seconds as MM:SS.
  */
 export function formatTime(seconds: number): string {
-  const mins = Math.floor(Math.abs(seconds) / 60);
-  const secs = Math.floor(Math.abs(seconds) % 60);
+  const safeSeconds = Math.max(0, seconds);
+  const mins = Math.floor(safeSeconds / 60);
+  const secs = Math.floor(safeSeconds % 60);
   return `${mins}:${secs.toString().padStart(2, '0')}`;
 }
 

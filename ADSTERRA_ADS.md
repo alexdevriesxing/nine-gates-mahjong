@@ -2,6 +2,30 @@
 
 This file serves as the master source of truth for all Adsterra ad unit scripts and keys integrated into Nine Gates Mahjong.
 
+## Production integration policy
+
+- `src/shared/ads.ts` is the executable placement registry shared by the React application and Cloudflare Worker. Do not duplicate or accept placement keys from URL parameters.
+- Banner frames use `/ad-frame?placement=<size>`; the Worker resolves only the six approved placements below and rejects every other value.
+- The native unit uses `/native-frame`. Legacy public frame files are retired with HTTP 410 so they cannot bypass placement validation.
+- Third-party scripts, native frames, banner frames, and Adsterra connection hints load only after the visitor accepts advertising. Declining ads leaves every game playable with reserved-size house messages.
+- Banner iframes are lazy-loaded with fixed dimensions to avoid layout shift. Connection hints are added only after consent.
+- A placement key appears at most once per rendered page. On very wide game pages the primary rail uses `160x600` and the secondary rail uses the distinct `160x300` unit.
+
+### Responsive placement map
+
+| Context | Placement |
+| --- | --- |
+| Mobile leaderboard | `320x50` |
+| Tablet game leaderboard | `468x60` |
+| Desktop leaderboard | `728x90` |
+| Mobile/content rectangle | `300x250` |
+| Wide desktop secondary rail | `160x300` |
+| Desktop primary rail | `160x600` |
+| Editorial/in-feed promotion | Native banner |
+| Optional overlay inventory | Social Bar |
+
+The banner and native inventory is intentionally built into the shared registry so a frontend build cannot drift from Worker validation. `VITE_ADSTERRA_SOCIAL_BAR_URL` remains available only for a verified HTTPS `effectivecpmnetwork.com` Social Bar URL; invalid values fall back to the approved URL below.
+
 ## 1. Native Banner
 - **Container ID:** `container-c9947e22755623a8fe8d556aa1ba06d5`
 - **Script URL:** `https://pl29884536.effectivecpmnetwork.com/c9947e22755623a8fe8d556aa1ba06d5/invoke.js`

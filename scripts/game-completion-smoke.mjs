@@ -7,8 +7,8 @@ import {
   isWinningMahjongHand,
 } from '../src/game/MahjongCore.ts';
 
-function completeSolitaire(seed) {
-  const tiles = createSolvableSolitaireBoard(seed);
+function completeSolitaire(seed, layout = 'fortress') {
+  const tiles = createSolvableSolitaireBoard(seed, layout);
   let moves = 0;
   while (tiles.some((tile) => !tile.removed)) {
     const free = tiles.filter((tile) => isSolitaireTileFree(tile, tiles));
@@ -20,7 +20,7 @@ function completeSolitaire(seed) {
         break;
       }
     }
-    if (!pair) throw new Error(`Solitaire seed ${seed} deadlocked after ${moves} moves.`);
+    if (!pair) throw new Error(`Solitaire ${layout} seed ${seed} deadlocked after ${moves} moves.`);
     pair.forEach((tile) => { tile.removed = true; });
     moves += 1;
   }
@@ -62,14 +62,20 @@ const standardWinKeys = [
 ];
 const winningHand = standardWinKeys.map((key, index) => ({ ...getFace(key), id: `known-${index}` }));
 
-const solitaireRuns = Array.from({ length: 80 }, (_, index) => completeSolitaire(20260624 + index));
+const solitaireLayouts = ['fortress', 'courtyard', 'pagoda'];
+const solitaireRuns = Object.fromEntries(solitaireLayouts.map((layout) => [
+  layout,
+  Array.from({ length: 80 }, (_, index) => completeSolitaire(20260624 + index, layout)),
+]));
 const connectRuns = Array.from({ length: 80 }, (_, index) => completeAdjacentGrid(20260624 + index));
 
 if (!isWinningMahjongHand(winningHand)) throw new Error('Known standard Mahjong hand was not recognized.');
 
 console.log(JSON.stringify({
-  solitaireBoardsCompleted: solitaireRuns.length,
-  solitaireMovesPerBoard: [...new Set(solitaireRuns)],
+  solitaireBoardsCompleted: Object.values(solitaireRuns).reduce((total, runs) => total + runs.length, 0),
+  solitaireMovesPerLayout: Object.fromEntries(
+    Object.entries(solitaireRuns).map(([layout, runs]) => [layout, [...new Set(runs)]])
+  ),
   connectBoardsCompleted: connectRuns.length,
   connectMovesPerBoard: [...new Set(connectRuns)],
   memoryPairsCompletable: createPairGrid(12, 42).length / 2,

@@ -11,7 +11,7 @@ export default function PrivacyPage() {
       <main className="legal-page">
         <article>
           <h1>Privacy Policy</h1>
-          <p>Last updated July 14, 2026.</p>
+          <p>Last updated July 22, 2026.</p>
 
           <h2>Who operates the service</h2>
           <p>
