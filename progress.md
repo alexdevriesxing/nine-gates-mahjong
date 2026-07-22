@@ -51,4 +51,17 @@ Follow-up prompt (2026-07-19): Audit this website and improve enhance and test a
 - Deployed the final gap-fix build to Cloudflare as version `dc1e6907-78b7-4c2a-884c-bb5cd92c28be`.
 - Final production matrix passes on `https://ninegatesmahjong.com`: 99 route/viewport checks, all seven original game completions, controls and touch input, five ruleset trainers, feature flows, account lifecycle, authoritative multiplayer, and two-browser multiplayer UI.
 - Captured and visually reviewed all 13 live games at desktop and mobile sizes; targeted initial-viewport checks confirmed no fixed-header overlap or horizontal overflow.
-- Corrected the advertising configuration to use independent Adsterra keys for 320x50, 728x90, and 160x600 placements. No publisher credentials are currently configured, so production intentionally renders the tested house-ad fallback until the owner supplies those keys.
+- Corrected the advertising configuration to use independent Adsterra keys by placement size with environment overrides. Production renders those units only after consent and uses the tested house-ad fallback otherwise.
+
+## 2026-07-22
+
+- Rebased the expansion pass onto the hardened production `master` so its edge-rendered SEO, security headers, rate limiting, protected advertising frames, truthful locale handling, and deployment workflows remain intact.
+- Added playable Sichuan Bloody Rules and Zung Jung guided trainers.
+  - Sichuan enforces a missing-suit declaration, removes honors, forces declared-suit discards, and teaches the Blood Battle flow.
+  - Zung Jung teaches the standard winning structure and compatible additive-pattern scoring concepts.
+- Added Jade Courtyard and Four-Storey Pagoda layouts alongside the original Fortress board, with deterministic solvability coverage across 240 generated boards.
+- Expanded routes, navigation, editorial content, structured data, edge metadata, sitemap, `llms.txt`, and release markers for both new variants.
+- Preserved consent-aware advertising, strengthened consent withdrawal with a clean reload, and verified that no third-party ad script, frame, or preconnect is active without permission.
+- Validated the niche rules copy against the Mahjong International League Sichuan rules and the Zung Jung designer/competition references.
+- Final integrated local matrix passes: production and Worker typechecks, all original game completions, three solitaire layouts, desktop/touch controls, seven variant trainers, 105 route/viewport checks, edge metadata and security headers, feature flows, account lifecycle, authoritative multiplayer, and two-browser multiplayer UI.
+- Captured and visually reviewed all 15 game/trainer shells at desktop and mobile sizes; no clipping, overlap, or horizontal overflow was found.
