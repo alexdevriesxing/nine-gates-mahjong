@@ -148,7 +148,7 @@ await page.getByRole('heading', { name: /404/ }).waitFor();
 if ((await page.locator('meta[name="robots"]').getAttribute('content')) !== 'noindex,follow') throw new Error('404 route is indexable.');
 const notFoundConsoleMessages = errors.splice(errorsBeforeNotFound);
 errors.push(...notFoundConsoleMessages.filter((message) =>
-  !/Failed to load resource: the server responded with a status of 404 \(Not Found\)/.test(message)
+  !/Failed to load resource:.*status of 404/i.test(message)
 ));
 results.notFound = true;
 

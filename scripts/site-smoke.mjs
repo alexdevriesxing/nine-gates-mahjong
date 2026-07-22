@@ -103,7 +103,7 @@ for (const viewport of viewports) {
     if (overflow > 4) failures.push(`${viewport.name} ${route}: horizontal overflow ${overflow}px`);
 
     const unexpectedErrors = route === notFoundRoute
-      ? errors.filter((message) => !/Failed to load resource: the server responded with a status of 404 \(Not Found\)/.test(message))
+      ? errors.filter((message) => !/Failed to load resource:.*status of 404/i.test(message))
       : errors;
     if (unexpectedErrors.length) failures.push(`${viewport.name} ${route}: ${unexpectedErrors.join(' | ')}`);
   }

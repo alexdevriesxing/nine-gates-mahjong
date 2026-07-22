@@ -65,3 +65,7 @@ Follow-up prompt (2026-07-19): Audit this website and improve enhance and test a
 - Validated the niche rules copy against the Mahjong International League Sichuan rules and the Zung Jung designer/competition references.
 - Final integrated local matrix passes: production and Worker typechecks, all original game completions, three solitaire layouts, desktop/touch controls, seven variant trainers, 105 route/viewport checks, edge metadata and security headers, feature flows, account lifecycle, authoritative multiplayer, and two-browser multiplayer UI.
 - Captured and visually reviewed all 15 game/trainer shells at desktop and mobile sizes; no clipping, overlap, or horizontal overflow was found.
+- Published branch `codex/mahjong-portal-expansion` to GitHub and deployed Cloudflare Worker version `c9ca42b0-a5a1-4574-b6bd-f10ac9c19f82`.
+- The hardened production smoke passed after the new release marker propagated, including canonical/www routing, edge metadata for Sichuan and Zung Jung, security headers, protected ad frames, and correct 404 status.
+- The complete production matrix passes on `https://ninegatesmahjong.com`: all original games, three solitaire layouts, desktop/touch controls, seven ruleset trainers, consent and feature flows, 105 route/viewport checks, account lifecycle, authoritative multiplayer, and two-browser multiplayer UI.
+- Hardened the browser suites to ignore the intentional 404 console message by status code regardless of Chrome's environment-specific reason-phrase formatting.
