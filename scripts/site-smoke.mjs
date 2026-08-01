@@ -10,7 +10,7 @@ const routes = [
   '/real-mahjong/zung-jung', '/learn',
   '/learn/mahjong-vs-mahjongg', '/learn/how-to-play-mahjongg-solitaire',
   '/learn/how-to-play-real-mahjong', '/learn/chi-pung-kong', '/learn/beginner-strategy',
-  '/learn/mahjong-variants', '/how-to-play', '/history', '/events', '/lobby',
+  '/learn/mahjong-variants', '/how-to-play', '/history', '/about', '/events', '/lobby',
   '/leaderboards', '/login', '/register', '/profile', '/guest', '/privacy', '/terms',
   notFoundRoute,
 ];
@@ -66,6 +66,19 @@ if (!initialHtml.includes('server-seo-fallback')) failures.push('Initial HTML mi
 if (!initialHtml.includes('application/ld+json')) failures.push('Initial HTML missing structured data.');
 if (!initialHtml.includes('WebApplication') || !initialHtml.includes('GameApplication')) {
   failures.push('Initial game HTML is missing eligible web-game structured data.');
+}
+
+const articleHtml = await (await fetch(`${base}/learn/mahjong-vs-mahjongg`)).text();
+if (!articleHtml.includes('datePublished') || !articleHtml.includes('Nine Gates Mahjong Editorial Team')) {
+  failures.push('Initial article HTML is missing publication or authorship structured data.');
+}
+const aboutHtml = await (await fetch(`${base}/about`)).text();
+if (!aboutHtml.includes('AboutPage') || !aboutHtml.includes('Editorial and Testing Standards')) {
+  failures.push('About page is missing edge metadata or AboutPage schema.');
+}
+const indexNowKey = await fetch(`${base}/a4e28bc3d69f41bb826c17f5909ce753.txt`);
+if (indexNowKey.status !== 200 || (await indexNowKey.text()).trim() !== 'a4e28bc3d69f41bb826c17f5909ce753') {
+  failures.push('IndexNow ownership key is unavailable or invalid.');
 }
 
 for (const viewport of viewports) {

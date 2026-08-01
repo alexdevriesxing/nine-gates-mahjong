@@ -27,13 +27,22 @@ export default function GamePageFrame({
         jsonLd={{
           '@context': 'https://schema.org',
           '@type': ['VideoGame', 'WebApplication'],
+          '@id': `https://ninegatesmahjong.com${canonical}#application`,
           name: title.split('|')[0].trim(),
           description,
           url: `https://ninegatesmahjong.com${canonical}`,
           applicationCategory: 'GameApplication',
           operatingSystem: 'Any modern web browser',
           browserRequirements: 'Requires JavaScript and a modern browser with local storage enabled.',
+          gamePlatform: 'Web browser',
+          playMode: 'SinglePlayer',
           isAccessibleForFree: true,
+          image: {
+            '@type': 'ImageObject',
+            url: 'https://ninegatesmahjong.com/hero-bg.jpg',
+            width: 1916,
+            height: 821,
+          },
           offers: { '@type': 'Offer', price: 0, priceCurrency: 'USD' },
         }}
       />

@@ -1,5 +1,7 @@
 const SITE_ORIGIN = 'https://ninegatesmahjong.com';
 const DEFAULT_IMAGE = `${SITE_ORIGIN}/hero-bg.jpg`;
+const DEFAULT_IMAGE_WIDTH = 1916;
+const DEFAULT_IMAGE_HEIGHT = 821;
 
 export interface RouteMeta {
   title: string;
@@ -144,6 +146,11 @@ const ROUTES: Record<string, RouteMeta> = {
     description: 'Explore the history of Mahjong, its regional development and the later rise of Mahjongg Solitaire.',
     kind: 'article',
   },
+  '/about': {
+    title: 'About Nine Gates Mahjong | Editorial and Testing Standards',
+    description: 'Learn who operates Nine Gates Mahjong, how its games are tested, how regional rule guides are reviewed, and how advertising and corrections are handled.',
+    kind: 'page',
+  },
   '/events': {
     title: 'Mahjong Challenges and Events | Nine Gates Mahjong',
     description: 'Track daily challenge progress, complete portal goals and review current Nine Gates Mahjong events.',
@@ -215,6 +222,7 @@ function labelSegment(segment: string) {
     riichi: 'Japanese Riichi',
     sichuan: 'Sichuan Bloody Rules',
     'zung-jung': 'Zung Jung Mahjong',
+    about: 'About',
   };
   return aliases[segment] ?? segment.split('-').map((word) => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
 }
@@ -272,7 +280,13 @@ export function renderHtmlResponse(request: Request, response: Response, pathnam
     })),
   ];
   const isGame = meta.kind === 'game' || meta.kind === 'trainer';
-  const routeType = isGame ? ['VideoGame', 'WebApplication'] : meta.kind === 'article' ? 'Article' : 'WebPage';
+  const routeType = isGame
+    ? ['VideoGame', 'WebApplication']
+    : meta.kind === 'article'
+      ? 'Article'
+      : pathname === '/about'
+        ? 'AboutPage'
+        : 'WebPage';
   const schema = {
     '@context': 'https://schema.org',
     '@graph': [
@@ -283,6 +297,7 @@ export function renderHtmlResponse(request: Request, response: Response, pathnam
         alternateName: 'Nine Gates Mahjong',
         url: `${SITE_ORIGIN}/`,
         logo: { '@type': 'ImageObject', url: `${SITE_ORIGIN}/logo_dark.png` },
+        sameAs: ['https://www.firedragoninteractive.com'],
       },
       {
         '@type': 'WebSite',
@@ -304,12 +319,28 @@ export function renderHtmlResponse(request: Request, response: Response, pathnam
         isPartOf: { '@id': `${SITE_ORIGIN}/#website` },
         breadcrumb: { '@id': `${canonical}#breadcrumb` },
         publisher: { '@id': `${SITE_ORIGIN}/#organization` },
-        image: DEFAULT_IMAGE,
-        ...(meta.kind === 'article' ? { mainEntityOfPage: canonical } : {}),
+        image: {
+          '@type': 'ImageObject',
+          url: DEFAULT_IMAGE,
+          width: DEFAULT_IMAGE_WIDTH,
+          height: DEFAULT_IMAGE_HEIGHT,
+        },
+        ...(meta.kind === 'article' ? {
+          mainEntityOfPage: canonical,
+          datePublished: '2026-06-25T00:00:00+02:00',
+          dateModified: '2026-07-22T00:00:00+02:00',
+          author: {
+            '@type': 'Organization',
+            name: 'Nine Gates Mahjong Editorial Team',
+            url: `${SITE_ORIGIN}/about`,
+          },
+        } : {}),
         ...(isGame ? {
           applicationCategory: 'GameApplication',
           operatingSystem: 'Any modern web browser',
           browserRequirements: 'Requires JavaScript and a modern web browser with local storage enabled.',
+          gamePlatform: 'Web browser',
+          playMode: pathname === '/lobby' ? 'MultiPlayer' : 'SinglePlayer',
           isAccessibleForFree: true,
           offers: { '@type': 'Offer', price: 0, priceCurrency: 'USD' },
         } : {}),
@@ -327,15 +358,18 @@ export function renderHtmlResponse(request: Request, response: Response, pathnam
       <h1>${escapeHtml(meta.title.replace(/ \| Nine Gates Mahjong$/, ''))}</h1>
       <p>${escapeHtml(meta.description)}</p>
       <nav aria-label="Featured links">
-        <a href="/play">Browse free games</a> · <a href="/learn">Learn Mahjong</a> · <a href="/variants">Compare variants</a>
+        <a href="/play">Browse free games</a> · <a href="/learn">Learn Mahjong</a> · <a href="/variants">Compare variants</a> · <a href="/about">Editorial standards</a>
       </nav>
     </main>`;
 
   const rewritten = new HTMLRewriter()
     .on('head', { element(element) {
       if (pathname === '/') {
-        element.append('<link rel="preload" as="image" href="/hero-bg.webp" type="image/webp" fetchpriority="high">', { html: true });
+        element.append('<link rel="preload" as="image" href="/hero-bg-mobile.webp" type="image/webp" media="(max-width: 767px)" fetchpriority="high">', { html: true });
+        element.append('<link rel="preload" as="image" href="/hero-bg.webp" type="image/webp" media="(min-width: 768px)" fetchpriority="high">', { html: true });
       }
+      element.append(`<meta property="og:image:width" content="${DEFAULT_IMAGE_WIDTH}"><meta property="og:image:height" content="${DEFAULT_IMAGE_HEIGHT}"><meta name="twitter:image:alt" content="Nine Gates Mahjong tiles and game table">`, { html: true });
+      if (meta.kind === 'article') element.append('<meta property="article:modified_time" content="2026-07-22T00:00:00+02:00">', { html: true });
     } })
     .on('title', { element(element) { element.setInnerContent(meta.title); } })
     .on('meta[name="description"]', { element(element) { element.setAttribute('content', meta.description); } })

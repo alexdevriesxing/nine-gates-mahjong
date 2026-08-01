@@ -1,6 +1,5 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
 import MobileMenu from './MobileMenu';
 import { TileRenderer } from '../../game/TileRenderer';
@@ -47,19 +46,14 @@ export default function Header() {
 
   return (
     <>
-      <motion.header
-        className={headerClass}
-        initial={{ y: -100 }}
-        animate={{ y: 0 }}
-        transition={{ duration: 0.5, ease: 'easeOut' }}
-      >
+      <header className={`${headerClass} header-enter`}>
         <div className="container-wide flex items-center justify-between">
           <Link to="/" className="flex items-center gap-3 group transition-all duration-300">
             <img
-              src="/logo_dark.webp"
+              src="/logo_dark-240.webp"
               alt="Nine Gates Mahjong"
-              width="991"
-              height="313"
+              width="240"
+              height="76"
               decoding="async"
               className="h-9 md:h-10 w-auto object-contain transition-transform group-hover:scale-[1.02] duration-300"
             />
@@ -129,13 +123,9 @@ export default function Header() {
             </svg>
           </button>
         </div>
-      </motion.header>
+      </header>
 
-      <AnimatePresence>
-        {isMobileMenuOpen && (
-          <MobileMenu onClose={closeMobileMenu} />
-        )}
-      </AnimatePresence>
+      {isMobileMenuOpen && <MobileMenu onClose={closeMobileMenu} />}
     </>
   );
 }

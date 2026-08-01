@@ -1,7 +1,7 @@
 const origin = (process.env.NGM_PRODUCTION_ORIGIN || 'https://ninegatesmahjong.com').replace(/\/$/, '');
 const maxAttempts = Number.parseInt(process.env.NGM_PRODUCTION_MAX_ATTEMPTS || '30', 10);
 const retryDelayMs = Number.parseInt(process.env.NGM_PRODUCTION_RETRY_DELAY_MS || '10000', 10);
-const expectedReleaseMarker = 'Last reviewed: 2026-07-22 (production audit release)';
+const expectedReleaseMarker = 'Last reviewed: 2026-07-22 (performance and discovery release)';
 
 function sleep(milliseconds) {
   return new Promise((resolve) => setTimeout(resolve, milliseconds));
@@ -84,6 +84,18 @@ const heroWebp = await request('/hero-bg.webp', { readBody: false });
 assert(heroWebp.response.status === 200, `Optimized hero image returned ${heroWebp.response.status}.`);
 assert((heroWebp.response.headers.get('content-type') || '').includes('image/webp'), 'Optimized hero image has the wrong content type.');
 
+const mobileHeroWebp = await request('/hero-bg-mobile.webp', { readBody: false });
+assert(mobileHeroWebp.response.status === 200, `Optimized mobile hero image returned ${mobileHeroWebp.response.status}.`);
+assert((mobileHeroWebp.response.headers.get('content-type') || '').includes('image/webp'), 'Optimized mobile hero image has the wrong content type.');
+
+const about = await request('/about', { accept: 'text/html' });
+assert(about.response.status === 200, `About route returned ${about.response.status}.`);
+assert(about.body.includes('AboutPage') && about.body.includes('Editorial and Testing Standards'), 'About route is missing edge-rendered trust metadata.');
+
+const indexNowKey = await request('/a4e28bc3d69f41bb826c17f5909ce753.txt', { accept: 'text/plain' });
+assert(indexNowKey.response.status === 200, `IndexNow key returned ${indexNowKey.response.status}.`);
+assert(indexNowKey.body.trim() === 'a4e28bc3d69f41bb826c17f5909ce753', 'IndexNow key body is invalid.');
+
 const sichuan = await request('/real-mahjong/sichuan', { accept: 'text/html' });
 assert(sichuan.response.status === 200, `Sichuan trainer route returned ${sichuan.response.status}.`);
 assert(sichuan.body.includes('Sichuan Bloody Rules Mahjong and Dingque Trainer'), 'Sichuan route is missing its edge-rendered metadata.');
@@ -127,6 +139,9 @@ console.log(JSON.stringify({
   rejectedAdFrameStatus: rejectedFrame.response.status,
   retiredAdFrameStatus: retiredFrame.response.status,
   heroWebpStatus: heroWebp.response.status,
+  mobileHeroWebpStatus: mobileHeroWebp.response.status,
+  aboutStatus: about.response.status,
+  indexNowKeyStatus: indexNowKey.response.status,
   wwwRedirectStatus: wwwResponse.status,
   trailingSlashRedirectStatus: trailingSlashResponse.status,
   securityHeaders: true,

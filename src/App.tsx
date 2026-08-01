@@ -45,6 +45,7 @@ const TermsPage = lazy(() => import('./app/pages/TermsPage'));
 const EventsPage = lazy(() => import('./app/pages/EventsPage'));
 const TutorialsPage = lazy(() => import('./app/pages/TutorialsPage'));
 const HistoryPage = lazy(() => import('./app/pages/HistoryPage'));
+const AboutPage = lazy(() => import('./app/pages/AboutPage'));
 const NotFoundPage = lazy(() => import('./app/pages/NotFoundPage'));
 
 // =====================================================
@@ -58,11 +59,16 @@ function SuspensePage({ children }: { children: React.ReactNode }) {
 // Scroll to Top on route change
 // =====================================================
 function ScrollToTop() {
-  const { pathname } = useLocation();
+  const { pathname, hash } = useLocation();
 
   useEffect(() => {
+    if (hash) {
+      const targetId = decodeURIComponent(hash.slice(1));
+      requestAnimationFrame(() => document.getElementById(targetId)?.scrollIntoView());
+      return;
+    }
     window.scrollTo(0, 0);
-  }, [pathname]);
+  }, [pathname, hash]);
 
   return null;
 }
@@ -120,6 +126,7 @@ export default function App() {
               <Route path="/events" element={<SuspensePage><EventsPage /></SuspensePage>} />
               <Route path="/how-to-play" element={<SuspensePage><TutorialsPage /></SuspensePage>} />
               <Route path="/history" element={<SuspensePage><HistoryPage /></SuspensePage>} />
+              <Route path="/about" element={<SuspensePage><AboutPage /></SuspensePage>} />
 
               {/* Account */}
               <Route path="/profile" element={<SuspensePage><ProfilePage /></SuspensePage>} />

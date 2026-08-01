@@ -1,6 +1,4 @@
 import { Link } from 'react-router-dom';
-import { motion, useInView } from 'framer-motion';
-import { useRef } from 'react';
 import SEOHead from '../components/SEOHead';
 import GameModeCard from '../components/GameModeCard';
 import VariantCard from '../components/VariantCard';
@@ -9,24 +7,8 @@ import { useAuth } from '../context/AuthContext';
 import AdSlot from '../components/AdSlot';
 import NativeBanner from '../components/NativeBanner';
 
-// Animation variant for staggered reveals
-const fadeUpVar = {
-  hidden: { opacity: 0, y: 30 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.6 } }
-};
-
 export default function HomePage() {
   const { loginAsGuest } = useAuth();
-  
-  // Refs for scroll animations
-  const pathRef = useRef(null);
-  const isPathInView = useInView(pathRef, { once: true, margin: '-100px' });
-  
-  const modesRef = useRef(null);
-  const isModesInView = useInView(modesRef, { once: true, margin: '-100px' });
-  
-  const variantsRef = useRef(null);
-  const isVariantsInView = useInView(variantsRef, { once: true, margin: '-100px' });
 
   return (
     <main className="w-full -mt-[72px]"> {/* Negative margin to underlap the fixed header */}
@@ -38,8 +20,7 @@ export default function HomePage() {
 
       {/* HERO SECTION */}
       <section 
-        className="relative min-h-screen flex items-center justify-center overflow-hidden bg-ink-950 bg-cover bg-center bg-no-repeat"
-        style={{ backgroundImage: "url('/hero-bg.webp')" }}
+        className="home-hero relative min-h-screen flex items-center justify-center overflow-hidden bg-ink-950 bg-cover bg-center bg-no-repeat"
       >
         {/* Dark vignette overlay for readability and blending */}
         <div className="absolute inset-0 bg-gradient-to-b from-ink-950/80 via-ink-950/40 to-ink-950" />
@@ -54,99 +35,63 @@ export default function HomePage() {
         </div>
 
         <div className="container-narrow relative z-10 text-center pt-20">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.8, ease: 'easeOut' }}
-            className="mb-6 flex justify-center"
-          >
+          <div className="hero-reveal mb-6 flex justify-center">
             <div className="gate-medallion scale-150">
               <span /><span /><span />
               <span /><span /><span />
               <span /><span /><span />
             </div>
-          </motion.div>
+          </div>
           
-          <motion.h1 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            className="font-display text-5xl md:text-7xl text-ivory mb-6 leading-tight"
-          >
+          <h1 className="hero-reveal font-display text-5xl md:text-7xl text-ivory mb-6 leading-tight" style={{ animationDelay: '60ms' }}>
             Free Mahjongg Games <br className="hidden md:block" />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-gold-light via-gold to-gold-dark gold-shimmer">
               and Guided Mahjong
             </span> Training
-          </motion.h1>
+          </h1>
           
-          <motion.p 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.4 }}
-            className="text-ink-200 text-xl md:text-2xl mb-12 max-w-3xl mx-auto font-light"
-          >
+          <p className="hero-reveal text-ink-200 text-xl md:text-2xl mb-12 max-w-3xl mx-auto font-light" style={{ animationDelay: '120ms' }}>
             Play free Mahjongg Solitaire and daily puzzles, learn traditional Mahjong step by step, or create a private room for a real four-player match.
-          </motion.p>
+          </p>
           
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.6 }}
-            className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6"
-          >
+          <div className="hero-reveal flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6" style={{ animationDelay: '180ms' }}>
             <Link to="/play" className="btn-primary text-lg w-full sm:w-auto px-8 py-4">
               Play Free Now
             </Link>
             <Link to="/real-mahjong" className="btn-vermilion text-lg w-full sm:w-auto px-8 py-4">
               Try Real Mahjong
             </Link>
-          </motion.div>
+          </div>
           
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 1, delay: 1.2 }}
-            className="mt-6"
-          >
+          <div className="hero-reveal mt-6" style={{ animationDelay: '240ms' }}>
             <button 
               onClick={() => { loginAsGuest(); window.location.href='/play'; }}
               className="text-gold hover:text-gold-light underline text-sm transition-colors"
             >
               Continue as Guest
             </button>
-          </motion.div>
+          </div>
         </div>
         
         {/* Scroll Indicator */}
-        <motion.div 
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 1, delay: 1.5 }}
-          className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce text-gold opacity-50"
-        >
+        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce text-gold opacity-50">
           <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <polyline points="6 9 12 15 18 9"></polyline>
           </svg>
-        </motion.div>
+        </div>
       </section>
 
       {/* CHOOSE YOUR PATH */}
-      <section className="py-24 bg-ink-950" ref={pathRef}>
+      <section className="py-24 bg-ink-950">
         <div className="container-wide">
-          <motion.div 
-            initial="hidden"
-            animate={isPathInView ? "visible" : "hidden"}
-            variants={{
-              hidden: {},
-              visible: { transition: { staggerChildren: 0.2 } }
-            }}
-            className="grid grid-cols-1 md:grid-cols-2 gap-8"
-          >
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {/* Casual Path */}
-            <motion.div variants={fadeUpVar} className="lacquer-panel group overflow-hidden flex flex-col h-full !p-0">
+            <div className="lacquer-panel group overflow-hidden flex flex-col h-full !p-0">
               <div className="relative overflow-hidden h-60 bg-ink-950 flex items-center justify-center shrink-0">
                 <img 
                   src="/images/casual_path.webp"
+                  srcSet="/images/casual_path-384.webp 384w, /images/casual_path-768.webp 768w, /images/casual_path.webp 1024w"
+                  sizes="(min-width: 768px) 50vw, 100vw"
                   alt="Casual Mahjongg" 
                   width="1024"
                   height="1024"
@@ -169,13 +114,15 @@ export default function HomePage() {
                   <Link to="/zen-mahjongg" className="btn-secondary text-sm">Zen Mode</Link>
                 </div>
               </div>
-            </motion.div>
+            </div>
 
             {/* Real Mahjong Path */}
-            <motion.div variants={fadeUpVar} className="lacquer-panel group bg-gradient-to-br from-lacquer to-ink-900 overflow-hidden flex flex-col h-full !p-0">
+            <div className="lacquer-panel group bg-gradient-to-br from-lacquer to-ink-900 overflow-hidden flex flex-col h-full !p-0">
               <div className="relative overflow-hidden h-60 bg-ink-950 flex items-center justify-center shrink-0">
                 <img 
                   src="/images/real_path.webp"
+                  srcSet="/images/real_path-384.webp 384w, /images/real_path-768.webp 768w, /images/real_path.webp 1024w"
+                  sizes="(min-width: 768px) 50vw, 100vw"
                   alt="Real Mahjong" 
                   width="1024"
                   height="1024"
@@ -198,8 +145,8 @@ export default function HomePage() {
                   <Link to="/learn" className="btn-secondary text-sm border-ink-500 text-ink-300">How to Play</Link>
                 </div>
               </div>
-            </motion.div>
-          </motion.div>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -209,14 +156,9 @@ export default function HomePage() {
       </div>
 
       {/* FEATURED GAME MODES */}
-      <section className="py-24 bg-ink-900/30" ref={modesRef}>
+      <section className="py-24 bg-ink-900/30">
         <div className="container-wide">
-          <motion.div 
-            initial="hidden"
-            animate={isModesInView ? "visible" : "hidden"}
-            variants={fadeUpVar}
-            className="flex items-end justify-between mb-12"
-          >
+          <div className="flex items-end justify-between mb-12">
             <div>
               <h2 className="font-display text-4xl text-gold mb-2">Choose Your Game</h2>
               <p className="text-ink-300 text-lg">From relaxing puzzles to high-stakes tables.</p>
@@ -224,23 +166,15 @@ export default function HomePage() {
             <Link to="/play" className="hidden sm:flex text-gold hover:text-gold-light items-center gap-2 font-semibold">
               See All Games <span aria-hidden="true">&rarr;</span>
             </Link>
-          </motion.div>
+          </div>
 
-          <motion.div 
-            initial="hidden"
-            animate={isModesInView ? "visible" : "hidden"}
-            variants={{
-              hidden: {},
-              visible: { transition: { staggerChildren: 0.1 } }
-            }}
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
-          >
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {GAME_MODES.slice(0, 6).map((mode) => (
-              <motion.div key={mode.id} variants={fadeUpVar}>
+              <div key={mode.id}>
                 <GameModeCard mode={mode} />
-              </motion.div>
+              </div>
             ))}
-          </motion.div>
+          </div>
           
           <div className="mt-8 sm:hidden flex justify-center">
             <Link to="/play" className="btn-secondary w-full text-center">
@@ -251,38 +185,25 @@ export default function HomePage() {
       </section>
 
       {/* WORLD OF MAHJONG VARIANTS */}
-      <section className="py-24 bg-ink-950 relative" ref={variantsRef}>
+      <section className="py-24 bg-ink-950 relative">
         {/* Subtle texture */}
         <div className="absolute inset-0 silk-texture opacity-30 pointer-events-none" />
         
         <div className="container-wide relative z-10">
-          <motion.div 
-            initial="hidden"
-            animate={isVariantsInView ? "visible" : "hidden"}
-            variants={fadeUpVar}
-            className="text-center mb-16 max-w-3xl mx-auto"
-          >
+          <div className="text-center mb-16 max-w-3xl mx-auto">
             <h2 className="font-display text-4xl text-ivory mb-6">Discover the World of Mahjong</h2>
             <p className="text-ink-300 text-lg">
               Mahjong has evolved into diverse regional variants, each with its own unique flavor, strategy, and scoring rules. Which one will you master?
             </p>
-          </motion.div>
+          </div>
 
-          <motion.div 
-            initial="hidden"
-            animate={isVariantsInView ? "visible" : "hidden"}
-            variants={{
-              hidden: {},
-              visible: { transition: { staggerChildren: 0.1 } }
-            }}
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
-          >
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {MAHJONG_VARIANTS.slice(0, 3).map((variant) => (
-              <motion.div key={variant.id} variants={fadeUpVar}>
+              <div key={variant.id}>
                 <VariantCard variant={variant} />
-              </motion.div>
+              </div>
             ))}
-          </motion.div>
+          </div>
           
           <div className="mt-12 text-center">
             <Link to="/variants" className="btn-secondary px-8">

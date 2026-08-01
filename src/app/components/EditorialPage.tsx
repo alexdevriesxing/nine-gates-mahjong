@@ -16,12 +16,26 @@ const VARIANT_RULESETS = new Set<VariantRuleset>([
 ]);
 
 const REVIEW_DATE = '2026-07-22';
+const PUBLISHED_DATE = '2026-06-25T00:00:00+02:00';
+
+function sectionId(heading: string) {
+  return heading
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '');
+}
 
 export default function EditorialPage({ slug }: { slug: string }) {
   const entry = EDITORIAL[slug];
   if (!entry) throw new Error(`Missing editorial entry: ${slug}`);
   const ruleset = VARIANT_RULESETS.has(slug as VariantRuleset) ? (slug as VariantRuleset) : null;
   const canonical = `https://ninegatesmahjong.com${entry.canonical}`;
+  const sectionLinks = entry.sections.map((section) => ({ heading: section.heading, id: sectionId(section.heading) }));
+  const wordCount = [
+    entry.summary,
+    ...entry.sections.flatMap((section) => [section.heading, ...section.paragraphs, ...(section.bullets ?? [])]),
+    ...entry.faqs.flatMap((faq) => [faq.question, faq.answer]),
+  ].join(' ').trim().split(/\s+/).length;
   const routeSchema = {
     '@context': 'https://schema.org',
     '@graph': [
@@ -31,13 +45,38 @@ export default function EditorialPage({ slug }: { slug: string }) {
         headline: entry.title,
         description: entry.description,
         mainEntityOfPage: { '@id': `${canonical}#webpage` },
-        author: { '@type': 'Organization', name: 'Nine Gates Mahjong Editorial Team' },
+        author: {
+          '@type': 'Organization',
+          name: 'Nine Gates Mahjong Editorial Team',
+          url: 'https://ninegatesmahjong.com/about',
+        },
         publisher: { '@id': 'https://ninegatesmahjong.com/#organization' },
-        datePublished: '2026-06-25',
-        dateModified: REVIEW_DATE,
+        datePublished: PUBLISHED_DATE,
+        dateModified: `${REVIEW_DATE}T00:00:00+02:00`,
         inLanguage: 'en',
-        image: 'https://ninegatesmahjong.com/hero-bg.jpg',
+        wordCount,
+        articleSection: entry.sections.map((section) => section.heading),
+        image: {
+          '@type': 'ImageObject',
+          url: 'https://ninegatesmahjong.com/hero-bg.jpg',
+          width: 1916,
+          height: 821,
+        },
       },
+      ...(ruleset ? [{
+        '@type': ['VideoGame', 'WebApplication'],
+        '@id': `${canonical}#application`,
+        name: `${entry.title} Guided Trainer`,
+        description: entry.description,
+        url: canonical,
+        applicationCategory: 'GameApplication',
+        operatingSystem: 'Any modern web browser',
+        browserRequirements: 'Requires JavaScript and a modern browser with local storage enabled.',
+        gamePlatform: 'Web browser',
+        playMode: 'SinglePlayer',
+        isAccessibleForFree: true,
+        offers: { '@type': 'Offer', price: 0, priceCurrency: 'USD' },
+      }] : []),
       {
         '@type': 'FAQPage',
         '@id': `${canonical}#faq`,
@@ -85,7 +124,7 @@ export default function EditorialPage({ slug }: { slug: string }) {
               <p className="mt-2 text-lg leading-relaxed text-ivory">{entry.summary}</p>
             </div>
             <p className="text-sm text-ink-300">
-              Reviewed by the Nine Gates Mahjong Editorial Team · Updated July 22, 2026
+              Reviewed by the <Link to="/about">Nine Gates Mahjong Editorial Team</Link> · <time dateTime={REVIEW_DATE}>Updated July 22, 2026</time>
             </p>
             {ruleset && (
               <p className="mt-4 rounded-lg border border-vermilion/30 bg-vermilion/10 p-4 text-sm text-ink-100">
@@ -93,13 +132,22 @@ export default function EditorialPage({ slug }: { slug: string }) {
               </p>
             )}
           </header>
+          <nav className="my-8 rounded-xl border border-gold/15 bg-ink-900/60 p-5" aria-label="On this page">
+            <strong className="text-gold">On this page</strong>
+            <ul className="mt-3 grid gap-2 sm:grid-cols-2">
+              {sectionLinks.map((section) => (
+                <li key={section.id}><a href={`#${section.id}`}>{section.heading}</a></li>
+              ))}
+              <li><a href="#frequently-asked-questions">Frequently asked questions</a></li>
+            </ul>
+          </nav>
           <div className="flex justify-center items-center my-6 w-full">
             <AdSlot width={728} height={90} className="hidden md:flex" />
             <AdSlot width={320} height={50} className="flex md:hidden" />
           </div>
           {entry.sections.map((section, index) => (
             <div key={section.heading}>
-              <section>
+              <section id={sectionLinks[index].id}>
                 <h2>{section.heading}</h2>
                 {section.paragraphs.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}
                 {section.bullets && <ul>{section.bullets.map((bullet) => <li key={bullet}>{bullet}</li>)}</ul>}
@@ -112,7 +160,7 @@ export default function EditorialPage({ slug }: { slug: string }) {
               )}
             </div>
           ))}
-          <section>
+          <section id="frequently-asked-questions">
             <h2>Frequently asked questions</h2>
             <div className="editorial-faq">
               {entry.faqs.map((faq) => (

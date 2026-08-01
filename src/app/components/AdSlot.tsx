@@ -32,7 +32,7 @@ export default function AdSlot({
       style={{ '--ad-width': `${width}px`, '--ad-height': `${height}px` } as React.CSSProperties}
       aria-label={label}
     >
-      <span>{label}</span>
+      <span data-nosnippet>{label}</span>
       {livePlacement ? (
         <iframe
           src={`/ad-frame?placement=${encodeURIComponent(livePlacement)}`}
@@ -44,7 +44,7 @@ export default function AdSlot({
           title={`${label} (${width} by ${height})`}
         />
       ) : (
-        <div className="ad-slot__house">
+        <div className="ad-slot__house" data-nosnippet>
           <img src="/favicon.svg" alt="" />
           <small>Free play supported by advertising</small>
         </div>

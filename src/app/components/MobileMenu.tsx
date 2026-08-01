@@ -1,6 +1,5 @@
 import { useEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { motion } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
 import { LANGUAGES, useLocale } from '../context/LocaleContext';
 
@@ -31,22 +30,13 @@ export default function MobileMenu({ onClose }: MobileMenuProps) {
   return (
     <div className="fixed inset-0 z-[60] flex justify-end" role="dialog" aria-modal="true" aria-labelledby="mobile-menu-title">
       {/* Overlay */}
-      <motion.div
-        className="absolute inset-0 bg-ink-950/60 backdrop-blur-sm"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
+      <div
+        className="mobile-menu-backdrop absolute inset-0 bg-ink-950/60 backdrop-blur-sm"
         onClick={onClose}
       />
 
       {/* Drawer */}
-      <motion.div
-        className="relative w-full max-w-sm h-full overflow-y-auto bg-ink-950/95 backdrop-blur-xl border-l border-gold/10 p-6 flex flex-col"
-        initial={{ x: '100%' }}
-        animate={{ x: 0 }}
-        exit={{ x: '100%' }}
-        transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-      >
+      <div className="mobile-menu-drawer relative w-full max-w-sm h-full overflow-y-auto bg-ink-950/95 backdrop-blur-xl border-l border-gold/10 p-6 flex flex-col">
         <div className="flex justify-between items-center mb-10">
           <div id="mobile-menu-title" className="font-display text-gold text-xl tracking-wider">Menu</div>
           <button ref={closeButtonRef} onClick={onClose} className="text-gold p-2" aria-label="Close menu">
@@ -126,7 +116,7 @@ export default function MobileMenu({ onClose }: MobileMenuProps) {
             </div>
           )}
         </div>
-      </motion.div>
+      </div>
     </div>
   );
 }

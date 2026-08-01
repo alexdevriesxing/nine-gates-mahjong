@@ -449,6 +449,7 @@ export const FOOTER_SECTIONS = [
   {
     title: 'Legal',
     links: [
+      { label: 'About & Editorial Standards', path: '/about' },
       { label: 'Privacy Policy', path: '/privacy' },
       { label: 'Terms of Service', path: '/terms' },
     ],

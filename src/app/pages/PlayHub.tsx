@@ -1,24 +1,9 @@
 import { useState } from 'react';
-import { motion } from 'framer-motion';
 import SEOHead from '../components/SEOHead';
 import GameModeCard from '../components/GameModeCard';
 import { GAME_MODES } from '@shared/constants';
 import AdSlot from '../components/AdSlot';
 import NativeBanner from '../components/NativeBanner';
-
-const containerVar = {
-  hidden: {},
-  visible: {
-    transition: {
-      staggerChildren: 0.1
-    }
-  }
-} as const;
-
-const itemVar = {
-  hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: 'easeOut' } }
-} as const;
 
 export default function PlayHub() {
   const [activeFilter, setActiveFilter] = useState<'all' | 'casual' | 'daily' | 'puzzle' | 'real-mahjong'>('all');
@@ -47,22 +32,12 @@ export default function PlayHub() {
       <main className="container-wide py-12 md:py-24">
         {/* Header */}
         <div className="text-center mb-12 max-w-2xl mx-auto">
-          <motion.h1 
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="font-display text-4xl md:text-5xl text-gold mb-4"
-          >
+          <h1 className="section-reveal font-display text-4xl md:text-5xl text-gold mb-4">
             Choose Your Game
-          </motion.h1>
-          <motion.p 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="text-ink-300 text-lg"
-          >
+          </h1>
+          <p className="section-reveal text-ink-300 text-lg" style={{ animationDelay: '80ms' }}>
             From relaxing tile-matching solitaire to deep strategic 4-player tables against our AI characters.
-          </motion.p>
+          </p>
         </div>
 
         {/* Top responsive ad */}
@@ -92,19 +67,16 @@ export default function PlayHub() {
         </div>
 
         {/* Game Modes Grid */}
-        <motion.div 
-          variants={containerVar}
-          initial="hidden"
-          animate="visible"
+        <div
           key={activeFilter}
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+          className="section-reveal grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
         >
           {filteredModes.map((mode) => (
-            <motion.div key={mode.id} variants={itemVar}>
+            <div key={mode.id}>
               <GameModeCard mode={mode} />
-            </motion.div>
+            </div>
           ))}
-        </motion.div>
+        </div>
 
         {/* Bottom native ad */}
         <div className="mt-16" data-gaio-section="ads">

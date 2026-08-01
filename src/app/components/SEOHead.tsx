@@ -24,6 +24,7 @@ function labelSegment(segment: string) {
     riichi: 'Japanese Riichi',
     sichuan: 'Sichuan Bloody Rules',
     'zung-jung': 'Zung Jung Mahjong',
+    about: 'About',
   };
   return aliases[segment] ?? segment.split('-').map((word) => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
 }
@@ -34,6 +35,10 @@ function upsertMeta(selector: string, attributes: Record<string, string>) {
   for (const duplicate of matches) duplicate.remove();
   Object.entries(attributes).forEach(([name, value]) => element.setAttribute(name, value));
   if (!element.isConnected) document.head.appendChild(element);
+}
+
+function removeMeta(selector: string) {
+  document.head.querySelectorAll(selector).forEach((element) => element.remove());
 }
 
 function upsertCanonical(href: string) {
@@ -115,6 +120,7 @@ export default function SEOHead({
             '@type': 'ImageObject',
             url: `${SITE_DOMAIN}/logo_dark.png`,
           },
+          sameAs: ['https://www.firedragoninteractive.com'],
         },
         {
           '@type': 'WebPage',
@@ -126,6 +132,12 @@ export default function SEOHead({
           about: { '@id': `${SITE_DOMAIN}/#organization` },
           inLanguage: 'en',
           dateModified,
+          primaryImageOfPage: {
+            '@type': 'ImageObject',
+            url: finalImage,
+            width: 1916,
+            height: 821,
+          },
           breadcrumb: { '@id': `${finalCanonical}#breadcrumb` },
         },
         {
@@ -135,12 +147,19 @@ export default function SEOHead({
         },
       ],
     };
-  }, [dateModified, description, finalCanonical, title]);
+  }, [dateModified, description, finalCanonical, finalImage, title]);
 
   useEffect(() => {
     document.documentElement.lang = 'en';
     document.documentElement.dir = 'ltr';
     document.title = title;
+
+    // Some third-party advertising creatives attempt to replace the tab title.
+    // Keep the route's descriptive title stable for visitors, history and crawlers.
+    const titleObserver = new MutationObserver(() => {
+      if (document.title !== title) document.title = title;
+    });
+    titleObserver.observe(document.head, { childList: true, characterData: true, subtree: true });
 
     upsertMeta('meta[name="description"]', { name: 'description', content: description, 'data-rh': 'true' });
     upsertMeta('meta[name="author"]', { name: 'author', content: 'Nine Gates Mahjong Editorial Team', 'data-rh': 'true' });
@@ -159,15 +178,25 @@ export default function SEOHead({
     upsertMeta('meta[property="og:url"]', { property: 'og:url', content: finalCanonical, 'data-rh': 'true' });
     upsertMeta('meta[property="og:image"]', { property: 'og:image', content: finalImage, 'data-rh': 'true' });
     upsertMeta('meta[property="og:image:alt"]', { property: 'og:image:alt', content: `${SITE_NAME} Mahjong tiles and game table`, 'data-rh': 'true' });
+    upsertMeta('meta[property="og:image:width"]', { property: 'og:image:width', content: '1916', 'data-rh': 'true' });
+    upsertMeta('meta[property="og:image:height"]', { property: 'og:image:height', content: '821', 'data-rh': 'true' });
+    if (ogType === 'article') {
+      upsertMeta('meta[property="article:modified_time"]', { property: 'article:modified_time', content: dateModified, 'data-rh': 'true' });
+    } else {
+      removeMeta('meta[property="article:modified_time"]');
+    }
 
     upsertMeta('meta[name="twitter:card"]', { name: 'twitter:card', content: 'summary_large_image', 'data-rh': 'true' });
     upsertMeta('meta[name="twitter:title"]', { name: 'twitter:title', content: finalOgTitle, 'data-rh': 'true' });
     upsertMeta('meta[name="twitter:description"]', { name: 'twitter:description', content: finalOgDescription, 'data-rh': 'true' });
     upsertMeta('meta[name="twitter:image"]', { name: 'twitter:image', content: finalImage, 'data-rh': 'true' });
+    upsertMeta('meta[name="twitter:image:alt"]', { name: 'twitter:image:alt', content: `${SITE_NAME} Mahjong tiles and game table`, 'data-rh': 'true' });
 
     upsertSchema('ngm-base-schema', baseSchema);
     upsertSchema('ngm-route-schema', jsonLd ?? null);
-  }, [baseSchema, description, finalCanonical, finalImage, finalOgDescription, finalOgTitle, jsonLd, noIndex, ogType, title]);
+
+    return () => titleObserver.disconnect();
+  }, [baseSchema, dateModified, description, finalCanonical, finalImage, finalOgDescription, finalOgTitle, jsonLd, noIndex, ogType, title]);
 
   return null;
 }
