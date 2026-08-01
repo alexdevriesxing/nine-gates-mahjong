@@ -7,8 +7,9 @@ This file serves as the master source of truth for all Adsterra ad unit scripts 
 - `src/shared/ads.ts` is the executable placement registry shared by the React application and Cloudflare Worker. Do not duplicate or accept placement keys from URL parameters.
 - Banner frames use `/ad-frame?placement=<size>`; the Worker resolves only the six approved placements below and rejects every other value.
 - The native unit uses `/native-frame`. Legacy public frame files are retired with HTTP 410 so they cannot bypass placement validation.
-- Third-party scripts, native frames, banner frames, and Adsterra connection hints load only after the visitor accepts advertising. Declining ads leaves every game playable with reserved-size house messages.
-- Banner iframes are lazy-loaded with fixed dimensions to avoid layout shift. Connection hints are added only after consent.
+- Advertising is enabled by default for every visitor. No consent prompt or interstitial gates the ad stack: third-party scripts, native frames, banner frames and Adsterra connection hints load on first paint of every page.
+- The only way advertising is suppressed is an explicit per-browser opt-out (`localStorage.ngm_ad_consent = 'disabled'`), set from the footer control or by automated capture/smoke runs. Opted-out browsers see reserved-size house messages so layout never shifts.
+- Banner iframes are lazy-loaded with fixed dimensions to avoid layout shift. The native frame reports its rendered height to the parent page (`postMessage` type `ngm-native-height`, same-origin only) so native creatives are never clipped.
 - A placement key appears at most once per rendered page. On very wide game pages the primary rail uses `160x600` and the secondary rail uses the distinct `160x300` unit.
 
 ### Responsive placement map
@@ -137,3 +138,7 @@ The banner and native inventory is intentionally built into the shared registry 
 </script>
 <script src="https://www.highperformanceformat.com/4492bd5c94522d00777227f98028a4c4/invoke.js"></script>
 ```
+
+## ads.txt verification
+
+Do not publish a guessed seller record. Adsterra's placement keys are not an ads.txt publisher or seller ID. If the approved domain entry in the Adsterra publisher dashboard supplies an ads.txt line, copy that exact line into `public/ads.txt`, deploy it, and verify it at `https://ninegatesmahjong.com/ads.txt`. Until the dashboard supplies a record, omitting the file is safer than publicly asserting an invalid seller relationship.

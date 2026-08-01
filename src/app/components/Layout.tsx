@@ -1,33 +1,19 @@
-import { Outlet, useLocation } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { Outlet } from 'react-router-dom';
 import Header from './Header';
 import Footer from './Footer';
-import PrivacyChoices from './PrivacyChoices';
 
 export default function Layout() {
-  const location = useLocation();
-
   return (
     <div className="min-h-screen flex flex-col bg-ink-950 text-ivory">
       <a className="skip-link" href="#page-content">Skip to main content</a>
       <Header />
       <div id="page-content" tabIndex={-1} className="flex-grow flex flex-col relative pt-[72px] min-w-0 w-full">
         {/* pt-[72px] offsets the fixed header for most pages except Home which underlaps it */}
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={location.pathname}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.3 }}
-            className="flex-grow flex flex-col min-w-0 w-full"
-          >
-            <Outlet />
-          </motion.div>
-        </AnimatePresence>
+        <div className="flex-grow flex flex-col min-w-0 w-full">
+          <Outlet />
+        </div>
       </div>
       <Footer />
-      <PrivacyChoices />
     </div>
   );
 }

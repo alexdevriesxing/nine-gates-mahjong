@@ -1593,47 +1593,6 @@
     line-height: 1.75;
   }
 
-  .consent-banner {
-    position: fixed;
-    right: max(1rem, env(safe-area-inset-right));
-    bottom: max(1rem, env(safe-area-inset-bottom));
-    left: max(1rem, env(safe-area-inset-left));
-    z-index: 5000;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 1rem;
-    max-width: 920px;
-    margin: 0 auto;
-    padding: 1rem;
-    border: 1px solid rgba(224, 204, 138, 0.35);
-    border-radius: 16px;
-    background: rgba(8, 8, 16, 0.96);
-    box-shadow: 0 20px 70px rgba(0, 0, 0, 0.62);
-    backdrop-filter: blur(18px);
-  }
-
-  .consent-banner strong {
-    color: var(--color-ivory);
-  }
-
-  .consent-banner p {
-    margin: 0.2rem 0 0;
-    color: var(--color-ink-300);
-    font-size: 0.78rem;
-  }
-
-  .consent-banner__actions {
-    display: flex;
-    flex-shrink: 0;
-    gap: 0.55rem;
-  }
-
-  .consent-banner__actions button {
-    min-height: 42px;
-    padding: 0.55rem 0.85rem;
-    font-size: 0.75rem;
-  }
 }
 
 @media (max-width: 1490px) {
@@ -1671,16 +1630,6 @@
 
   .game-page__layout {
     padding-inline: 0.35rem;
-  }
-
-  .consent-banner {
-    align-items: stretch;
-    flex-direction: column;
-  }
-
-  .consent-banner__actions {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
   }
 }
 
@@ -2519,6 +2468,7 @@
   .editorial-page header h1,
   .legal-page h1 { color: var(--color-ivory); font-size: clamp(2rem, 5vw, 4rem); }
   .editorial-page__trainer { max-width: 1180px; margin: 0 auto 2rem; }
+  .editorial-page section[id] { scroll-margin-top: 6rem; }
   .editorial-page > article > .ad-slot { margin: 1.5rem auto; }
   .editorial-faq details { border-bottom: 1px solid rgba(196, 163, 90, 0.14); }
   .editorial-faq summary { padding: 0.9rem 0; color: var(--color-ivory); cursor: pointer; }
@@ -3160,6 +3110,63 @@
     justify-content: center;
     gap: 0.6rem;
     width: 100%;
+  }
+}
+
+.home-hero {
+  background-image: url('/hero-bg.webp');
+}
+
+.header-enter {
+  animation: header-enter 420ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.hero-reveal,
+.section-reveal {
+  animation: content-reveal 420ms ease-out both;
+}
+
+.mobile-menu-backdrop {
+  animation: menu-fade-in 180ms ease-out both;
+}
+
+.mobile-menu-drawer {
+  animation: menu-slide-in 260ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes header-enter {
+  from { transform: translateY(-100%); }
+  to { transform: translateY(0); }
+}
+
+@keyframes content-reveal {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes menu-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes menu-slide-in {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+
+@media (max-width: 767px) {
+  .home-hero {
+    background-image: url('/hero-bg-mobile.webp');
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .header-enter,
+  .hero-reveal,
+  .section-reveal,
+  .mobile-menu-backdrop,
+  .mobile-menu-drawer {
+    animation: none;
   }
 }
 

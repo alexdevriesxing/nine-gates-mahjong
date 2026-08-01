@@ -4,14 +4,13 @@ import {
   ADSTERRA_SOCIAL_BAR_URL,
 } from '@shared/ads';
 
-type ConsentChoice = 'accepted' | 'declined' | null;
+type AdPreference = 'enabled' | 'disabled';
 
 interface AdContextValue {
-  consent: ConsentChoice;
+  preference: AdPreference;
   adsEnabled: boolean;
-  accept: () => void;
-  decline: () => void;
-  reset: () => void;
+  enableAds: () => void;
+  disableAds: () => void;
 }
 
 const STORAGE_KEY = 'ngm_ad_consent';
@@ -19,18 +18,38 @@ const SOCIAL_SCRIPT_SELECTOR = '[data-ngm-social-ad]';
 const AD_HINT_SELECTOR = '[data-ngm-ad-hint]';
 const AdContext = createContext<AdContextValue | null>(null);
 
-function readStoredConsent(): ConsentChoice {
-  const stored = window.localStorage.getItem(STORAGE_KEY);
-  return stored === 'accepted' || stored === 'declined' ? stored : null;
+// Advertising is on by default for every visitor: no interstitial consent prompt
+// gates the ad stack. Only an explicit opt-out stored in this browser turns it
+// off, which also lets automated capture/smoke runs suppress third-party frames.
+function readStoredPreference(): AdPreference {
+  try {
+    const stored = window.localStorage.getItem(STORAGE_KEY);
+    return stored === 'disabled' || stored === 'declined' ? 'disabled' : 'enabled';
+  } catch {
+    // Private-mode or storage-blocked browsers still see advertising.
+    return 'enabled';
+  }
+}
+
+function writeStoredPreference(preference: AdPreference) {
+  try {
+    if (preference === 'enabled') {
+      window.localStorage.removeItem(STORAGE_KEY);
+      return;
+    }
+    window.localStorage.setItem(STORAGE_KEY, 'disabled');
+  } catch {
+    // Preference is best-effort; the in-memory value still drives this session.
+  }
 }
 
 export function AdProvider({ children }: { children: ReactNode }) {
-  const [consent, setConsent] = useState<ConsentChoice>(readStoredConsent);
+  const [preference, setPreference] = useState<AdPreference>(readStoredPreference);
 
   useEffect(() => {
     const existing = document.querySelector<HTMLScriptElement>(SOCIAL_SCRIPT_SELECTOR);
 
-    if (consent !== 'accepted') {
+    if (preference === 'disabled') {
       existing?.remove();
       document.querySelectorAll(AD_HINT_SELECTOR).forEach((element) => element.remove());
       return;
@@ -65,32 +84,22 @@ export function AdProvider({ children }: { children: ReactNode }) {
     script.dataset.ngmSocialAd = 'true';
     script.referrerPolicy = 'strict-origin-when-cross-origin';
     document.body.appendChild(script);
+  }, [preference]);
 
-    return () => {
-      script.remove();
-      document.querySelectorAll(AD_HINT_SELECTOR).forEach((element) => element.remove());
-    };
-  }, [consent]);
-
-  const value = useMemo<AdContextValue>(() => {
-    const choose = (choice: Exclude<ConsentChoice, null>) => {
-      window.localStorage.setItem(STORAGE_KEY, choice);
-      setConsent(choice);
-    };
-
-    return {
-      consent,
-      adsEnabled: consent === 'accepted',
-      accept: () => choose('accepted'),
-      decline: () => choose('declined'),
-      reset: () => {
-        window.localStorage.removeItem(STORAGE_KEY);
-        // Reload so third-party code that ran under prior consent cannot keep
-        // global listeners alive after the visitor reopens privacy choices.
-        window.location.reload();
-      },
-    };
-  }, [consent]);
+  const value = useMemo<AdContextValue>(() => ({
+    preference,
+    adsEnabled: preference === 'enabled',
+    enableAds: () => {
+      writeStoredPreference('enabled');
+      setPreference('enabled');
+    },
+    disableAds: () => {
+      writeStoredPreference('disabled');
+      // Reload so third-party code that already ran cannot keep global
+      // listeners or overlay inventory alive after the visitor opts out.
+      window.location.reload();
+    },
+  }), [preference]);
 
   return <AdContext.Provider value={value}>{children}</AdContext.Provider>;
 }

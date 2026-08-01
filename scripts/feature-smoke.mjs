@@ -20,28 +20,23 @@ async function assertNoBrokenImages(page, label) {
   if (broken.length) throw new Error(`${label}: broken images ${broken.join(', ')}`);
 }
 
-// Consent choice, persistence and ad gating.
+// Advertising is on by default for every visitor, with a footer opt-out.
 {
   const context = await browser.newContext({ viewport: { width: 1440, height: 900 } });
   const page = await context.newPage();
   const errors = trackErrors(page);
   await page.goto(base, { waitUntil: 'networkidle' });
-  await page.getByRole('complementary', { name: 'Privacy choices' }).waitFor();
-  if (await page.locator('script[data-ngm-social-ad]').count()) throw new Error('Social ad loaded before consent.');
-  if (await page.locator('link[rel="preconnect"][href*="effectivecpmnetwork.com"], link[rel="preconnect"][href*="demolishwrestconclusions.com"]').count()) {
-    throw new Error('Ad network preconnect occurred before consent.');
+  if (await page.getByRole('complementary', { name: 'Privacy choices' }).count()) {
+    throw new Error('A consent prompt blocked advertising on first visit.');
   }
-  await page.getByRole('button', { name: 'Accept ads' }).click();
-  if ((await page.evaluate(() => localStorage.getItem('ngm_ad_consent'))) !== 'accepted') {
-    throw new Error('Advertising consent was not stored.');
-  }
+  await page.locator('script[data-ngm-social-ad]').waitFor({ state: 'attached' });
   const adHints = await page.locator('link[data-ngm-ad-hint][rel="preconnect"]').count();
-  if (adHints < 2) throw new Error('Consent-aware Adsterra connection hints were not installed.');
+  if (adHints < 2) throw new Error('Adsterra connection hints were not installed by default.');
+  if (await page.locator('.ad-slot iframe[src*="/ad-frame?placement="]').count() < 1) {
+    throw new Error('Ad frames did not render by default.');
+  }
   await page.setViewportSize({ width: 1600, height: 900 });
   await page.goto(`${base}/mahjongg-solitaire`, { waitUntil: 'networkidle' });
-  if (await page.getByRole('complementary', { name: 'Privacy choices' }).count()) {
-    throw new Error('Consent banner returned after a stored choice.');
-  }
   if (await page.locator('.ad-slot').count() < 1) throw new Error('Ad slots did not render.');
   if (await page.locator('iframe[src*="placement=160x600"]').count() !== 1) {
     throw new Error('The desktop game layout requested a duplicate or missing 160x600 placement.');
@@ -49,15 +44,22 @@ async function assertNoBrokenImages(page, label) {
   if (await page.locator('iframe[src*="placement=160x300"]').count() !== 1) {
     throw new Error('The wide desktop secondary rail did not use its distinct 160x300 placement.');
   }
-  await page.getByRole('button', { name: /Privacy choices/ }).click();
-  await page.getByRole('button', { name: 'Continue without ads' }).click();
-  if ((await page.evaluate(() => localStorage.getItem('ngm_ad_consent'))) !== 'declined') {
-    throw new Error('Advertising decline was not stored.');
+  const expectedTitle = 'Play Mahjongg Solitaire Free Online | Nine Gates Mahjong';
+  await page.evaluate(() => { document.title = '(1) New Message!'; });
+  await page.waitForFunction((routeTitle) => document.title === routeTitle, expectedTitle);
+  await page.getByRole('button', { name: 'Turn off ads on this device' }).click();
+  await page.waitForLoadState('networkidle');
+  if ((await page.evaluate(() => localStorage.getItem('ngm_ad_consent'))) !== 'disabled') {
+    throw new Error('The advertising opt-out was not stored.');
   }
   if (await page.locator('script[data-ngm-social-ad], .ad-slot iframe').count()) {
-    throw new Error('Third-party advertising remained active after consent withdrawal.');
+    throw new Error('Third-party advertising remained active after opting out.');
   }
-  if (errors.length) throw new Error(`Consent/ad flow: ${errors.join(' | ')}`);
+  await page.getByRole('button', { name: 'Turn ads back on' }).click();
+  if (await page.evaluate(() => localStorage.getItem('ngm_ad_consent'))) {
+    throw new Error('Re-enabling advertising did not clear the stored opt-out.');
+  }
+  if (errors.length) throw new Error(`Ad default/opt-out flow: ${errors.join(' | ')}`);
   results.consentAndAds = true;
   await context.close();
 }

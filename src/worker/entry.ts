@@ -27,7 +27,12 @@ function advertisingFrame(url: URL) {
   if (url.pathname === '/native-frame') {
     return secureResponse(new Response(`<!DOCTYPE html>
 <html lang="en"><head><meta charset="UTF-8"><meta name="robots" content="noindex,nofollow"><style>body{margin:0;padding:0;background:transparent;overflow:hidden}</style></head>
-<body><script async data-cfasync="false" src="${ADSTERRA_NATIVE.scriptUrl}"></script><div id="${ADSTERRA_NATIVE.containerId}"></div></body></html>`, {
+<body><script async data-cfasync="false" src="${ADSTERRA_NATIVE.scriptUrl}"></script><div id="${ADSTERRA_NATIVE.containerId}"></div>
+<script>(function(){var last=0,ticks=0;function report(){var h=document.body.scrollHeight;if(!h||h===last)return;last=h;parent.postMessage({type:'ngm-native-height',height:h},location.origin);}
+if(window.ResizeObserver){new ResizeObserver(report).observe(document.body);}
+window.addEventListener('load',report);
+var timer=setInterval(function(){report();if(++ticks>15)clearInterval(timer);},1000);
+report();})();</script></body></html>`, {
       headers: {
         'Content-Type': 'text/html; charset=utf-8',
         'Cache-Control': 'public, max-age=3600',

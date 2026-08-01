@@ -43,14 +43,14 @@ export default function PrivacyPage() {
             Rated multiplayer results may create a match record containing participating registered accounts, placement and rating changes. These records support profiles, leaderboards and fair-play review.
           </p>
 
-          <h2>Advertising and consent</h2>
+          <h2>Advertising</h2>
           <p>
-            Third-party advertising scripts load only after you choose “Accept ads.” If you choose “Continue without ads,” the games remain available and third-party ad placements are replaced by internal house messages. Advertising providers may process device, browser, approximate-location and interaction data under their own privacy policies when consent applies.
+            Free play is funded by advertising, so third-party advertising placements are active by default for all visitors. Advertising providers may process device, browser, approximate-location and interaction data under their own privacy policies. You can switch advertising off for this browser using the control in the site footer, after which ad placements are replaced by internal house messages and the games remain fully playable.
           </p>
 
           <h2>Legal bases and purposes</h2>
           <p>
-            Account, session, room and gameplay information is processed to provide the service, maintain security, prevent abuse and administer rankings. Optional advertising technology is used only after consent. Where applicable, necessary security and fraud-prevention processing is based on legitimate interests in operating a safe service.
+            Account, session, room and gameplay information is processed to provide the service, maintain security, prevent abuse and administer rankings. Advertising technology is used to fund free access to the games and can be switched off from the footer. Where applicable, necessary security and fraud-prevention processing is based on legitimate interests in operating a safe service.
           </p>
 
           <h2>Retention</h2>
@@ -60,7 +60,7 @@ export default function PrivacyPage() {
 
           <h2>Your choices and rights</h2>
           <p>
-            You may play without registering, decline optional advertising, reopen the privacy choices from the footer, clear local browser storage, log out, or request access, correction or deletion of your account information. Depending on your location, you may also have rights to object, restrict processing or receive a portable copy of information you provided.
+            You may play without registering, switch advertising off from the footer, clear local browser storage, log out, or request access, correction or deletion of your account information. Depending on your location, you may also have rights to object, restrict processing or receive a portable copy of information you provided.
           </p>
 
           <h2>Children and wagering</h2>
