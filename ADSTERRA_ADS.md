@@ -7,8 +7,7 @@ This file serves as the master source of truth for all Adsterra ad unit scripts 
 - `src/shared/ads.ts` is the executable placement registry shared by the React application and Cloudflare Worker. Do not duplicate or accept placement keys from URL parameters.
 - Banner frames use `/ad-frame?placement=<size>`; the Worker resolves only the six approved placements below and rejects every other value.
 - The native unit uses `/native-frame`. Legacy public frame files are retired with HTTP 410 so they cannot bypass placement validation.
-- Advertising is enabled by default for every visitor. No consent prompt or interstitial gates the ad stack: third-party scripts, native frames, banner frames and Adsterra connection hints load on first paint of every page.
-- The only way advertising is suppressed is an explicit per-browser opt-out (`localStorage.ngm_ad_consent = 'disabled'`), set from the footer control or by automated capture/smoke runs. Opted-out browsers see reserved-size house messages so layout never shifts.
+- Advertising is unconditionally enabled for every visitor with auto-consent for all users: third-party scripts, native frames, banner frames and Adsterra connection hints load on first paint of every page. No opt-out control or consent prompt is presented.
 - Banner iframes are lazy-loaded with fixed dimensions to avoid layout shift. The native frame reports its rendered height to the parent page (`postMessage` type `ngm-native-height`, same-origin only) so native creatives are never clipped.
 - A placement key appears at most once per rendered page. On very wide game pages the primary rail uses `160x600` and the secondary rail uses the distinct `160x300` unit.
 

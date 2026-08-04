@@ -20,7 +20,7 @@ async function assertNoBrokenImages(page, label) {
   if (broken.length) throw new Error(`${label}: broken images ${broken.join(', ')}`);
 }
 
-// Advertising is on by default for every visitor, with a footer opt-out.
+// Advertising is unconditionally enabled for every visitor with auto-consent.
 {
   const context = await browser.newContext({ viewport: { width: 1440, height: 900 } });
   const page = await context.newPage();
@@ -47,19 +47,10 @@ async function assertNoBrokenImages(page, label) {
   const expectedTitle = 'Play Mahjongg Solitaire Free Online | Nine Gates Mahjong';
   await page.evaluate(() => { document.title = '(1) New Message!'; });
   await page.waitForFunction((routeTitle) => document.title === routeTitle, expectedTitle);
-  await page.getByRole('button', { name: 'Turn off ads on this device' }).click();
-  await page.waitForLoadState('networkidle');
-  if ((await page.evaluate(() => localStorage.getItem('ngm_ad_consent'))) !== 'disabled') {
-    throw new Error('The advertising opt-out was not stored.');
+  if (await page.getByRole('button', { name: 'Turn off ads on this device' }).count() > 0) {
+    throw new Error('An opt-out button was unexpectedly present in the footer.');
   }
-  if (await page.locator('script[data-ngm-social-ad], .ad-slot iframe').count()) {
-    throw new Error('Third-party advertising remained active after opting out.');
-  }
-  await page.getByRole('button', { name: 'Turn ads back on' }).click();
-  if (await page.evaluate(() => localStorage.getItem('ngm_ad_consent'))) {
-    throw new Error('Re-enabling advertising did not clear the stored opt-out.');
-  }
-  if (errors.length) throw new Error(`Ad default/opt-out flow: ${errors.join(' | ')}`);
+  if (errors.length) throw new Error(`Ad unconditional auto-consent flow: ${errors.join(' | ')}`);
   results.consentAndAds = true;
   await context.close();
 }
