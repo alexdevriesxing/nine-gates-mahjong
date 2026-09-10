@@ -1,7 +1,7 @@
 const origin = (process.env.NGM_PRODUCTION_ORIGIN || 'https://ninegatesmahjong.com').replace(/\/$/, '');
 const maxAttempts = Number.parseInt(process.env.NGM_PRODUCTION_MAX_ATTEMPTS || '30', 10);
 const retryDelayMs = Number.parseInt(process.env.NGM_PRODUCTION_RETRY_DELAY_MS || '10000', 10);
-const expectedReleaseMarker = 'Last reviewed: 2026-07-22 (performance and discovery release)';
+const expectedReleaseMarker = 'Last reviewed: 2026-09-10 (production advertising and content-consistency audit)';
 
 function sleep(milliseconds) {
   return new Promise((resolve) => setTimeout(resolve, milliseconds));
