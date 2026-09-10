@@ -18,20 +18,28 @@ const SOCIAL_SCRIPT_SELECTOR = '[data-ngm-social-ad]';
 const AD_HINT_SELECTOR = '[data-ngm-ad-hint]';
 const AdContext = createContext<AdContextValue | null>(null);
 
-// Advertising is on by default for every visitor: no interstitial consent prompt
-// gates the ad stack. Only an explicit opt-out stored in this browser turns it
-// off, which also lets automated capture/smoke runs suppress third-party frames.
+function isLocalAdTestHost() {
+  if (typeof window === 'undefined') return false;
+  return window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+}
+
+// Production advertising is always enabled by the application. The old
+// ngm_ad_consent preference is honored only on localhost so browser smoke and
+// visual-capture tooling can suppress third-party frames without creating a
+// production ad-free path. Browser, network, provider and legally required
+// regional privacy controls remain outside this application-level switch.
 function readStoredPreference(): AdPreference {
+  if (!isLocalAdTestHost()) return 'enabled';
   try {
     const stored = window.localStorage.getItem(STORAGE_KEY);
     return stored === 'disabled' || stored === 'declined' ? 'disabled' : 'enabled';
   } catch {
-    // Private-mode or storage-blocked browsers still see advertising.
     return 'enabled';
   }
 }
 
 function writeStoredPreference(preference: AdPreference) {
+  if (!isLocalAdTestHost()) return;
   try {
     if (preference === 'enabled') {
       window.localStorage.removeItem(STORAGE_KEY);
@@ -39,7 +47,7 @@ function writeStoredPreference(preference: AdPreference) {
     }
     window.localStorage.setItem(STORAGE_KEY, 'disabled');
   } catch {
-    // Preference is best-effort; the in-memory value still drives this session.
+    // Local test preference is best-effort.
   }
 }
 
@@ -47,9 +55,20 @@ export function AdProvider({ children }: { children: ReactNode }) {
   const [preference, setPreference] = useState<AdPreference>(readStoredPreference);
 
   useEffect(() => {
+    // Migrate every production browser away from the legacy opt-out value so a
+    // returning visitor cannot remain permanently excluded from ad delivery.
+    if (!isLocalAdTestHost()) {
+      try {
+        window.localStorage.removeItem(STORAGE_KEY);
+      } catch {
+        // Storage can be unavailable in privacy-focused browsers; ads still run.
+      }
+      if (preference !== 'enabled') setPreference('enabled');
+    }
+
     const existing = document.querySelector<HTMLScriptElement>(SOCIAL_SCRIPT_SELECTOR);
 
-    if (preference === 'disabled') {
+    if (preference === 'disabled' && isLocalAdTestHost()) {
       existing?.remove();
       document.querySelectorAll(AD_HINT_SELECTOR).forEach((element) => element.remove());
       return;
@@ -88,15 +107,14 @@ export function AdProvider({ children }: { children: ReactNode }) {
 
   const value = useMemo<AdContextValue>(() => ({
     preference,
-    adsEnabled: preference === 'enabled',
+    adsEnabled: !isLocalAdTestHost() || preference === 'enabled',
     enableAds: () => {
       writeStoredPreference('enabled');
       setPreference('enabled');
     },
     disableAds: () => {
+      if (!isLocalAdTestHost()) return;
       writeStoredPreference('disabled');
-      // Reload so third-party code that already ran cannot keep global
-      // listeners or overlay inventory alive after the visitor opts out.
       window.location.reload();
     },
   }), [preference]);

@@ -2,8 +2,14 @@ import { Link } from 'react-router-dom';
 import { FOOTER_SECTIONS } from '@shared/constants';
 import { useAds } from '../context/AdContext';
 
+function isLocalAdTestHost() {
+  if (typeof window === 'undefined') return false;
+  return window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+}
+
 export default function Footer() {
   const { adsEnabled, enableAds, disableAds } = useAds();
+  const showLocalAdTestControl = isLocalAdTestHost();
 
   return (
     <footer className="bg-ink-950 border-t border-gold/10 pt-16 pb-8">
@@ -40,13 +46,15 @@ export default function Footer() {
             <span>Nine Gates Mahjong — Free online Mahjong and Mahjongg portal.</span>
           </div>
           <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 md:justify-end">
-            <button
-              className="text-gold hover:text-gold-light underline"
-              type="button"
-              onClick={adsEnabled ? disableAds : enableAds}
-            >
-              {adsEnabled ? 'Turn off ads on this device' : 'Turn ads back on'}
-            </button>
+            {showLocalAdTestControl && (
+              <button
+                className="text-gold hover:text-gold-light underline"
+                type="button"
+                onClick={adsEnabled ? disableAds : enableAds}
+              >
+                {adsEnabled ? 'Turn off ads on this device' : 'Turn ads back on'}
+              </button>
+            )}
             <span>
               &copy; 2026 Fire Dragon Interactive ·{' '}
               <a href="https://www.firedragoninteractive.com" target="_blank" rel="noreferrer">

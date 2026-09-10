@@ -5,13 +5,13 @@ export default function PrivacyPage() {
     <>
       <SEOHead
         title="Privacy Policy | Nine Gates Mahjong"
-        description="Learn how Nine Gates Mahjong uses account, session, profile, multiplayer, browser-storage and advertising data, and how to exercise your privacy choices."
+        description="Learn how Nine Gates Mahjong uses account, session, profile, multiplayer, browser-storage and advertising data, and how to exercise your privacy rights."
         canonical="https://ninegatesmahjong.com/privacy"
       />
       <main className="legal-page">
         <article>
           <h1>Privacy Policy</h1>
-          <p>Last updated July 22, 2026.</p>
+          <p>Last updated September 10, 2026.</p>
 
           <h2>Who operates the service</h2>
           <p>
@@ -20,7 +20,7 @@ export default function PrivacyPage() {
 
           <h2>Information used without an account</h2>
           <p>
-            You can play the core games without creating an account. Guest names, interface-language choices, puzzle progress and advertising choices may be stored locally in your browser. You can remove this information through your browser settings.
+            You can play the core games without creating an account. Guest names, interface-language choices and puzzle progress may be stored locally in your browser. You can remove this information through your browser settings.
           </p>
 
           <h2>Account and profile information</h2>
@@ -45,12 +45,12 @@ export default function PrivacyPage() {
 
           <h2>Advertising</h2>
           <p>
-            Free play is funded by advertising, so third-party advertising placements are active by default for all visitors. Advertising providers may process device, browser, approximate-location and interaction data under their own privacy policies. You can switch advertising off for this browser using the control in the site footer, after which ad placements are replaced by internal house messages and the games remain fully playable.
+            Free play is funded by advertising. The application reserves and requests third-party advertising placements by default rather than offering a site-level ad-free mode. Advertising providers may process device, browser, approximate-location and interaction data under their own privacy policies. Browser controls, network filtering, provider availability and privacy choices required by applicable law can still affect whether a third-party creative is filled, personalized or measured.
           </p>
 
           <h2>Legal bases and purposes</h2>
           <p>
-            Account, session, room and gameplay information is processed to provide the service, maintain security, prevent abuse and administer rankings. Advertising technology is used to fund free access to the games and can be switched off from the footer. Where applicable, necessary security and fraud-prevention processing is based on legitimate interests in operating a safe service.
+            Account, session, room and gameplay information is processed to provide the service, maintain security, prevent abuse and administer rankings. Advertising supports free access to the games. Where applicable law requires consent for non-essential storage, personalization or measurement, those choices apply to the relevant processing and do not create a separate Nine Gates ad-free subscription or mode. Necessary security and fraud-prevention processing may be based on legitimate interests in operating a safe service.
           </p>
 
           <h2>Retention</h2>
@@ -60,7 +60,7 @@ export default function PrivacyPage() {
 
           <h2>Your choices and rights</h2>
           <p>
-            You may play without registering, switch advertising off from the footer, clear local browser storage, log out, or request access, correction or deletion of your account information. Depending on your location, you may also have rights to object, restrict processing or receive a portable copy of information you provided.
+            You may play without registering, clear local browser storage, use privacy controls made available by your browser or relevant advertising provider, log out, or request access, correction or deletion of your account information. Depending on your location, you may also have rights to object, withdraw consent where consent is the applicable legal basis, restrict processing or receive a portable copy of information you provided.
           </p>
 
           <h2>Children and wagering</h2>

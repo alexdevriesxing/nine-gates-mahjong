@@ -11,7 +11,7 @@ export default function TermsPage() {
       <main className="legal-page">
         <article>
           <h1>Terms of Service</h1>
-          <p>Last updated July 14, 2026.</p>
+          <p>Last updated September 10, 2026.</p>
 
           <h2>Free entertainment and learning service</h2>
           <p>
@@ -20,7 +20,7 @@ export default function TermsPage() {
 
           <h2>Training scope</h2>
           <p>
-            “Real Mahjong vs AI” and the Hong Kong, Riichi, MCR, American and Taiwanese modes are guided training experiences. They teach selected concepts and simplified hand flows; they do not reproduce every scoring rule, claim, penalty, round condition or official tournament interpretation. Use the rules of the relevant association or event when playing competitively.
+            “Real Mahjong vs AI” and the Hong Kong, Riichi, MCR, American, Taiwanese, Sichuan Bloody Rules and Zung Jung modes are guided training experiences. They teach selected concepts and simplified hand flows; they do not reproduce every scoring rule, claim, penalty, round condition or official tournament interpretation. Use the rules of the relevant association or event when playing competitively.
           </p>
 
           <h2>No real-money gambling</h2>
@@ -45,12 +45,12 @@ export default function TermsPage() {
 
           <h2>Advertising</h2>
           <p>
-            The core games remain playable when optional third-party advertising is declined. When you accept advertising, third-party providers may display or measure ads according to their own terms and privacy notices. Do not interact with advertisements through automation or deceptive means.
+            Advertising funds free access to the service and the application requests advertising placements by default. A site-level ad-free mode is not offered. Third-party providers may display, personalize or measure advertising according to their own terms, privacy notices and applicable legal requirements. Browser controls, network filtering, regional privacy requirements or provider fill can still affect whether a particular third-party creative appears. Do not interact with advertisements through automation or deceptive means.
           </p>
 
           <h2>Availability and changes</h2>
           <p>
-            Games, rooms, events, rankings and rules explanations may change as the service improves. We do not guarantee uninterrupted availability, preservation of every room or preview feature, a specific search ranking, or compatibility with every browser and device.
+            Games, rooms, events, rankings and rules explanations may change as the service improves. We do not guarantee uninterrupted availability, preservation of every room or preview feature, a specific search ranking, advertising fill from a third-party network, or compatibility with every browser and device.
           </p>
 
           <h2>Ownership</h2>
