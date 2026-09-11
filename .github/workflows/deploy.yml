@@ -1,10 +1,31 @@
-name: Deploy Cloudflare production
+name: Deploy Cloudflare production (manual fallback)
+
+# MANUAL FALLBACK ONLY - this workflow no longer runs on push.
+#
+# Production deploys are handled by Cloudflare Workers Builds, which builds and
+# deploys every push to master by itself and needs neither GitHub Actions
+# minutes nor a Cloudflare API token. See DEPLOYMENT.md for the dashboard
+# settings (Workers & Pages -> nine-gates-mahjong -> Settings -> Build ->
+# Connect to Git; build `npm run build`, deploy `npx wrangler deploy`, branch
+# master).
+#
+# This file previously triggered on push to master and was the only way the
+# repository deployed. It could never honour that: the account Actions spending
+# limit is exhausted, so runs end in ~4s with steps: [] and the annotation "The
+# job was not started because an Actions budget is preventing further use".
+# That is a billing setting at https://github.com/settings/billing, not a
+# configuration problem.
+#
+# The D1 schema step below runs here only because this path is explicitly
+# invoked by a human. The automatic Workers Builds path deploys code only, so an
+# ordinary commit cannot write to the production database.
+#
+# To ship by hand from a clean checkout of master instead:
+#
+#   npm ci && npm run build && npx wrangler deploy
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - master
 
 permissions:
   contents: read
