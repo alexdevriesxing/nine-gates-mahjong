@@ -48,23 +48,49 @@ export default function GamePageFrame({
       />
       <div className="game-page" data-gaio-container="true">
         <div className="game-page__mobile-ad flex justify-center items-center">
-          <AdSlot width={468} height={60} className="hidden sm:flex" />
-          <AdSlot width={320} height={50} className="flex sm:hidden" />
+          <AdSlot
+            width={468}
+            height={60}
+            className="hidden sm:flex"
+            minViewportWidth={640}
+            loading="eager"
+            diagnosticId="game-top-tablet"
+          />
+          <AdSlot
+            width={320}
+            height={50}
+            className="flex sm:hidden"
+            maxViewportWidth={639}
+            loading="eager"
+            diagnosticId="game-top-mobile"
+          />
         </div>
         <div className="game-page__layout">
           <div className="game-page__rail game-page__rail--left">
-            <AdSlot width={160} height={600} sticky />
+            <AdSlot width={160} height={600} minViewportWidth={1131} sticky diagnosticId="game-left-rail" />
           </div>
           <main className="game-page__main">
             {children}
             <div className="flex justify-center items-center my-6 w-full">
-              <AdSlot width={728} height={90} className="hidden md:flex" />
-              <AdSlot width={300} height={250} className="flex md:hidden" />
+              <AdSlot
+                width={728}
+                height={90}
+                className="hidden md:flex"
+                minViewportWidth={768}
+                diagnosticId="game-after-desktop"
+              />
+              <AdSlot
+                width={300}
+                height={250}
+                className="flex md:hidden"
+                maxViewportWidth={767}
+                diagnosticId="game-after-mobile"
+              />
             </div>
             {afterGame}
           </main>
           <div className="game-page__rail game-page__rail--right">
-            <AdSlot width={160} height={300} sticky />
+            <AdSlot width={160} height={300} minViewportWidth={1491} sticky diagnosticId="game-right-rail" />
           </div>
         </div>
       </div>
