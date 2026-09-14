@@ -142,8 +142,8 @@ export default function EditorialPage({ slug }: { slug: string }) {
             </ul>
           </nav>
           <div className="flex justify-center items-center my-6 w-full">
-            <AdSlot width={728} height={90} className="hidden md:flex" />
-            <AdSlot width={320} height={50} className="flex md:hidden" />
+            <AdSlot width={728} height={90} className="hidden md:flex" loading="eager" diagnosticId="editorial-top-desktop" />
+            <AdSlot width={320} height={50} className="flex md:hidden" loading="eager" diagnosticId="editorial-top-mobile" />
           </div>
           {entry.sections.map((section, index) => (
             <div key={section.heading}>
@@ -152,10 +152,10 @@ export default function EditorialPage({ slug }: { slug: string }) {
                 {section.paragraphs.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}
                 {section.bullets && <ul>{section.bullets.map((bullet) => <li key={bullet}>{bullet}</li>)}</ul>}
               </section>
-              {index === 0 && <NativeBanner />}
+              {index === 0 && <NativeBanner loading="eager" diagnosticId="editorial-native" />}
               {index === 2 && (
                 <div className="flex justify-center items-center my-6 w-full">
-                  <AdSlot width={300} height={250} />
+                  <AdSlot width={300} height={250} diagnosticId="editorial-mid-mrec" />
                 </div>
               )}
             </div>
