@@ -3,6 +3,7 @@ import {
   ADSTERRA_PRECONNECT_ORIGINS,
   ADSTERRA_SOCIAL_BAR_URL,
 } from '@shared/ads';
+import { recordAdDiagnostic } from '../adDiagnostics';
 
 type AdPreference = 'enabled' | 'disabled';
 
@@ -97,11 +98,33 @@ export function AdProvider({ children }: { children: ReactNode }) {
     } catch {
       // Keep the verified built-in Adsterra URL when deployment configuration is invalid.
     }
+
+    recordAdDiagnostic('ad_slot_registered', {
+      placement: 'social-bar',
+      loading: 'eager',
+      status: 'eligible',
+    });
+    recordAdDiagnostic('ad_slot_requested', {
+      placement: 'social-bar',
+      loading: 'eager',
+      status: 'requested',
+    });
+
     const script = document.createElement('script');
     script.src = socialBarUrl;
     script.async = true;
     script.dataset.ngmSocialAd = 'true';
     script.referrerPolicy = 'strict-origin-when-cross-origin';
+    script.onload = () => recordAdDiagnostic('ad_provider_loaded', {
+      placement: 'social-bar',
+      loading: 'eager',
+      status: 'loaded',
+    });
+    script.onerror = () => recordAdDiagnostic('ad_provider_error', {
+      placement: 'social-bar',
+      loading: 'eager',
+      status: 'error',
+    });
     document.body.appendChild(script);
   }, [preference]);
 
