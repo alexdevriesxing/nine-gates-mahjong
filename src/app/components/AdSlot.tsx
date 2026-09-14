@@ -15,6 +15,18 @@ interface AdSlotProps {
   diagnosticId?: string;
 }
 
+function inferredViewportBounds(className: string, minViewportWidth?: number, maxViewportWidth?: number) {
+  let min = minViewportWidth;
+  let max = maxViewportWidth;
+
+  if (min === undefined && className.includes('hidden md:flex')) min = 768;
+  if (max === undefined && className.includes('md:hidden')) max = 767;
+  if (min === undefined && className.includes('hidden sm:flex')) min = 640;
+  if (max === undefined && className.includes('sm:hidden')) max = 639;
+
+  return { min, max };
+}
+
 function viewportMatches(minViewportWidth?: number, maxViewportWidth?: number) {
   if (typeof window === 'undefined') return true;
   if (minViewportWidth !== undefined && window.innerWidth < minViewportWidth) return false;
@@ -34,8 +46,9 @@ export default function AdSlot({
   diagnosticId,
 }: AdSlotProps) {
   const { adsEnabled } = useAds();
+  const bounds = inferredViewportBounds(className, minViewportWidth, maxViewportWidth);
   const [failed, setFailed] = useState(false);
-  const [viewportEligible, setViewportEligible] = useState(() => viewportMatches(minViewportWidth, maxViewportWidth));
+  const [viewportEligible, setViewportEligible] = useState(() => viewportMatches(bounds.min, bounds.max));
   const containerRef = useRef<HTMLElement | null>(null);
   const frameRef = useRef<HTMLIFrameElement | null>(null);
   const viewableTimerRef = useRef<number | null>(null);
@@ -44,11 +57,11 @@ export default function AdSlot({
   const livePlacement = viewportEligible && adsEnabled && placementId && !failed ? placementId : null;
 
   useEffect(() => {
-    const updateEligibility = () => setViewportEligible(viewportMatches(minViewportWidth, maxViewportWidth));
+    const updateEligibility = () => setViewportEligible(viewportMatches(bounds.min, bounds.max));
     updateEligibility();
     window.addEventListener('resize', updateEligibility, { passive: true });
     return () => window.removeEventListener('resize', updateEligibility);
-  }, [minViewportWidth, maxViewportWidth]);
+  }, [bounds.max, bounds.min]);
 
   useEffect(() => {
     setFailed(false);
