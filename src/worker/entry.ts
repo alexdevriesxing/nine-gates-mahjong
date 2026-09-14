@@ -27,12 +27,23 @@ function advertisingFrame(url: URL) {
   if (url.pathname === '/native-frame') {
     return secureResponse(new Response(`<!DOCTYPE html>
 <html lang="en"><head><meta charset="UTF-8"><meta name="robots" content="noindex,nofollow"><style>body{margin:0;padding:0;background:transparent;overflow:hidden}</style></head>
-<body><script async data-cfasync="false" src="${ADSTERRA_NATIVE.scriptUrl}"></script><div id="${ADSTERRA_NATIVE.containerId}"></div>
-<script>(function(){var last=0,ticks=0;function report(){var h=document.body.scrollHeight;if(!h||h===last)return;last=h;parent.postMessage({type:'ngm-native-height',height:h},location.origin);}
-if(window.ResizeObserver){new ResizeObserver(report).observe(document.body);}
-window.addEventListener('load',report);
-var timer=setInterval(function(){report();if(++ticks>15)clearInterval(timer);},1000);
-report();})();</script></body></html>`, {
+<body><div id="${ADSTERRA_NATIVE.containerId}"></div>
+<script>(function(){
+var last=0,ticks=0,reported={};
+function status(value){if(reported[value])return;reported[value]=1;parent.postMessage({type:'ngm-native-status',status:value},location.origin);}
+window.__ngmNativeReport=status;
+function height(){var h=document.body.scrollHeight;if(!h||h===last)return;last=h;parent.postMessage({type:'ngm-native-height',height:h},location.origin);}
+function creative(){var c=document.getElementById('${ADSTERRA_NATIVE.containerId}');if(!c)return false;return !!(c.querySelector('iframe,img[src],a[href],object,embed')||c.childElementCount);}
+function inspect(){height();if(creative())status('filled');}
+var target=document.getElementById('${ADSTERRA_NATIVE.containerId}');
+if(window.ResizeObserver)new ResizeObserver(inspect).observe(document.body);
+if(window.MutationObserver&&target)new MutationObserver(inspect).observe(target,{childList:true,subtree:true,attributes:true});
+window.addEventListener('load',inspect);
+var timer=setInterval(function(){inspect();if(++ticks>20)clearInterval(timer);},1000);
+setTimeout(function(){if(!creative())status('empty');},20000);
+inspect();})();</script>
+<script async data-cfasync="false" src="${ADSTERRA_NATIVE.scriptUrl}" onload="window.__ngmNativeReport&&window.__ngmNativeReport('loaded')" onerror="window.__ngmNativeReport&&window.__ngmNativeReport('error')"></script>
+</body></html>`, {
       headers: {
         'Content-Type': 'text/html; charset=utf-8',
         'Cache-Control': 'public, max-age=3600',
@@ -58,7 +69,17 @@ report();})();</script></body></html>`, {
   const options = JSON.stringify({ key, format: 'iframe', height, width, params: {} });
   return secureResponse(new Response(`<!DOCTYPE html>
 <html lang="en"><head><meta charset="UTF-8"><meta name="robots" content="noindex,nofollow"><style>body{margin:0;padding:0;background:transparent;overflow:hidden;display:flex;justify-content:center;align-items:center}</style></head>
-<body><script>window.atOptions=${options};document.write('<script src="https://www.highperformanceformat.com/${key}/invoke.js"></'+'script>');</script></body></html>`, {
+<body><script>(function(){
+var reported={};
+function status(value){if(reported[value])return;reported[value]=1;parent.postMessage({type:'ngm-ad-status',placement:'${placementId}',status:value},location.origin);}
+window.__ngmAdReport=status;
+window.atOptions=${options};
+function creative(){return !!document.body.querySelector('iframe,img[src],a[href],object,embed');}
+function inspect(){if(creative())status('filled');}
+if(window.MutationObserver)new MutationObserver(inspect).observe(document.body,{childList:true,subtree:true,attributes:true});
+document.write('<script src="https://www.highperformanceformat.com/${key}/invoke.js" onload="window.__ngmAdReport&&window.__ngmAdReport(\\'loaded\\')" onerror="window.__ngmAdReport&&window.__ngmAdReport(\\'error\\')"></'+'script>');
+setTimeout(function(){inspect();if(!creative())status('empty');},20000);
+})();</script></body></html>`, {
     headers: {
       'Content-Type': 'text/html; charset=utf-8',
       'Cache-Control': 'public, max-age=3600',
