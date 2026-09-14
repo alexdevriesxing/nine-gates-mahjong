@@ -40,10 +40,10 @@ export default function PlayHub() {
           </p>
         </div>
 
-        {/* Top responsive ad */}
+        {/* Top responsive ad: only the eligible viewport mounts, so eager loading is safe. */}
         <div className="flex justify-center items-center mb-12 w-full">
-          <AdSlot width={728} height={90} className="hidden md:flex" />
-          <AdSlot width={320} height={50} className="flex md:hidden" />
+          <AdSlot width={728} height={90} className="hidden md:flex" loading="eager" diagnosticId="play-top-desktop" />
+          <AdSlot width={320} height={50} className="flex md:hidden" loading="eager" diagnosticId="play-top-mobile" />
         </div>
 
         {/* Filter Tabs */}
@@ -80,7 +80,7 @@ export default function PlayHub() {
 
         {/* Bottom native ad */}
         <div className="mt-16" data-gaio-section="ads">
-          <NativeBanner />
+          <NativeBanner diagnosticId="play-bottom-native" />
         </div>
       </main>
     </>
